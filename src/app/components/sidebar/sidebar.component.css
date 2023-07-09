@@ -1,0 +1,172 @@
+body {
+    pointer-events: none;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  li:focus {
+    outline: 0;
+    font-style: normal;
+    text-decoration: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  li:active {}
+  
+  li:hover {}
+  
+  
+  /*
+  label:hover {
+    color: #FBC658;
+  }
+  
+  label:active {
+    color: #FBC658;
+  }
+  
+  label:focus {
+    outline: 0;
+    color: #FBC658;
+    font-style: normal;
+  }
+  
+  label {
+    color: rgba(0, 0, 0, 0.664);
+  }
+  #xna:focus {
+    outline: 0;
+    background-color: rgba(0, 0, 1, 1);
+  } */
+  
+  div:focus {
+    outline: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  label:focus {
+    outline: 0;
+    pointer-events: none;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  a:focus {
+    outline: 0;
+    font-style: normal;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    cursor: default;
+  }
+  
+  a:hover {
+    box-shadow: 0px 0px;
+    font-style: normal;
+    text-decoration: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  a:active {}
+  
+  a {
+    color: rgba(0, 0, 0, 0.664);
+  }
+  
+  p:focus {
+    outline: 0;
+    font-style: normal;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  ul {
+    outline: 0;
+    list-style-type: none;
+    color: rgba(0, 0, 0, 0.664);
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  label:hover {
+    background-color: #e9ecef;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  li:focus {
+    outline: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  
+  /* ul:focus {
+    outline: 0;
+    color: #FBC658;
+    font-style: normal;
+  }
+  
+  ul:hover {
+    color: #FBC658;
+  }
+  
+  ul:checked {
+    color: #FBC658;
+  }
+  
+  ul:current {
+    color: #FBC658;
+  }
+  
+  ul:active {
+    color: #FBC658;
+  } */
+  

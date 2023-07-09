@@ -1,0 +1,36 @@
+<div class="sidebar-wrapper" *ngIf="localAuth==true">
+    <div class="text-center">
+        <br>
+        <a href="#" class="simple-text">
+            <img src="../../../assets/img/angular.png" alt="TaskTerminal" style="height: auto;width: 10vw;">
+        </a>
+    </div>
+    <br>
+    <ul class=" ">
+        <li *ngFor="let menuItem of menuItems">
+            <div (click)="routeForOne(menuItem)" [class]="menuItem.class" [style]="menuItem.style" (click)="getChildItems(menuItem.chilName)" (click)="setActivePageNameForMenuItem(menuItem)">
+                <label class="align-middle d-block py-2 px-1" (click)="routeChangeColor(menuItem)" (click)="childVisible(menuItem)">
+                    <div class="px-2 mx-2 align-middle">
+                        <i [class]="'align-middle' + ' pi ' + menuItem.icon"></i>
+                        <a style="text-transform:capitalize;font-size: 18px;padding-left: 5px;vertical-align: middle;" #menuItemId>{{menuItem.title}}</a>
+                        <i class="align-middle pl-1" *ngIf="isBreak(menuItem)==true">{{menuItem.chilIcon}}</i>
+                    </div>
+                </label>
+                <label *ngFor="let menuChildItem of menuChildItems" class="align-middle bg-black d-block" [style]="menuChildItem.style">
+                    <div class="px-2 mx-2 my-2" *ngIf="menuChildItem.name===menuItem.chilName">
+                        <div [class]="menuChildItem.class" (click)="routeChangeColorChild(menuItem,menuChildItem)"
+                            [routerLink]="[menuChildItem.path]" (click)="setActivePageName(menuChildItem)" #id>
+                            <div>
+                                <a class="text-left my-3 py-3 px-auto mx-auto">
+                                    <i [class]="'align-middle icon pl-1' + ' pi ' + menuChildItem.icon"></i>
+                                    <a [style]="'text-transform:capitalize;font-size: 15px;'">{{menuChildItem.title}}</a>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </li>
+    </ul>
+  </div>
+  

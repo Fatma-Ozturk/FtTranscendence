@@ -25,9 +25,21 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/bootstrap/scss/bootstrap.scss",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "node_modules/primeicons/primeicons.css",
+              "primeng/resources/themes/bootstrap4-light-blue/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/ngx-spinner/animations/line-scale-party.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -89,7 +101,13 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/arrive/src/arrive.js",
+              "node_modules/moment/moment.js",
+              "node_modules/chartist/dist/chartist.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           }
         }
       }

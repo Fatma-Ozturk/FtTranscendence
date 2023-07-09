@@ -5,7 +5,9 @@
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,//araştır
     "strict": true,
+    "strictNullChecks": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
