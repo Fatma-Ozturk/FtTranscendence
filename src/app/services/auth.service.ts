@@ -27,9 +27,9 @@ export class AuthService {
   register(registerModel: RegisterModel) {
     return this.httpClient.post<SingleResponseModel<TokenModel>>(environment.appurl + "auth/register", registerModel)
   }
-  passwordChange(registerModel: RegisterModel) {
-    return this.httpClient.post<SingleResponseModel<TokenModel>>(environment.appurl + "auth/passwordchange", registerModel)
-  }
+  // passwordChange(registerModel: RegisterModel) {
+  //   return this.httpClient.post<SingleResponseModel<TokenModel>>(environment.appurl + "auth/passwordchange", registerModel)
+  // }
   isAuthenticadet() {
     if (localStorage.getItem("token")) {
       this.data.next(true)
@@ -40,22 +40,26 @@ export class AuthService {
     }
   }
   getCurrentFullName(): string {
-    let token: string = localStorage.getItem("token")
+    let token: string = localStorage.getItem("token");
     if (token) {
-      let decoded = this.jwtControllerService.decodeToken(token)
-      let userName = Object.keys(decoded).filter(x => x.endsWith("/name"))[0];
-      return decoded[userName];
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "name");
+      if (nameClaim) {
+        return nameClaim.value;
+      }
     }
-    return (null)
+    return null;
   }
   getCurrentUserId(): number {
-    let token: string = localStorage.getItem("token")
+    let token: string = localStorage.getItem("token");
     if (token) {
-      let decoded = this.jwtControllerService.decodeToken(token)
-      let userId = Object.keys(decoded).filter(x => x.endsWith("/nameidentifier"))[0];
-      return decoded[userId];
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "nameIdentifier");
+      if (nameClaim) {
+        return nameClaim.value;
+      }
     }
-    return (null)
+    return null;
   }
   getCurrentRole():string{
     let token: string = localStorage.getItem("token")
