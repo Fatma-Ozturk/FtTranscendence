@@ -16,4 +16,6 @@ export class Messages{
     static success:string="Başarı"
     static requestSuccess:string="İstek onaylandı"
     static requestError:string="İstek iptal edildi"
-}
+    public static readonly passwordError: string = 'Şifre Hatalı';
+
+}   

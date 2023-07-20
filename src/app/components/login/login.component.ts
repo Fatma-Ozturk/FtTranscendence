@@ -30,7 +30,7 @@ export class LoginComponent {
   createLoginFrom() {
     this.loginForm = this.formBuilder.group({
       "email": ["", [Validators.required, Validators.email, Validators.minLength(3)]],
-      "password": ["", [Validators.required, Validators.minLength(10)]]
+      "password": ["", [Validators.required, Validators.minLength(1)]]
     })
   }
   login() {
@@ -42,9 +42,13 @@ export class LoginComponent {
           this.router.navigate(['/view'])
         }
       }, responseError => {
-        if (responseError.error == "User Not Found")
+        console.log("responseError.data.message " + JSON.stringify(responseError.error.message));
+        
+        if (responseError.error.message == "User Not Found")
           this.toastrService.info(Messages.userNotFound)
-        this.router.navigate(['/login'])
+        if (responseError.error.message == "Password Error")
+          this.toastrService.info(Messages.passwordError)
+        this.router.navigate(['/login'])  
       });
   }
   onSubmit(): void {
