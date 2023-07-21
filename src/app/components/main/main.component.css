@@ -4,7 +4,7 @@ html{
   body{
 	height:100%; /* Sayfanın yüksekliğini %100 olarak ayarlar */
 	background-color: #040505 !important;
-	background: url(https://ucmgamestudies2017.files.wordpress.com/2017/05/pong.png) center center no-repeat; /* Arkaplan resmi merkezde tekrar etmeden sabitlenir */
+	background: url('~src/assets/pong.png') center center no-repeat; /* Arkaplan resmi merkezde tekrar etmeden sabitlenir */
 	background-size:cover; /* Arkaplan resmini sayfa boyutuna sığacak şekilde ölçekler */
 	display:flex; /* İçerikleri yatayda hizalamak için flexbox kullanır */
 	justify-content:center; /* İçerikleri yatayda ortalar */

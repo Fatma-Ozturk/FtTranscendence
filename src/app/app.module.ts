@@ -58,6 +58,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,8 @@ import { UserActivateComponent } from './components/user-activate/user-activate.
     NotFoundComponent,
     SidebarComponent,
     ViewComponent,
-    UserActivateComponent
+    UserActivateComponent,
+    LeaderboardComponent
   ],
   imports: [
     BrowserModule,
