@@ -2,6 +2,12 @@
     <main class="form-signin">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
         <p-card header="Kayıt Yap" class="border-round w-full lg:w-6">
+          <div class="avatar-frame">
+            <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="Avatar" class="avatar" />
+          </div>
+          <ng-template #defaultAvatar>
+            <img src="../../../assets/images.png" alt="Default Avatar" class="avatar" />
+          </ng-template>
           <div>
             <div class="form-floating text-left">
               <input pInputText formControlName="email" type="email" class="form-control" id="floatingInput"
@@ -25,25 +31,25 @@
             <div class="form-floating text-left">
                 <input pInputText formControlName="password1" type="password" class="form-control" id="floatingPassword"
                   placeholder="" pTooltip="Şifre Yeniden" />
-                <label htmlFor="floatingPassword">Şifre
+                <label htmlFor="floatingPassword">Şifre Tekrar
                   <small *ngIf="isFieldInvalid('password')" class="p-error">
                     {{ getErrorMessage('password1') }}
                   </small>
                 </label>
               </div>
             <div class="form-floating text-left">
-                <input pInputText formControlName="firtName" type="text" class="form-control" id="floatingInput"
+                <input pInputText formControlName="firstName" type="text" class="form-control" id="floatingInput"
                   placeholder="" pTooltip="Ad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">E-Posta
-                  <small *ngIf="isFieldInvalid('firtName')" class="p-error">
-                    {{ getErrorMessage('firtName') }}
+                <label htmlFor="floatingInput">Ad
+                  <small *ngIf="isFieldInvalid('firstName')" class="p-error">
+                    {{ getErrorMessage('firstName') }}
                   </small>
                 </label>
               </div>
               <div class="form-floating text-left">
                 <input pInputText formControlName="lastName" type="text" class="form-control" id="floatingInput"
                   placeholder="" pTooltip="Soyad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">E-Posta
+                <label htmlFor="floatingInput">Soyad
                   <small *ngIf="isFieldInvalid('lastName')" class="p-error">
                     {{ getErrorMessage('lastName') }}
                   </small>
@@ -52,12 +58,15 @@
               <div class="form-floating text-left">
                 <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="floatingInput"
                   placeholder="" pTooltip="Kullanıcı adı" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">E-Posta
+                <label htmlFor="floatingInput">Kullanıcı Adı
                   <small *ngIf="isFieldInvalid('nickName')" class="p-error">
                     {{ getErrorMessage('nickName') }}
                   </small>
                 </label>
               </div>
+          </div>
+          <div>
+            <input type="file" (change)="onAvatarSelected($event)" accept="image/*" />
           </div>
           <div>
             <!-- <div class="checkbox text-left align-middle">
