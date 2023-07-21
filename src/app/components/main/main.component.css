@@ -1,0 +1,47 @@
+html{
+	height:100%; /* Sayfanın yüksekliğini %100 olarak ayarlar */
+  }
+  body{
+	height:100%; /* Sayfanın yüksekliğini %100 olarak ayarlar */
+	background-color: #040505 !important;
+	background: url(https://ucmgamestudies2017.files.wordpress.com/2017/05/pong.png) center center no-repeat; /* Arkaplan resmi merkezde tekrar etmeden sabitlenir */
+	background-size:cover; /* Arkaplan resmini sayfa boyutuna sığacak şekilde ölçekler */
+	display:flex; /* İçerikleri yatayda hizalamak için flexbox kullanır */
+	justify-content:center; /* İçerikleri yatayda ortalar */
+	align-items:center; /* İçerikleri dikeyde ortalar */
+	font-family:sans-serif;/* Metinler için sans-serif yazı tipi kullanır */
+	margin:0; /* Sayfanın dış boşluğunu kaldırır */
+	overflow:hidden /* Sayfa taşmalarını gizler */
+  }
+  #brand{  
+	text-align:center;  /* İçerikleri yatayda ortalar */
+	cursor:pointer; /* İçeriğin üzerine gelince fare imlecini değiştirir */
+  }
+  #brand img{
+	display:block;
+	width:80vw;
+	max-width:800px;
+	height:auto;
+	transition:0.2s;
+	margin: 0 auto;
+	margin: 0 auto 20px; /* Resim altına 20px boşluk ekler */
+  }
+
+  .custom-button {
+	font-family: 'Passion One', sans-serif;
+	font-size: 1.2em;
+	color: #fff;
+	background-color: #040505; /* Arkaplan rengi, istediğiniz renge göre değiştirilebilir */
+	border: none;
+	border-radius: 10px; /* Yuvarlak kenarlıklar için */
+	padding: 10px 20px; /* Buton içeriğinden boşluk bırakır */
+	box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2); /* Butona gölge efekti ekler */
+	transition: 0.3s;
+	margin-top: 10px; /* Butonun üstüne 10px boşluk ekler */
+  }
+  
+  .custom-button:hover {
+	background-color: #00b327; /* Üzerine gelince arkaplan rengini değiştirir */
+	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Üzerine gelince gölge efektini arttırır */
+  }
+  
