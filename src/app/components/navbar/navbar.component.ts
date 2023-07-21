@@ -94,8 +94,19 @@ export class NavbarComponent implements OnInit {
         command: () => this.signOut(),
         routerLink: ['/']
 
+      },
+      {
+        label: 'Leaderboard',
+        icon: 'pi pi-fw pi-leaderboard',
+        visible: this.isAuthenticadet(),
+        command: () => this.leaderboard,
+        routerLink: ['/leaderboard']
+
       }
     ];
+  }
+  leaderboard () {
+
   }
   updateAuthBool() {
     const token = localStorage.getItem('token');

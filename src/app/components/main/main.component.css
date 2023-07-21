@@ -16,6 +16,7 @@ html{
   #brand{  
 	text-align:center;  /* İçerikleri yatayda ortalar */
 	cursor:pointer; /* İçeriğin üzerine gelince fare imlecini değiştirir */
+	margin-top: 70px;
   }
   #brand img{
 	display:block;
@@ -24,7 +25,7 @@ html{
 	height:auto;
 	transition:0.2s;
 	margin: 0 auto;
-	margin: 0 auto 20px; /* Resim altına 20px boşluk ekler */
+	margin-bottom: 0 auto 20px; /* Resim altına 20px boşluk ekler */
   }
 
   .custom-button {

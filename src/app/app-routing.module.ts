@@ -7,6 +7,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { ViewComponent } from './components/view/view.component';
 import { loginGuard } from './guards/login.guard';
 import { notLoginGuard } from './guards/not-login.guard';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
 const routes: Routes = [
   { path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -14,7 +15,8 @@ const routes: Routes = [
   { path: "main", component: MainComponent, canActivate: [notLoginGuard] },
   { path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
   { path: "view", component: ViewComponent, canActivate: [loginGuard] },
-  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] }
+  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
+  { path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard]}
 ];
 
 @NgModule({
