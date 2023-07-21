@@ -53,6 +53,13 @@ export class NavbarComponent implements OnInit {
         command: () => this.visibleMain(),
       },
       {
+        label: 'Leaderboard',
+        icon: 'pi pi-fw pi-table',
+        visible: this.isAuthenticadet(),
+        //visible: true,
+        command: () => this.leaderboardRoute()
+      },
+      {
         label: 'Menü',
         icon: 'pi pi-fw pi-bars',
         visible: this.isAuthenticadet(),
@@ -95,18 +102,11 @@ export class NavbarComponent implements OnInit {
         routerLink: ['/']
 
       },
-      {
-        label: 'Leaderboard',
-        icon: 'pi pi-fw pi-leaderboard',
-        visible: this.isAuthenticadet(),
-        command: () => this.leaderboard,
-        routerLink: ['/leaderboard']
-
-      }
     ];
   }
-  leaderboard () {
-
+  leaderboardRoute () {
+    if (this.authService.isAuthenticadet())
+      this.router.navigate(['/leaderboard']);
   }
   updateAuthBool() {
     const token = localStorage.getItem('token');

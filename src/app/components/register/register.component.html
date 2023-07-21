@@ -29,36 +29,36 @@
               </label>
             </div>
             <div class="form-floating text-left">
-                <input pInputText formControlName="password1" type="password" class="form-control" id="floatingPassword"
+                <input pInputText formControlName="password1" type="password" class="form-control" id="SifreTekrar"
                   placeholder="" pTooltip="Şifre Yeniden" />
-                <label htmlFor="floatingPassword">Şifre Tekrar
+                <label htmlFor="SifreTekrar">Şifre Tekrar
                   <small *ngIf="isFieldInvalid('password')" class="p-error">
                     {{ getErrorMessage('password1') }}
                   </small>
                 </label>
               </div>
             <div class="form-floating text-left">
-                <input pInputText formControlName="firstName" type="text" class="form-control" id="floatingInput"
+                <input pInputText formControlName="firstName" type="text" class="form-control" id="Ad"
                   placeholder="" pTooltip="Ad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">Ad
+                <label htmlFor="Ad">Ad
                   <small *ngIf="isFieldInvalid('firstName')" class="p-error">
                     {{ getErrorMessage('firstName') }}
                   </small>
                 </label>
               </div>
               <div class="form-floating text-left">
-                <input pInputText formControlName="lastName" type="text" class="form-control" id="floatingInput"
+                <input pInputText formControlName="lastName" type="text" class="form-control" id="Soyad"
                   placeholder="" pTooltip="Soyad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">Soyad
+                <label htmlFor="Soyad">Soyad
                   <small *ngIf="isFieldInvalid('lastName')" class="p-error">
                     {{ getErrorMessage('lastName') }}
                   </small>
                 </label>
               </div>
               <div class="form-floating text-left">
-                <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="floatingInput"
+                <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="KullanıcıAdı"
                   placeholder="" pTooltip="Kullanıcı adı" pAutoFocus [autofocus]="true" />
-                <label htmlFor="floatingInput">Kullanıcı Adı
+                <label htmlFor="KullanıcıAdı">Kullanıcı Adı
                   <small *ngIf="isFieldInvalid('nickName')" class="p-error">
                     {{ getErrorMessage('nickName') }}
                   </small>
