@@ -2,6 +2,12 @@
     <main class="form-signin">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
         <p-card header="Kayıt Yap" class="border-round w-full lg:w-6">
+          <div class="avatar-frame">
+            <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="Avatar" class="avatar" />
+          </div>
+          <ng-template #defaultAvatar>
+            <img src="../../../assets/avatar.png" alt="Default Avatar" class="avatar" />
+          </ng-template>
           <div>
             <div class="form-floating text-left">
               <input pInputText formControlName="email" type="email" class="form-control" id="floatingInput"
@@ -23,9 +29,9 @@
               </label>
             </div>
             <div class="form-floating text-left">
-                <input pInputText formControlName="password1" type="password" class="form-control" id="floatingPassword"
+                <input pInputText formControlName="password1" type="password" class="form-control" id="SifreTekrar"
                   placeholder="" pTooltip="Şifre Yeniden" />
-                <label htmlFor="floatingPassword">Şifre
+                <label htmlFor="SifreTekrar">Şifre Tekrar
                   <small *ngIf="isFieldInvalid('password')" class="p-error">
                     {{ getErrorMessage('password1') }}
                   </small>
@@ -41,7 +47,7 @@
                 </label>
               </div>
               <div class="form-floating text-left">
-                <input pInputText formControlName="lastName" type="text" class="form-control" id="floatingInput"
+                <input pInputText formControlName="lastName" type="text" class="form-control" id="Soyad"
                   placeholder="" pTooltip="Soyad" pAutoFocus [autofocus]="true" />
                 <label htmlFor="floatingInput">Soyad
                   <small *ngIf="isFieldInvalid('lastName')" class="p-error">
@@ -50,7 +56,7 @@
                 </label>
               </div>
               <div class="form-floating text-left">
-                <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="floatingInput"
+                <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="KullanıcıAdı"
                   placeholder="" pTooltip="Kullanıcı adı" pAutoFocus [autofocus]="true" />
                 <label htmlFor="floatingInput">Kullanıcı adı
                   <small *ngIf="isFieldInvalid('nickName')" class="p-error">

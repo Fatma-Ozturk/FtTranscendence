@@ -13,6 +13,8 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+
+  avatarUrl: string | null = null;
   protected registerForm: FormGroup;
   formErrors: { [key: string]: string } = {};
 
@@ -82,5 +84,19 @@ export class RegisterComponent {
     }
 
     return '';
+  }
+  
+  onAvatarSelected(event: any) {
+    const file: File | null = event.target.files ? event.target.files[0] : null;
+
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.avatarUrl = reader.result as string;
+      };
+    } else {
+      this.avatarUrl = null;
+    }
   }
 }

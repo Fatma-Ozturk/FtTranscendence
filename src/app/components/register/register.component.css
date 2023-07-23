@@ -11,6 +11,28 @@ body {
     background-color: transparent;
 }
 
+.avatar {
+    width: 150px; /* Avatarın boyutunu istediğiniz gibi ayarlayın */
+    height: 150px;
+    border: 3px solid #fff; /* Çerçeve rengini istediğiniz renkle değiştirin */
+    border-radius: 50%; /* Yuvarlatılmış köşelerle daire şeklinde bir çerçeve oluşturur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Opsiyonel olarak gölge ekleyebilirsiniz */
+  }
+
+  .avatar-frame {
+    width: 150px; /* Çerçevenin boyutunu istediğiniz gibi ayarlayın */
+    height: 150px;
+    border: 3px solid #fff; /* Çerçeve rengini istediğiniz renkle değiştirin */
+    border-radius: 50%; /* Yuvarlatılmış köşelerle daire şeklinde bir çerçeve oluşturur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Opsiyonel olarak gölge ekleyebilirsiniz */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+  }
+  
+  
+
 .form-signin {
     width: 100%;
     max-width: 400px;
@@ -44,3 +66,4 @@ body {
 {
   border-radius: 16px;
 }
+  
