@@ -53,10 +53,17 @@ export class NavbarComponent implements OnInit {
         command: () => this.visibleMain(),
       },
       {
+        label: 'Chat',
+        icon: 'pi pi-fw pi-inbox',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.ChatRoute()
+      },
+      {
         label: 'Leaderboard',
         icon: 'pi pi-fw pi-table',
-        visible: this.isAuthenticadet(),
-        //visible: true,
+        //visible: this.isAuthenticadet(),
+        visible: true,
         command: () => this.leaderboardRoute()
       },
       {
@@ -104,8 +111,12 @@ export class NavbarComponent implements OnInit {
       },
     ];
   }
+  ChatRoute () {
+     //if (this.authService.isAuthenticadet())
+     this.router.navigate(['/chat']);
+  }
   leaderboardRoute () {
-    if (this.authService.isAuthenticadet())
+    //if (this.authService.isAuthenticadet())
       this.router.navigate(['/leaderboard']);
   }
   updateAuthBool() {

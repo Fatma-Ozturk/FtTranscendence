@@ -58,6 +58,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { LeaderboardComponent } from './components/leaderboard/leaderboard.compo
     SidebarComponent,
     ViewComponent,
     UserActivateComponent,
-    LeaderboardComponent
+    LeaderboardComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
