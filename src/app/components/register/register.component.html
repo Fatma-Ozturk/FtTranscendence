@@ -38,18 +38,18 @@
                 </label>
               </div>
             <div class="form-floating text-left">
-                <input pInputText formControlName="firstName" type="text" class="form-control" id="Ad"
+                <input pInputText formControlName="firstName" type="text" class="form-control" id="floatingInput"
                   placeholder="" pTooltip="Ad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="Ad">Ad
+                <label htmlFor="floatingInput">Ad
                   <small *ngIf="isFieldInvalid('firstName')" class="p-error">
-                    {{ getErrorMessage('firstName') }}
+                    {{ getErrorMessage('firtName') }}
                   </small>
                 </label>
               </div>
               <div class="form-floating text-left">
                 <input pInputText formControlName="lastName" type="text" class="form-control" id="Soyad"
                   placeholder="" pTooltip="Soyad" pAutoFocus [autofocus]="true" />
-                <label htmlFor="Soyad">Soyad
+                <label htmlFor="floatingInput">Soyad
                   <small *ngIf="isFieldInvalid('lastName')" class="p-error">
                     {{ getErrorMessage('lastName') }}
                   </small>
@@ -58,25 +58,16 @@
               <div class="form-floating text-left">
                 <input pInputText formControlName="nickName" type="text" class="form-control form-register-end" id="KullanıcıAdı"
                   placeholder="" pTooltip="Kullanıcı adı" pAutoFocus [autofocus]="true" />
-                <label htmlFor="KullanıcıAdı">Kullanıcı Adı
+                <label htmlFor="floatingInput">Kullanıcı adı
                   <small *ngIf="isFieldInvalid('nickName')" class="p-error">
                     {{ getErrorMessage('nickName') }}
                   </small>
                 </label>
               </div>
           </div>
-          <div>
-            <input type="file" (change)="onAvatarSelected($event)" accept="image/*" />
-          </div>
-          <div>
-            <!-- <div class="checkbox text-left align-middle">
-              <label style="vertical-align: middle">
-                <input type="checkbox" value="remember-me" style="vertical-align: middle" />
-                Beni Hatırla
-              </label>
-            </div> -->
+          <div class="w-100">
             <div class="pt-2">
-              <p-button type="submit" pRipple label="Kayıt Ol" icon="pi pi-user" styleClass="p-button-rounded w-100"
+              <p-button type="submit" pRipple label="Kayıt Ol" icon="pi pi-user" styleClass="p-button-rounded w-100" class="w-100"
                 [disabled]="checkRequiredForDisable()">
               </p-button>
             </div>
