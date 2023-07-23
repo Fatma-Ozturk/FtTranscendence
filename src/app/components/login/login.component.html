@@ -1,51 +1,82 @@
 <body class="text-center">
-    <main class="form-signin">
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
-        <p-card header="Giriş Yap" class="border-round w-full lg:w-6">
-          <div>
-            <div class="form-floating text-left">
-              <input pInputText formControlName="email" type="email" class="form-control" id="floatingInput"
-                placeholder="" pTooltip="E-Posta" pAutoFocus [autofocus]="true" />
-              <label htmlFor="floatingInput">E-Posta
-                <small *ngIf="isFieldInvalid('email')" class="p-error">
-                  {{ getErrorMessage('email') }}
-                </small>
-              </label>
-  
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <main class="form-signin">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+            <p-card header="Giriş Yap" class="border-round w-full lg:w-6">
+              <div>
+                <div class="form-floating text-left">
+                  <input pInputText formControlName="email" type="email" class="form-control" id="floatingInput"
+                    placeholder="" pTooltip="E-Posta" pAutoFocus [autofocus]="true" />
+                  <label htmlFor="floatingInput">E-Posta
+                    <small *ngIf="isFieldInvalid('email')" class="p-error">
+                      {{ getErrorMessage('email') }}
+                    </small>
+                  </label>
+
+                </div>
+                <div class="form-floating text-left">
+                  <input pInputText formControlName="password" type="password" class="form-control"
+                    id="floatingPassword" placeholder="" pTooltip="Şifre" />
+                  <label htmlFor="floatingPassword">Şifre
+                    <small *ngIf="isFieldInvalid('password')" class="p-error">
+                      {{ getErrorMessage('password') }}
+                    </small>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <div class="checkbox text-left align-middle">
+                  <label style="vertical-align: middle">
+                    <input type="checkbox" value="remember-me" style="vertical-align: middle" />
+                    Beni Hatırla
+                  </label>
+                </div>
+                <div class="pt-2">
+                  <p-button type="submit" pRipple label="Giriş Yap" icon="pi pi-user"
+                    styleClass="p-button-rounded w-100" [disabled]="checkRequiredForDisable()">
+                  </p-button>
+                </div>
+                <div class="p-2">
+                  <label>Hesabınız yok mu?
+                    <a routerLink="/register" class="text-warning">Kayıt Ol</a></label>
+                </div>
+                <div class="text-right mt-2">
+                  <a routerLink="/register">Şifremi Unuttum?</a>
+                </div>
+              </div>
+            </p-card>
+          </form>
+        </main>
+      </div>
+    </div>
+    <div class="row">
+      <main class="form-signin-auth">
+        <p-card class="border-round w-full lg:w-6">
+          <div class="d-flex justify-content-between text-center">
+            <div class="col-md-6">
+              <div class="d-block">
+                <img alt="42_Logo-icon" src="/assets/icons/42_Logo.png" width="32">
+              </div>
+              <div class="d-block">
+                <label for="42_Logo">42 Ecole</label>
+              </div>
             </div>
-            <div class="form-floating text-left">
-              <input pInputText formControlName="password" type="password" class="form-control" id="floatingPassword"
-                placeholder="" pTooltip="Şifre" />
-              <label htmlFor="floatingPassword">Şifre
-                <small *ngIf="isFieldInvalid('password')" class="p-error">
-                  {{ getErrorMessage('password') }}
-                </small>
-              </label>
-            </div>
-          </div>
-          <div>
-            <!-- <div class="checkbox text-left align-middle">
-              <label style="vertical-align: middle">
-                <input type="checkbox" value="remember-me" style="vertical-align: middle" />
-                Beni Hatırla
-              </label>
-            </div> -->
-            <div class="pt-2">
-              <p-button type="submit" pRipple label="Giriş Yap" icon="pi pi-user" styleClass="p-button-rounded w-100"
-                [disabled]="checkRequiredForDisable()">
-              </p-button>
-            </div>
-            <div class="p-2">
-              <label>Hesabınız yok mu?
-                <a routerLink="/register" class="text-warning">Kayıt Ol</a></label>
-            </div>
-            <div class="text-right mt-2">
-              <a routerLink="/register">Şifremi Unuttum?</a>
+            <div class="col-md-6">
+              <div class="d-block">
+                <img alt="Google__G__Logo-icon" src="/assets/icons/Google__G__Logo.png" width="32">
+              </div>
+              <div class="d-block">
+                <label for="42_Logo">Google</label>
+              </div>
             </div>
           </div>
         </p-card>
-      </form>
+      </main>
+    </div>
+    <div class="row">
       <p class="mt-5 mb-3 text-muted">&copy; Copyright 2023-..</p>
-    </main>
-  </body>
-  
+    </div>
+  </div>
+</body>
