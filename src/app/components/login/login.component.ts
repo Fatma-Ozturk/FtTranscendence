@@ -82,4 +82,9 @@ export class LoginComponent {
 
     return '';
   }
+  Login42(): void
+  {
+    console.log("42Login");
+    location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b573ae099adcf6f927bb38d2d0612e247c9d23c772a292d91b49046b9ac645fd&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth42%2Fregister&response_type=code"
+  }
 }
