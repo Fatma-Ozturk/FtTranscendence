@@ -1,13 +1,13 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
-  @ViewChild('chatHistory') private chatHistory!: ElementRef;
-  @ViewChild('messageToSend') private messageToSend!: ElementRef;
+export class ChatComponent implements OnInit, AfterViewInit {
+  @ViewChild('chatHistory', { static: true }) private chatHistory!: ElementRef<HTMLUListElement>;
+  @ViewChild('messageToSend', { static: true }) private messageToSend!: ElementRef<HTMLInputElement>;
   messageResponses: string[] = [
     'Why did the web developer leave the restaurant? Because of the table layout.',
     'How do you comfort a JavaScript bug? You console it.',
@@ -22,12 +22,20 @@ export class ChatComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    // Initialization that doesn't rely on view elements can be placed here.
+  }
+
+  ngAfterViewInit(): void {
+    // The view elements are now available, so we can safely access them.
     this.cacheDOM();
   }
 
   cacheDOM(): void {
-    this.chatHistoryList = this.chatHistory.nativeElement.querySelector('ul');
+    if (this.chatHistory && this.chatHistory.nativeElement && this.chatHistory.nativeElement.querySelector) {
+      this.chatHistoryList = this.chatHistory.nativeElement.querySelector('ul');
+    }
   }
+  
 
   render(): void {
     this.scrollToBottom();
