@@ -30,7 +30,7 @@ export class LoginComponent {
   createLoginFrom() {
     this.loginForm = this.formBuilder.group({
       "email": ["", [Validators.required, Validators.email, Validators.minLength(3)]],
-      "password": ["", [Validators.required, Validators.minLength(10)]]
+      "password": ["", [Validators.required, Validators.minLength(1)]]
     })
   }
   login() {
@@ -42,9 +42,13 @@ export class LoginComponent {
           this.router.navigate(['/view'])
         }
       }, responseError => {
-        if (responseError.error == "User Not Found")
+        console.log("responseError.data.message " + JSON.stringify(responseError.error.message));
+        
+        if (responseError.error.message == "User Not Found")
           this.toastrService.info(Messages.userNotFound)
-        this.router.navigate(['/login'])
+        if (responseError.error.message == "Password Error")
+          this.toastrService.info(Messages.passwordError)
+        this.router.navigate(['/login'])  
       });
   }
   onSubmit(): void {
@@ -77,5 +81,10 @@ export class LoginComponent {
     }
 
     return '';
+  }
+  Login42(): void
+  {
+    console.log("42Login");
+    location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-b573ae099adcf6f927bb38d2d0612e247c9d23c772a292d91b49046b9ac645fd&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth42%2Fregister&response_type=code"
   }
 }

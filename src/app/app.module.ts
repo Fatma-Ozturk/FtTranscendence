@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ToastrModule } from 'ngx-toastr';
@@ -58,6 +57,8 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,9 @@ import { UserActivateComponent } from './components/user-activate/user-activate.
     NotFoundComponent,
     SidebarComponent,
     ViewComponent,
-    UserActivateComponent
+    UserActivateComponent,
+    LeaderboardComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,
