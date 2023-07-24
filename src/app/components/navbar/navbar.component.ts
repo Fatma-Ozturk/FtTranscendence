@@ -67,6 +67,13 @@ export class NavbarComponent implements OnInit {
         command: () => this.leaderboardRoute()
       },
       {
+        label: 'Game',
+        icon: 'pi pi-fw pi-play',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.gameRoute()
+      },
+      {
         label: 'Menü',
         icon: 'pi pi-fw pi-bars',
         visible: this.isAuthenticadet(),
@@ -111,12 +118,13 @@ export class NavbarComponent implements OnInit {
       },
     ];
   }
+  gameRoute () {
+    this.router.navigate(['/game']);
+  }
   ChatRoute () {
-     //if (this.authService.isAuthenticadet())
      this.router.navigate(['/chat']);
   }
   leaderboardRoute () {
-    //if (this.authService.isAuthenticadet())
       this.router.navigate(['/leaderboard']);
   }
   updateAuthBool() {

@@ -59,6 +59,7 @@ import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { GameComponent } from './components/game/game.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { ChatComponent } from './components/chat/chat.component';
     ViewComponent,
     UserActivateComponent,
     LeaderboardComponent,
-    ChatComponent
+    ChatComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,
