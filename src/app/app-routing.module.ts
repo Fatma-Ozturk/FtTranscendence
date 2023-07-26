@@ -8,6 +8,9 @@ import { RegisterComponent } from './components/register/register.component';
 import { ViewComponent } from './components/view/view.component';
 import { loginGuard } from './guards/login.guard';
 import { notLoginGuard } from './guards/not-login.guard';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { GameComponent } from './components/game/game.component';
 
 const routes: Routes = [
   { path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -16,7 +19,10 @@ const routes: Routes = [
   { path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
   { path: "view", component: ViewComponent, canActivate: [loginGuard] },
   { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
-  { path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component}
+  { path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component},
+  { path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard]},
+  { path: "chat", component: ChatComponent, canActivate: [notLoginGuard]},
+  { path: "game", component: GameComponent, canActivate: [notLoginGuard]}
 ];
 
 @NgModule({

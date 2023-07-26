@@ -53,6 +53,27 @@ export class NavbarComponent implements OnInit {
         command: () => this.visibleMain(),
       },
       {
+        label: 'Chat',
+        icon: 'pi pi-fw pi-inbox',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.ChatRoute()
+      },
+      {
+        label: 'Leaderboard',
+        icon: 'pi pi-fw pi-table',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.leaderboardRoute()
+      },
+      {
+        label: 'Game',
+        icon: 'pi pi-fw pi-play',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.gameRoute()
+      },
+      {
         label: 'Menü',
         icon: 'pi pi-fw pi-bars',
         visible: this.isAuthenticadet(),
@@ -94,8 +115,17 @@ export class NavbarComponent implements OnInit {
         command: () => this.signOut(),
         routerLink: ['/']
 
-      }
+      },
     ];
+  }
+  gameRoute () {
+    this.router.navigate(['/game']);
+  }
+  ChatRoute () {
+     this.router.navigate(['/chat']);
+  }
+  leaderboardRoute () {
+      this.router.navigate(['/leaderboard']);
   }
   updateAuthBool() {
     const token = localStorage.getItem('token');
