@@ -1,3 +1,4 @@
+import { RedirectionAuth42Component } from './components/redirection-auth42/redirection-auth42.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
@@ -14,7 +15,8 @@ const routes: Routes = [
   { path: "main", component: MainComponent, canActivate: [notLoginGuard] },
   { path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
   { path: "view", component: ViewComponent, canActivate: [loginGuard] },
-  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] }
+  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
+  { path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component}
 ];
 
 @NgModule({

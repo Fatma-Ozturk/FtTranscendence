@@ -1,0 +1,17 @@
+<div (click)="Login42()" *ngIf="isLoginOrRegister">
+    <div class="d-block">
+        <img alt="42_Logo-icon" src="/assets/icons/42_Logo.png" width="32">
+    </div>
+    <div class="d-block">
+        <label for="42_Logo">42 Ecole</label>
+    </div>
+</div>
+
+<div (click)="Register42()" *ngIf="!isLoginOrRegister">
+    <div class="d-block">
+        <img alt="42_Logo-icon" src="/assets/icons/42_Logo.png" width="32">
+    </div>
+    <div class="d-block">
+        <label for="42_Logo">42 Ecole</label>
+    </div>
+</div>

@@ -34,8 +34,8 @@
                   </label>
                 </div>
                 <div class="pt-2 w-100">
-                  <p-button type="submit" label="Giriş Yap" icon="pi pi-user"
-                    styleClass="p-button-rounded w-100" class="w-100" [disabled]="checkRequiredForDisable()">
+                  <p-button type="submit" label="Giriş Yap" icon="pi pi-user" styleClass="p-button-rounded w-100"
+                    class="w-100" [disabled]="checkRequiredForDisable()">
                   </p-button>
                 </div>
                 <div class="p-2">
@@ -55,13 +55,8 @@
       <main class="form-signin-auth">
         <p-card class="border-round w-full lg:w-6">
           <div class="d-flex justify-content-between text-center">
-            <div class="col-md-6" (click)="Login42()">
-              <div class="d-block">
-                <img alt="42_Logo-icon" src="/assets/icons/42_Logo.png" width="32">
-              </div>
-              <div class="d-block">
-                <label for="42_Logo">42 Ecole</label>
-              </div>
+            <div class="col-md-6">
+                <app-auth42 [isLoginOrRegister]="true"></app-auth42>
             </div>
             <div class="col-md-6">
               <div class="d-block">
