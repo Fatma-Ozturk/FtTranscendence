@@ -62,6 +62,7 @@ import { RedirectionAuth42Component } from './components/redirection-auth42/redi
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
+import { AuthGoogleComponent } from './components/auth-google/auth-google.component';
 
 @NgModule({
   declarations: [
@@ -79,7 +80,8 @@ import { GameComponent } from './components/game/game.component';
     RedirectionAuth42Component,
     LeaderboardComponent,
     ChatComponent,
-    GameComponent
+    GameComponent,
+    AuthGoogleComponent
   ],
   imports: [
     BrowserModule,
