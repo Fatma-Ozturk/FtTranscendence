@@ -10,11 +10,11 @@ export class AuthGoogleComponent {
 
   LoginGoogle(): void
   {
-    location.href = "https://accounts.google.com/o/oauth2/auth?client_id=14263514491-idgt0ri47deboi1o5ssacbiqicsr9dn9.apps.googleusercontent.com&redirect_uri=http://localhost:3000/api/auth-google/login&response_type=code&scope=email"
+    location.href = "https://accounts.google.com/o/oauth2/v2/auth?client_id=14263514491-idgt0ri47deboi1o5ssacbiqicsr9dn9.apps.googleusercontent.com&response_type=code&scope=email&include_granted_scopes=true&redirect_uri=http://localhost:3000/api/auth-google/login"
   }
 
   RegisterGoogle(): void
   {
-    location.href = "https://accounts.google.com/o/oauth2/auth?client_id=14263514491-idgt0ri47deboi1o5ssacbiqicsr9dn9.apps.googleusercontent.com&redirect_uri=http://localhost:3000/api/auth-google/register&response_type=code&scope=email"
+    location.href = "https://accounts.google.com/o/oauth2/v2/auth?client_id=14263514491-idgt0ri47deboi1o5ssacbiqicsr9dn9.apps.googleusercontent.com&response_type=code&scope=email&include_granted_scopes=true&redirect_uri=http://localhost:3000/api/auth-google/register"
   }
 }
