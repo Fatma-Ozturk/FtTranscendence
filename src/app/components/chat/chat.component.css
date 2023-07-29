@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+@import '~@fortawesome/fontawesome-free/css/all.css';
 
 *,
 *:before,
@@ -18,11 +18,11 @@ body {
 	width: 100%;
 	background: #444753;
 	border-radius: 5px;
-	overflow: hidden; /* Ensuring container wraps its floated children */
+	color: white;
 }
 
 .people-list {
-	width: 260px;
+	width: 250px;
 	float: left;
 
 	.search {
@@ -42,12 +42,13 @@ body {
 	.fa-search {
 		position: relative;
 		left: -25px;
+		color: grey;
 	}
 
-	ul {
+	.ul {
 		padding: 20px;
 		height: 770px;
-		li {
+		.li {
 			padding-bottom: 20px;
 		}
 	}
@@ -61,18 +62,12 @@ body {
 		margin-top: 8px;
 		padding-left: 8px;
 	}
-
-	.status {
-		color: gray;
-	}
 }
 
 .chat {
-	width: calc(100% - 260px);
-	float: left;
+	width: calc(100% - 250px);
+	float:left;
 	background: #F2F5F8;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
 	color: #434651;
 
 	.chat-header {
@@ -83,27 +78,11 @@ body {
 			float: left;
 		}
 
-		.chat-about {
-			float: left;
-			padding-left: 10px;
-			margin-top: 6px;
-		}
-
 		.chat-with {
 			font-weight: bold;
 			font-size: 16px;
 		}
 
-		.chat-num-messages {
-			color: gray;
-		}
-
-		.fa-star {
-			float: right;
-			color: #D8DADF;
-			font-size: 20px;
-			margin-top: 12px;
-		}
 	}
 
 	.chat-history {
@@ -163,15 +142,26 @@ body {
 	.chat-message {
 		padding: 30px;
 
-		.textarea {
+	/* 	.textarea {
 			width: 100%;
 			border: none;
-			padding: 14px 20px; /* Increased padding to add more spacing inside */
-			font: 16px/26px "Lato", Arial, sans-serif; /* Increased font-size and line-height */
+			padding: 14px 20px; Increased padding to add more spacing inside 
+			font: 16px/26px "Lato", Arial, sans-serif; Increased font-size and line-height
 			margin-bottom: 10px;
 			border-radius: 5px;
 			resize: none;
-		}
+		} */
+
+		textarea {
+			width: 100%;
+			border: none;
+			padding: 10px 20px;
+			font: 14px/22px "Lato", Arial, sans-serif;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			resize: none;
+			
+		  }
 		  
 
 		.fa-file-o,

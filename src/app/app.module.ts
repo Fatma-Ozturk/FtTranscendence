@@ -60,6 +60,7 @@ import { UserActivateComponent } from './components/user-activate/user-activate.
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations: [
@@ -119,6 +120,7 @@ import { GameComponent } from './components/game/game.component';
     RippleModule,
     AutoFocusModule,
     InputSwitchModule,
+    ButtonModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
