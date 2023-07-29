@@ -68,6 +68,7 @@ export class NavbarComponent implements OnInit {
         label: 'Game',
         icon: 'pi pi-fw pi-play',
         visible: this.isAuthenticadet(),
+        routerLink: "/game",
         command: () => this.gameRoute()
       },
       {

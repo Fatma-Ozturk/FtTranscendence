@@ -22,7 +22,7 @@ const routes: Routes = [
   { path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component},
   { path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard]},
   { path: "chat", component: ChatComponent, canActivate: [notLoginGuard]},
-  { path: "game", component: GameComponent, canActivate: [notLoginGuard]}
+  { path: "game", component: GameComponent}
 ];
 
 @NgModule({
