@@ -1,6 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, ViewChildren } from '@angular/core';
 import { GameBaseObject } from 'src/app/models/entities/gameBaseObject';
-// import * as game from './game';
 
 @Component({
 	selector: 'app-game',
@@ -8,20 +7,23 @@ import { GameBaseObject } from 'src/app/models/entities/gameBaseObject';
 	styleUrls: ['./game.component.css'],
 })
 export class GameComponent {
-	@ViewChild('gameCanvas') gameCanvas: HTMLCanvasElement;
-	private gameContext: CanvasRenderingContext2D;
-	private gameBaseObject = new GameBaseObject(50, 50, 50, 50);
-	constructor() {}
+	@ViewChild('gameCanvas') gamecanvas: ElementRef<HTMLCanvasElement>;
+	context: CanvasRenderingContext2D;
+	// element extends GameBaseObject
 
-	ngOnInit(): void {
-		console.log('GmaeCanvas : ', this.gameCanvas);
-		this.gameContext = this.gameCanvas.getContext('2d');
-		this.draw(this.gameCanvas.getContext('2d'), this.gameBaseObject);
+	constructor() {
 	}
 
-	draw(context: CanvasRenderingContext2D, object: GameBaseObject) {
-		context.fillStyle = '#fff';
-		context.fillRect(object.x, object.y, object.width, object.height);
+	ngOnInit(): void {
+	}
+
+	//https://angular.io/guide/lifecycle-hooks
+	ngAfterViewInit(): void {
+		this.context = this.gamecanvas.nativeElement.getContext('2d');
+		this.context.fillStyle = '#fff';
+		this.context.fillRect(50, 50, 200, 200);
+		console.log("Canvaselement : ", this.gamecanvas);
+		console.log("Canvaselement : ", this.context);
 	}
 }
 /* 
