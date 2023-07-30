@@ -57,9 +57,12 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
+import { Auth42Component } from './components/auth42/auth42.component';
+import { RedirectionAuth42Component } from './components/redirection-auth42/redirection-auth42.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
+import { AuthGoogleComponent } from './components/auth-google/auth-google.component';
 
 @NgModule({
   declarations: [
@@ -73,9 +76,12 @@ import { GameComponent } from './components/game/game.component';
     SidebarComponent,
     ViewComponent,
     UserActivateComponent,
+    Auth42Component,
+    RedirectionAuth42Component,
     LeaderboardComponent,
     ChatComponent,
-    GameComponent
+    GameComponent,
+    AuthGoogleComponent
   ],
   imports: [
     BrowserModule,

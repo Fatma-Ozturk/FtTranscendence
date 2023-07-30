@@ -55,22 +55,20 @@ export class NavbarComponent implements OnInit {
       {
         label: 'Chat',
         icon: 'pi pi-fw pi-inbox',
-        //visible: this.isAuthenticadet(),
-        visible: true,
+        visible: this.isAuthenticadet(),
         command: () => this.ChatRoute()
       },
       {
         label: 'Leaderboard',
         icon: 'pi pi-fw pi-table',
-        //visible: this.isAuthenticadet(),
-        visible: true,
+        visible: this.isAuthenticadet(),
         command: () => this.leaderboardRoute()
       },
       {
         label: 'Game',
         icon: 'pi pi-fw pi-play',
-        //visible: this.isAuthenticadet(),
-        visible: true,
+        visible: this.isAuthenticadet(),
+        routerLink: "/game",
         command: () => this.gameRoute()
       },
       {
