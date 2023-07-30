@@ -91,7 +91,6 @@ export class GameComponent {
     }
   }
 
-  // Listen for keyup event on the window
   @HostListener('window:keyup', ['$event'])
   onKeyUp(event: KeyboardEvent) {
     if (event.key === 'ArrowUp') {

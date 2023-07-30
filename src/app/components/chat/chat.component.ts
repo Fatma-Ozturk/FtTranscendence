@@ -1,98 +1,82 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, AfterViewInit {
-  @ViewChild('chatHistory', { static: true }) private chatHistory!: ElementRef<HTMLUListElement>;
-  @ViewChild('messageToSend', { static: true }) private messageToSend!: ElementRef<HTMLInputElement>;
-  messageResponses: string[] = [
-    'Why did the web developer leave the restaurant? Because of the table layout.',
-    'How do you comfort a JavaScript bug? You console it.',
-    'An SQL query enters a bar, approaches two tables and asks: "May I join you?"',
-    'What is the most used language in programming? Profanity.',
-    'What is the object-oriented way to become wealthy? Inheritance.',
-    'An SEO expert walks into a bar, bars, pub, tavern, public house, Irish pub, drinks, beer, alcohol'
+export class ChatComponent implements AfterViewInit, OnInit {
+  screenHeight: number;
+  screenWidth: number;
+
+  @ViewChild('gameCanvas', { static: true }) canvasRef: ElementRef<HTMLCanvasElement>;
+  context: CanvasRenderingContext2D;
+
+  isArrowUpPressed: boolean = false;
+  isArrowDownPressed: boolean = false;
+
+  sprites = [
+    "https://i.ibb.co/TqMC0Dp/grass.png",
+    "https://i.ibb.co/GTsDmJF/fountain.png",
+    "https://i.ibb.co/59SRcxm/chibi-m.png",
+    "https://i.ibb.co/PChphHS/chibi-f.png"
   ];
-  chatHistoryList: HTMLUListElement | undefined;
-  messageToSendText: string = '';
+  images:any = [];
 
   constructor() { }
 
-  ngOnInit(): void {
-    // Initialization that doesn't rely on view elements can be placed here.
-  }
-
   ngAfterViewInit(): void {
-    // The view elements are now available, so we can safely access them.
-    this.cacheDOM();
+    this.context = this.canvasRef.nativeElement.getContext('2d');
+    this.gameDraw();
+    this.loadImages();
   }
 
-  cacheDOM(): void {
-    if (this.chatHistory && this.chatHistory.nativeElement && this.chatHistory.nativeElement.querySelector) {
-      this.chatHistoryList = this.chatHistory.nativeElement.querySelector('ul');
-    }
+  ngOnInit(): void {
+    this.getScreenSize();
   }
-  
 
-  render(): void {
-    this.scrollToBottom();
-    if (this.messageToSendText.trim() !== '') {
-      const template = `
-        <li class="message new">
-          <figure class="avatar">
-            <img src="assets/user.svg" />
-          </figure>
-          <div class="message-text">${this.messageToSendText}</div>
-          <div class="timestamp">${this.getCurrentTime()}</div>
-        </li>
-      `;
-      this.chatHistoryList?.insertAdjacentHTML('beforeend', template);
-      this.scrollToBottom();
+  private gameDraw(): void {
+    this.context.fillStyle = 'blue';
+    this.canvasRef.nativeElement.height = this.screenHeight - 200;
+    this.canvasRef.nativeElement.width = this.screenWidth - 100;
+    this.context.fillRect(0, 0, 10, 10);
+  }
 
-      // responses
-      const response = this.getRandomItem(this.messageResponses);
-      const templateResponse = `
-        <li class="message message-personal">
-          <figure class="avatar">
-            <img src="assets/bot.svg" />
-          </figure>
-          <div class="message-text">${response}</div>
-          <div class="timestamp">${this.getCurrentTime()}</div>
-        </li>
-      `;
-      setTimeout(() => {
-        this.chatHistoryList?.insertAdjacentHTML('beforeend', templateResponse);
-        this.scrollToBottom();
-      }, 1500);
-
-      this.messageToSendText = '';
+  private loadImages(): void {
+    for (const sprite of this.sprites) {
+      const image = new Image();
+      image.src = sprite;
+      this.images.push(image);
     }
   }
 
-  addMessage(): void {
-    this.messageToSendText = this.messageToSend.nativeElement.value;
-    this.render();
-  }
-
-  addMessageEnter(event: KeyboardEvent): void {
-    if (event.keyCode === 13) {
-      this.addMessage();
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') {
+      this.isArrowUpPressed = true;
+      console.log("arrow up");
+    } else if (event.key === 'ArrowDown') {
+      this.isArrowDownPressed = true;
+      console.log("arrow down");
     }
   }
 
-  scrollToBottom(): void {
-    this.chatHistory.nativeElement.scrollTop = this.chatHistory.nativeElement.scrollHeight;
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') {
+      this.isArrowUpPressed = false;
+    } else if (event.key === 'ArrowDown') {
+      this.isArrowDownPressed = false;
+    }
   }
 
-  getCurrentTime(): string {
-    return new Date().toLocaleTimeString()
-      .replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3");
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.getScreenSize();
   }
 
-  getRandomItem(arr: string[]): string {
-    return arr[Math.floor(Math.random() * arr.length)];
+  getScreenSize() {
+    this.screenWidth = window.innerWidth;
+    this.screenHeight = window.innerHeight;
   }
 }
