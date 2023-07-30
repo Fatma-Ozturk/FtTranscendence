@@ -3,9 +3,9 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
 
 @Component({
-  selector: 'app-game',
-  templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+	selector: 'app-game',
+	templateUrl: './game.component.html',
+	styleUrls: ['./game.component.css'],
 })
 export class GameComponent {
   screenHeight: number;
@@ -111,3 +111,7 @@ export class GameComponent {
     this.screenHeight = window.innerHeight;
   }
 }
+/* 
+TODO :
+Game Start Stop Mechanic
+*/
