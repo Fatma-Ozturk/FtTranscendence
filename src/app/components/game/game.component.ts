@@ -23,7 +23,7 @@ export class GameComponent {
 	static playerHostScore: number = 0;
 	static playerGuestScore: number = 0;
 
-	fixedscreenratio: number;
+	fixedScreenRatio: number;
 
 	isArrowUpPressed: boolean = false;
 	isArrowDownPressed: boolean = false;
@@ -32,27 +32,22 @@ export class GameComponent {
 		this.paddleGuest = new PaddleGameModel();
 		this.paddleHost = new PaddleGameModel();
 		this.ball = new BallGameModel();
+		// this.gameLoop();
 	}
 
 	ngAfterViewInit(): void {
-		// this.gameDraw();
 		this.gameLoop();
 	}
 
 	ngOnInit(): void {
 		this.getScreenSize();
-		this.context = this.canvasRef.nativeElement.getContext('2d');
-		this.fixedscreenratio = Math.abs(this.screenWidth / this.screenHeight);
-		console.log('Fixed Screen Ratio : ', this.fixedscreenratio);
+		this.setCanvasSize();
 		this.initGameModels();
-		this.gameDraw();
 	}
 
 	//* ^^ eventloophooks and constructor^^
 
 	private gameDraw(): void {
-		this.canvasRef.nativeElement.width = this.screenWidth - 100;
-		this.canvasRef.nativeElement.height = this.screenHeight - 200;
 		this.context.fillStyle = '#000';
 		this.context.fillRect(
 			0,
@@ -65,7 +60,7 @@ export class GameComponent {
 		this.playerGuestDraw();
 	}
 
-	gameLoop(): void {
+	gameLoop = (): void => {
 		this.gameUpdate();
 		this.gameDraw();
 		setTimeout(() => {
@@ -75,35 +70,41 @@ export class GameComponent {
 
 	initGameModels(): void {
 		//* paddleGuest
-		this.paddleGuest.width = this.fixedscreenratio * 15;
-		this.paddleGuest.height = this.fixedscreenratio * 150;
+		this.paddleGuest.width = this.fixedScreenRatio * 5;
+		this.paddleGuest.height = this.fixedScreenRatio * 50;
 		this.paddleGuest.x =
 			this.screenWidth - 100 - this.paddleGuest.width - 2;
 		this.paddleGuest.y = 2;
 		//* paddleHost
-		this.paddleHost.width = this.fixedscreenratio * 15;
-		this.paddleHost.height = this.fixedscreenratio * 150;
+		this.paddleHost.width = this.fixedScreenRatio * 5;
+		this.paddleHost.height = this.fixedScreenRatio * 50;
 		this.paddleHost.x = 2;
-		this.paddleHost.y = 200;
+		this.paddleHost.y = 100;
 		//* ball
-		this.ball.width = this.fixedscreenratio * 10;
-		this.ball.height = this.fixedscreenratio * 10;
+		this.ball.width = this.fixedScreenRatio * 5;
+		this.ball.height = this.fixedScreenRatio * 5;
 		this.ball.x = 50;
 		this.ball.y = 50;
 	}
 
-	gameUpdate(): void {}
+	gameUpdate(): void { }
 
 	paddleUpdateHost(): void {
 		if (this.isArrowUpPressed) {
-			console.log('deneme');
-			this.paddleHost.y = this.paddleHost.y - this.fixedscreenratio * 2;
+			this.paddleHost.y = this.paddleHost.y - this.fixedScreenRatio * 3;
+			if (this.paddleHost.y < 0)
+				this.paddleHost.y = 2
+		}
+		if (this.isArrowDownPressed) {
+			this.paddleHost.y = this.paddleHost.y + this.fixedScreenRatio * 3;
+			if (this.paddleHost.y + this.paddleHost.height > this.canvasRef.nativeElement.height)
+				this.paddleHost.y = this.canvasRef.nativeElement.height - this.paddleHost.height - 2;
 		}
 	}
 
-	paddleUpdateGuest(): void {}
+	paddleUpdateGuest(): void { }
 
-	updateBall(): void {}
+	updateBall(): void { }
 
 	playerHostDraw(): void {
 		this.context.fillStyle = '#fff';
@@ -139,11 +140,12 @@ export class GameComponent {
 	onKeyDown(event: KeyboardEvent) {
 		if (event.key === 'ArrowUp') {
 			this.isArrowUpPressed = true;
-			console.log('arrow up');
 			this.paddleUpdateHost();
+			// console.log('arrow up');
 		} else if (event.key === 'ArrowDown') {
 			this.isArrowDownPressed = true;
-			console.log('arrow down');
+			this.paddleUpdateHost();
+			// console.log('arrow down');
 		}
 	}
 
@@ -165,5 +167,15 @@ export class GameComponent {
 	getScreenSize() {
 		this.screenWidth = window.innerWidth;
 		this.screenHeight = window.innerHeight;
+	}
+	setCanvasSize() {
+		this.canvasRef.nativeElement.width = this.screenWidth - 100;
+		this.canvasRef.nativeElement.height = this.screenHeight - 200;
+		this.context = this.canvasRef.nativeElement.getContext('2d');
+		let fixedWidthRatio = this.canvasRef.nativeElement.width / 20;
+		let fixedHeightRatio = this.canvasRef.nativeElement.height / 200;
+		this.fixedScreenRatio =
+			fixedWidthRatio < fixedHeightRatio ? fixedWidthRatio : fixedHeightRatio;
+		console.log("FixedScreenRatio: ", this.fixedScreenRatio);
 	}
 }
