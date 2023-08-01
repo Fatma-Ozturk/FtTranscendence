@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { User } from 'src/app/models/entities/user';
 
 @Component({
   selector: 'app-user-profile-card',
@@ -6,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./user-profile-card.component.css']
 })
 export class UserProfileCardComponent {
+  @Input() user: User;
+  constructor() {
+  }
 
+  ngOnInint(): void{
+
+  }
 }
