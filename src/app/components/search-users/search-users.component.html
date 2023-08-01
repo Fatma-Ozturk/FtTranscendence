@@ -1,0 +1,29 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Kullanıcı Ara</h1>
+        </div>
+        <form [formGroup]="searchUsersForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+            <div class="row d-flex justify-content-center">
+                <div class="col-6 m-2">
+                    <span class="p-input-icon-left w-100">
+                        <i class="pi pi-search"></i>
+                        <input pInputText formControlName="searchtext" type="text" id="floatingInput" placeholder=""
+                            pTooltip="Kullanıcı" pAutoFocus [autofocus]="true" class="w-100" />
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="container-fluid">
+    <!-- <div class="row"> -->
+        <div class="col-2 mt-2 mb-2">
+            <app-user-profile-card></app-user-profile-card>
+        </div>
+        <div class="col-2 mt-2 mb-2">
+            <app-user-profile-card></app-user-profile-card>
+        </div>
+    <!-- </div> -->
+
+</div>

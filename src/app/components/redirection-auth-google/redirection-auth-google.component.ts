@@ -7,14 +7,14 @@ import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 
 @Component({
-  selector: 'app-redirection-auth42',
-  templateUrl: './redirection-auth42.component.html',
-  styleUrls: ['./redirection-auth42.component.css'],
+  selector: 'app-redirection-auth-google',
+  templateUrl: './redirection-auth-google.component.html',
+  styleUrls: ['./redirection-auth-google.component.css'],
   providers: [MessageService]
 })
-export class RedirectionAuth42Component {
+export class RedirectionAuthGoogleComponent {
   private token: string = "";
-  private success: string = "";
+  private success: string= "";
   private message: string = "";
   constructor(private route: ActivatedRoute,
     private router: Router,
