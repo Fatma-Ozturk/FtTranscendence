@@ -50,19 +50,6 @@ export class GameComponent {
 
 	//* ^^ eventloophooks and constructor^^
 
-	private gameDraw(): void {
-		this.context.fillStyle = '#000';
-		this.context.fillRect(
-			0,
-			0,
-			this.canvasRef.nativeElement.width,
-			this.canvasRef.nativeElement.height
-		);
-		this.ballDraw();
-		this.playerHostDraw();
-		this.playerGuestDraw();
-	}
-
 	gameLoop = (): void => {
 		this.gameUpdate();
 		this.gameDraw();
@@ -150,6 +137,21 @@ export class GameComponent {
 		this.ball.y += this.speedmultiplier * this.ball.yVel;
 	}
 
+	gameDraw(): void {
+		this.context.font = "30px Arial";
+		this.context.fillStyle = '#000';
+		this.context.fillRect(
+			0,
+			0,
+			this.canvasRef.nativeElement.width,
+			this.canvasRef.nativeElement.height
+		);
+		this.ballDraw();
+		this.playerHostDraw();
+		this.playerGuestDraw();
+		this.context.fillText('-', this.canvasRef.nativeElement.width / 2, 60, this.fixedScreenRatio * 10);
+	}
+
 	playerHostDraw(): void {
 		this.context.fillStyle = '#fff';
 		this.context.fillRect(
@@ -158,6 +160,7 @@ export class GameComponent {
 			this.paddleHost.width,
 			this.paddleHost.height
 		);
+		this.context.fillText(this.playerHostScore.toString(), this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10, 60, this.fixedScreenRatio * 10);
 	}
 
 	playerGuestDraw(): void {
@@ -168,6 +171,7 @@ export class GameComponent {
 			this.paddleGuest.width,
 			this.paddleGuest.height
 		);
+		this.context.fillText(this.playerGuestScore.toString(), this.canvasRef.nativeElement.width / 2 + this.fixedScreenRatio * 10 - 10, 60, this.fixedScreenRatio * 10);
 	}
 
 	ballDraw(): void {
