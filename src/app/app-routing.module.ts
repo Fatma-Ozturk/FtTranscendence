@@ -15,22 +15,22 @@ import { GameComponent } from './components/game/game.component';
 import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
 
 const routes: Routes = [
-  { path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
-  { path: '404', pathMatch: "full", component: NotFoundComponent },
-  { path: "main", component: MainComponent, canActivate: [notLoginGuard] },
-  { path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
-  { path: "view", component: ViewComponent, canActivate: [loginGuard] },
-  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
-  { path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component},
-  { path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent},
-  { path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard]},
-  { path: "chat", component: ChatComponent, canActivate: [loginGuard]},
-  { path: "game", component: GameComponent, canActivate: [loginGuard]},
-  { path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard]}
+	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
+	{ path: '404', pathMatch: "full", component: NotFoundComponent },
+	{ path: "main", component: MainComponent, canActivate: [notLoginGuard] },
+	{ path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
+	{ path: "view", component: ViewComponent, canActivate: [loginGuard] },
+	{ path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
+	{ path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component },
+	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
+	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
+	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
+	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
+	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+	imports: [RouterModule.forRoot(routes)],
+	exports: [RouterModule]
 })
 export class AppRoutingModule { }
