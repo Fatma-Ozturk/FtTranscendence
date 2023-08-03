@@ -22,8 +22,8 @@ export class GameComponent {
 	paddleHost: PaddleGameModel;
 	paddleGuest: PaddleGameModel;
 
-	playerHostScore: number = 0;
-	playerGuestScore: number = 0;
+	leftPaddle: PaddleGameModel;
+	rightPaddle: PaddleGameModel;
 
 	speedmultiplier: number = 2;
 	fixedScreenRatio: number;
@@ -36,6 +36,16 @@ export class GameComponent {
 		this.paddleHost = new PaddleGameModel();
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
+		//todo These are reassigned after api call
+		if (Math.floor(Math.random() * 100) % 2 == 0) {
+			this.leftPaddle = this.paddleGuest;
+			this.rightPaddle = this.paddleHost;
+			console.log("host is right");
+		} else {
+			this.leftPaddle = this.paddleHost;
+			this.rightPaddle = this.paddleGuest;
+			console.log("host is left");
+		}
 	}
 
 	ngAfterViewInit(): void {
@@ -60,33 +70,33 @@ export class GameComponent {
 				// console.log("Gameloop");
 			}
 		}, 10);
-	}
+	};
 
 	initGameModels(): void {
-		//! PADDLE'S X POSITIONS AND BALL STARTING VELOCITY COMES FROM BACKEND
-		//* paddleGuest
-		this.paddleGuest.width = this.fixedScreenRatio * 5;
-		this.paddleGuest.height = this.fixedScreenRatio * 50;
-		this.paddleGuest.x =
-			this.screenWidth - 100 - this.paddleGuest.width - 2;
-		this.paddleGuest.y = (this.canvasRef.nativeElement.height / 2) - (this.paddleGuest.height / 2);
-		//* paddleHost
-		this.paddleHost.width = this.fixedScreenRatio * 5;
-		this.paddleHost.height = this.fixedScreenRatio * 50;
-		this.paddleHost.x = 2;
-		this.paddleHost.y = (this.canvasRef.nativeElement.height / 2) - (this.paddleHost.height / 2);
+		this.leftPaddle.width = this.fixedScreenRatio * 5;
+		this.leftPaddle.height = this.fixedScreenRatio * 50;
+		this.rightPaddle.width = this.fixedScreenRatio * 5;
+		this.rightPaddle.height = this.fixedScreenRatio * 50;
+		this.leftPaddle.x = 2;
+		this.leftPaddle.y =
+			this.canvasRef.nativeElement.height / 2 -
+			this.leftPaddle.height / 2;
+		this.rightPaddle.x = this.canvasRef.nativeElement.width - 2 - this.rightPaddle.width;
+		this.rightPaddle.y =
+			this.canvasRef.nativeElement.height / 2 -
+			this.rightPaddle.height / 2;
 		this.ballInit();
 	}
 
 	ballInit(): void {
 		this.ball.width = this.fixedScreenRatio * 5;
 		this.ball.height = this.fixedScreenRatio * 5;
-		this.ball.x = (this.canvasRef.nativeElement.width / 2) - (this.ball.width / 2);
+		this.ball.x =
+			this.canvasRef.nativeElement.width / 2 - this.ball.width / 2;
 		this.ball.y = 50;
 		//TODO below parts changed after gamestart call, just random start position for the start
 		this.ball.xVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 		this.ball.yVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
-		console.log('Scores : ' + 'Host: ' + this.playerHostScore + '\t Guest: ' + this.playerGuestScore);
 	}
 
 	gameUpdate(): void {
@@ -97,48 +107,69 @@ export class GameComponent {
 	paddleUpdateHost(): void {
 		if (this.isArrowUpPressed) {
 			this.paddleHost.y = this.paddleHost.y - this.speedmultiplier;
-			if (this.paddleHost.y < 0)
-				this.paddleHost.y = 2
+			if (this.paddleHost.y < 0) this.paddleHost.y = 2;
 		}
 		if (this.isArrowDownPressed) {
 			this.paddleHost.y = this.paddleHost.y + this.speedmultiplier;
-			if (this.paddleHost.y + this.paddleHost.height > this.canvasRef.nativeElement.height)
-				this.paddleHost.y = this.canvasRef.nativeElement.height - this.paddleHost.height - 2;
+			if (
+				this.paddleHost.y + this.paddleHost.height >
+				this.canvasRef.nativeElement.height
+			)
+				this.paddleHost.y =
+					this.canvasRef.nativeElement.height -
+					this.paddleHost.height -
+					2;
 		}
 	}
 
-	paddleUpdateGuest(): void { }//TODO: COMES FROM BACKEND :>
+	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>
 
 	updateBall = (): void => {
-		if (this.ball.y - this.speedmultiplier < 0) //* UP Border
+		if (this.ball.y - this.fixedScreenRatio < 0)
+			//* UP Border
 			this.ball.yVel = 1;
-		if (this.ball.y + this.speedmultiplier + this.ball.height > this.canvasRef.nativeElement.height) //* DOWN Border
+		if (
+			this.ball.y + this.fixedScreenRatio + this.ball.height >
+			this.canvasRef.nativeElement.height
+		)
+			//* DOWN Border
 			this.ball.yVel = -1;
-		if (this.ball.x < this.paddleHost.width) { //* LEFT Border
-			if (this.paddleHost.y < this.ball.y && this.paddleHost.y + this.paddleHost.height > this.ball.y)
+		if (this.ball.x < this.leftPaddle.width) {
+			//* LEFT Border
+			if (
+				this.leftPaddle.y < this.ball.y &&
+				this.leftPaddle.y + this.leftPaddle.height > this.ball.y
+			)
 				this.ball.xVel = 1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.playerGuestScore++;
+				this.rightPaddle.score++;
 				this.ballInit();
 			}
 		}
-		if (this.ball.x + this.ball.width > this.canvasRef.nativeElement.width - this.paddleGuest.width - 2) { // * RIGHT Border
-			if (this.ball.y > this.paddleGuest.y && this.ball.y < this.paddleGuest.y + this.paddleGuest.height)
+		if (
+			this.ball.x + this.ball.width >
+			this.canvasRef.nativeElement.width - this.rightPaddle.width - 2
+		) {
+			// * RIGHT Border
+			if (
+				this.ball.y > this.rightPaddle.y &&
+				this.ball.y < this.rightPaddle.y + this.rightPaddle.height
+			)
 				this.ball.xVel = -1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.playerHostScore++;
+				this.leftPaddle.score++;
 				this.ballInit();
 			}
 		}
 
-		this.ball.x += this.speedmultiplier * this.ball.xVel;
-		this.ball.y += this.speedmultiplier * this.ball.yVel;
-	}
+		this.ball.x += this.fixedScreenRatio * this.ball.xVel;
+		this.ball.y += this.fixedScreenRatio * this.ball.yVel;
+	};
 
 	gameDraw(): void {
-		this.context.font = "30px Arial";
+		this.context.font = '30px Arial';
 		this.context.fillStyle = '#000';
 		this.context.fillRect(
 			0,
@@ -149,7 +180,26 @@ export class GameComponent {
 		this.ballDraw();
 		this.playerHostDraw();
 		this.playerGuestDraw();
-		this.context.fillText('-', this.canvasRef.nativeElement.width / 2, 60, this.fixedScreenRatio * 10);
+		this.context.fillText(
+			'-',
+			this.canvasRef.nativeElement.width / 2,
+			60,
+			this.fixedScreenRatio * 5
+		);
+		this.context.fillText(
+			this.leftPaddle.score.toString(),
+			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
+			60,
+			this.fixedScreenRatio * 5
+		);
+		this.context.fillText(
+			this.rightPaddle.score.toString(),
+			this.canvasRef.nativeElement.width / 2 +
+			this.fixedScreenRatio * 10 -
+			10,
+			60,
+			this.fixedScreenRatio * 5
+		);
 	}
 
 	playerHostDraw(): void {
@@ -160,7 +210,6 @@ export class GameComponent {
 			this.paddleHost.width,
 			this.paddleHost.height
 		);
-		this.context.fillText(this.playerHostScore.toString(), this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10, 60, this.fixedScreenRatio * 10);
 	}
 
 	playerGuestDraw(): void {
@@ -171,7 +220,6 @@ export class GameComponent {
 			this.paddleGuest.width,
 			this.paddleGuest.height
 		);
-		this.context.fillText(this.playerGuestScore.toString(), this.canvasRef.nativeElement.width / 2 + this.fixedScreenRatio * 10 - 10, 60, this.fixedScreenRatio * 10);
 	}
 
 	ballDraw(): void {
@@ -186,9 +234,13 @@ export class GameComponent {
 
 	@HostListener('window:keydown', ['$event'])
 	onKeyDown(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp') {
+		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
 			this.isArrowUpPressed = true;
-		} else if (event.key === 'ArrowDown') {
+		} else if (
+			event.key === 'ArrowDown' ||
+			event.key === 's' ||
+			event.key === 'S'
+		) {
 			this.isArrowDownPressed = true;
 		}
 	}
@@ -196,9 +248,13 @@ export class GameComponent {
 	// Listen for keyup event on the window
 	@HostListener('window:keyup', ['$event'])
 	onKeyUp(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp') {
+		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
 			this.isArrowUpPressed = false;
-		} else if (event.key === 'ArrowDown') {
+		} else if (
+			event.key === 'ArrowDown' ||
+			event.key === 's' ||
+			event.key === 'S'
+		) {
 			this.isArrowDownPressed = false;
 		}
 	}
@@ -213,15 +269,36 @@ export class GameComponent {
 		this.screenHeight = window.innerHeight;
 	}
 
+	adjustCanvasSizeToAspectRatio(
+		width: number,
+		height: number,
+		targetAspectRatio: number
+	) {
+		const currentAspectRatio = width / height;
+		if (currentAspectRatio > targetAspectRatio) {
+			const newWidth = height * targetAspectRatio;
+			return { width: newWidth, height };
+		} else {
+			const newHeight = width / targetAspectRatio;
+			return { width, height: newHeight };
+		}
+	}
+
 	setCanvasSize() {
-		this.canvasRef.nativeElement.width = this.screenWidth - 100;
-		this.canvasRef.nativeElement.height = this.screenHeight - 200;
+		let canvasSize = this.adjustCanvasSizeToAspectRatio(
+			this.screenWidth - this.screenWidth / 20,
+			this.screenHeight - 50 - this.screenHeight / 10,
+			16 / 9
+		);
+		this.canvasRef.nativeElement.width = canvasSize.width;
+		this.canvasRef.nativeElement.height = canvasSize.height;
 		this.context = this.canvasRef.nativeElement.getContext('2d');
 		let fixedWidthRatio = this.canvasRef.nativeElement.width / 20;
 		let fixedHeightRatio = this.canvasRef.nativeElement.height / 200;
 		this.fixedScreenRatio =
-			fixedWidthRatio < fixedHeightRatio ? fixedWidthRatio : fixedHeightRatio;
+			fixedWidthRatio < fixedHeightRatio
+				? fixedWidthRatio
+				: fixedHeightRatio;
 		this.speedmultiplier = this.speedmultiplier * this.fixedScreenRatio;
-		console.log("FixedScreenRatio: ", this.fixedScreenRatio);
 	}
 }
