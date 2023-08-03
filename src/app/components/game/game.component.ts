@@ -22,8 +22,8 @@ export class GameComponent {
 	paddleHost: PaddleGameModel;
 	paddleGuest: PaddleGameModel;
 
-	playerHostScore: number = 0;
-	playerGuestScore: number = 0;
+	leftPaddle: PaddleGameModel;
+	rightPaddle: PaddleGameModel;
 
 	speedmultiplier: number = 2;
 	fixedScreenRatio: number;
@@ -36,6 +36,16 @@ export class GameComponent {
 		this.paddleHost = new PaddleGameModel();
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
+		//todo These are reassigned after api call
+		if (Math.floor(Math.random() * 100) % 2 == 0) {
+			this.leftPaddle = this.paddleGuest;
+			this.rightPaddle = this.paddleHost;
+			console.log("host is right");
+		} else {
+			this.leftPaddle = this.paddleHost;
+			this.rightPaddle = this.paddleGuest;
+			console.log("host is left");
+		}
 	}
 
 	ngAfterViewInit(): void {
@@ -63,25 +73,18 @@ export class GameComponent {
 	};
 
 	initGameModels(): void {
-		//! PADDLE'S X POSITIONS AND BALL STARTING VELOCITY COMES FROM BACKEND
-		//* paddleGuest
-		this.paddleGuest.width = this.fixedScreenRatio * 5;
-		this.paddleGuest.height = this.fixedScreenRatio * 50;
-		this.paddleGuest.x =
-			this.screenWidth -
-			(this.screenWidth - this.canvasRef.nativeElement.width) -
-			this.paddleGuest.width -
-			2;
-		this.paddleGuest.y =
+		this.leftPaddle.width = this.fixedScreenRatio * 5;
+		this.leftPaddle.height = this.fixedScreenRatio * 50;
+		this.rightPaddle.width = this.fixedScreenRatio * 5;
+		this.rightPaddle.height = this.fixedScreenRatio * 50;
+		this.leftPaddle.x = 2;
+		this.leftPaddle.y =
 			this.canvasRef.nativeElement.height / 2 -
-			this.paddleGuest.height / 2;
-		//* paddleHost
-		this.paddleHost.width = this.fixedScreenRatio * 5;
-		this.paddleHost.height = this.fixedScreenRatio * 50;
-		this.paddleHost.x = 2;
-		this.paddleHost.y =
+			this.leftPaddle.height / 2;
+		this.rightPaddle.x = this.canvasRef.nativeElement.width - 2 - this.rightPaddle.width;
+		this.rightPaddle.y =
 			this.canvasRef.nativeElement.height / 2 -
-			this.paddleHost.height / 2;
+			this.rightPaddle.height / 2;
 		this.ballInit();
 	}
 
@@ -119,7 +122,7 @@ export class GameComponent {
 		}
 	}
 
-	paddleUpdateGuest(): void {} //TODO: COMES FROM BACKEND :>
+	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>
 
 	updateBall = (): void => {
 		if (this.ball.y - this.fixedScreenRatio < 0)
@@ -131,32 +134,32 @@ export class GameComponent {
 		)
 			//* DOWN Border
 			this.ball.yVel = -1;
-		if (this.ball.x < this.paddleHost.width) {
+		if (this.ball.x < this.leftPaddle.width) {
 			//* LEFT Border
 			if (
-				this.paddleHost.y < this.ball.y &&
-				this.paddleHost.y + this.paddleHost.height > this.ball.y
+				this.leftPaddle.y < this.ball.y &&
+				this.leftPaddle.y + this.leftPaddle.height > this.ball.y
 			)
 				this.ball.xVel = 1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.playerGuestScore++;
+				this.rightPaddle.score++;
 				this.ballInit();
 			}
 		}
 		if (
 			this.ball.x + this.ball.width >
-			this.canvasRef.nativeElement.width - this.paddleGuest.width - 2
+			this.canvasRef.nativeElement.width - this.rightPaddle.width - 2
 		) {
 			// * RIGHT Border
 			if (
-				this.ball.y > this.paddleGuest.y &&
-				this.ball.y < this.paddleGuest.y + this.paddleGuest.height
+				this.ball.y > this.rightPaddle.y &&
+				this.ball.y < this.rightPaddle.y + this.rightPaddle.height
 			)
 				this.ball.xVel = -1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.playerHostScore++;
+				this.leftPaddle.score++;
 				this.ballInit();
 			}
 		}
@@ -183,6 +186,20 @@ export class GameComponent {
 			60,
 			this.fixedScreenRatio * 5
 		);
+		this.context.fillText(
+			this.leftPaddle.score.toString(),
+			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
+			60,
+			this.fixedScreenRatio * 5
+		);
+		this.context.fillText(
+			this.rightPaddle.score.toString(),
+			this.canvasRef.nativeElement.width / 2 +
+			this.fixedScreenRatio * 10 -
+			10,
+			60,
+			this.fixedScreenRatio * 5
+		);
 	}
 
 	playerHostDraw(): void {
@@ -193,12 +210,6 @@ export class GameComponent {
 			this.paddleHost.width,
 			this.paddleHost.height
 		);
-		this.context.fillText(
-			this.playerHostScore.toString(),
-			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
-			60,
-			this.fixedScreenRatio * 5
-		);
 	}
 
 	playerGuestDraw(): void {
@@ -208,14 +219,6 @@ export class GameComponent {
 			this.paddleGuest.y,
 			this.paddleGuest.width,
 			this.paddleGuest.height
-		);
-		this.context.fillText(
-			this.playerGuestScore.toString(),
-			this.canvasRef.nativeElement.width / 2 +
-				this.fixedScreenRatio * 10 -
-				10,
-			60,
-			this.fixedScreenRatio * 5
 		);
 	}
 
@@ -297,19 +300,5 @@ export class GameComponent {
 				? fixedWidthRatio
 				: fixedHeightRatio;
 		this.speedmultiplier = this.speedmultiplier * this.fixedScreenRatio;
-		console.log(
-			'Aspect Ratio: ' +
-				canvasSize.width / canvasSize.height +
-				' - 16/9 : ' +
-				16 / 9
-		);
-		console.log(
-			'FixedScreenRatio: ',
-			this.fixedScreenRatio,
-			'width: ',
-			fixedWidthRatio,
-			'\t height: ',
-			fixedHeightRatio
-		);
 	}
 }
