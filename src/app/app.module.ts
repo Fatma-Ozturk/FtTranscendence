@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from "@angular/forms"
+import { ToastModule } from 'primeng/toast';
 import { JwtModule } from "@auth0/angular-jwt";
 import { KnobModule } from 'primeng/knob';
 import { TableModule } from 'primeng/table';
@@ -57,9 +58,19 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ViewComponent } from './components/view/view.component';
 import { UserActivateComponent } from './components/user-activate/user-activate.component';
+import { Auth42Component } from './components/auth42/auth42.component';
+import { RedirectionAuth42Component } from './components/redirection-auth42/redirection-auth42.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
+import { AuthGoogleComponent } from './components/auth-google/auth-google.component';
+import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
+import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
+import { SearchUsersComponent } from './components/search-users/search-users.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
+import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
 import { ButtonModule } from 'primeng/button';
 
 @NgModule({
@@ -74,9 +85,19 @@ import { ButtonModule } from 'primeng/button';
     SidebarComponent,
     ViewComponent,
     UserActivateComponent,
+    Auth42Component,
+    RedirectionAuth42Component,
     LeaderboardComponent,
     ChatComponent,
-    GameComponent
+    GameComponent,
+    AuthGoogleComponent,
+    RedirectionAuthGoogleComponent,
+    ChatRoomComponent,
+    ChatRoomsComponent,
+    SearchUsersComponent,
+    UserProfileComponent,
+    UserProfileCardComponent,
+    UserProfileEditComponent
   ],
   imports: [
     BrowserModule,
@@ -120,6 +141,7 @@ import { ButtonModule } from 'primeng/button';
     RippleModule,
     AutoFocusModule,
     InputSwitchModule,
+    ToastModule,
     ButtonModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",

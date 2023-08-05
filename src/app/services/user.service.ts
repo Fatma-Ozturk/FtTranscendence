@@ -8,13 +8,14 @@ import { environment } from 'src/environments/environment';
 import { BaseService } from 'src/app/utilities/baseService';
 import { Observable } from 'rxjs';
 import { OperationClaim } from '../models/entities/operationClaim';
+import { UserForSearchDto } from '../models/dto/userForSearchDto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService extends BaseService<User>{
 
-  constructor(private httpClient:HttpClient) {
+  constructor(private httpClient: HttpClient) {
     super(httpClient);
     this.name = "users";
   }
@@ -22,8 +23,8 @@ export class UserService extends BaseService<User>{
     let newPath = environment.appurl + "users/isuserverificationcode?verificationCode=" + verificationCode
     return this.httpClient.get<SingleResponseModel<boolean>>(newPath);
   }
-  deleteById(userId:number){
-    let newPath = environment.appurl + "users/deletebyid?id="+userId
+  deleteById(userId: number) {
+    let newPath = environment.appurl + "users/deletebyid?id=" + userId
     return this.httpClient.get<ResponseModel>(newPath);
   }
   /*RePublic*/
@@ -31,15 +32,18 @@ export class UserService extends BaseService<User>{
     let newPath = environment.appurl + "users/getall"
     return this.httpClient.get<ListResponseModel<User>>(newPath);
   }
-  getUser(id: number): Observable<SingleResponseModel<User>> {
-    let newPath = environment.appurl + "users/getbyid?id=" + id
-    return this.httpClient.get<SingleResponseModel<User>>(newPath);
+  // getUser(id: number): Observable<SingleResponseModel<User>> {
+  //   let newPath = environment.appurl + "users/getbyid?id=" + id
+  //   return this.httpClient.get<SingleResponseModel<User>>(newPath);
+  // }
+  getById(id: number) {
+    return this.httpClient.post<SingleResponseModel<number>>(environment.appurl + "users/getbyid", id)
   }
-  getById(user:User){
-    return this.httpClient.post<SingleResponseModel<number>>(environment.appurl + "users/getByid",user)
+  getByAttributes(userForSearchDto: UserForSearchDto) {
+    return this.httpClient.post<ListResponseModel<User>>(environment.appurl + "users/getbyattributes", userForSearchDto)
   }
-  getAllOperationClaimRank(userId:number): Observable<ListResponseModel<OperationClaim>> {
-    let newPath = environment.appurl + "users/getalloperationclaimrank?userId="+userId
+  getAllOperationClaimRank(userId: number): Observable<ListResponseModel<OperationClaim>> {
+    let newPath = environment.appurl + "users/getalloperationclaimrank?userId=" + userId
     return this.httpClient.get<ListResponseModel<OperationClaim>>(newPath);
   }
   /* getAuthDetail(userId:number): Observable<SingleResponseModel<AuthListDetailDto>> {

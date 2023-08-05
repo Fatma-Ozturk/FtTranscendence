@@ -1,0 +1,17 @@
+<div (click)="LoginGoogle()" *ngIf="isLoginOrRegister">
+    <div class="d-block">
+        <img alt="Google_Logo-icon" src="/assets/icons/Google__G__Logo.png" width="32">
+    </div>
+    <div class="d-block">
+        <label for="Google_Logo">Google</label>
+    </div>
+</div>
+
+<div (click)="RegisterGoogle()" *ngIf="!isLoginOrRegister">
+    <div class="d-block">
+        <img alt="Google_Logo-icon" src="/assets/icons/Google__G__Logo.png" width="32">
+    </div>
+    <div class="d-block">
+        <label for="Google_Logo">Google</label>
+    </div>
+</div>
