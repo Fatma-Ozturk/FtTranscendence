@@ -34,30 +34,39 @@ export class LoginComponent {
     })
   }
   login() {
-      let loginModel = Object.assign({}, this.loginForm.value);
-      this.authService.login(loginModel).subscribe(response => {
-        let token:string = String(response.data.token);
-        localStorage.setItem("token", token);
-        if(response.data && token.length > 0 && localStorage.getItem("token")){
-          this.router.navigate(['/view'])
+    let userStatus: boolean = false;
+    let loginModel = Object.assign({}, this.loginForm.value);
+    this.authService.login(loginModel).subscribe(response => {
+      let token: string = String(response.data.token);
+      localStorage.setItem("token", token);
+      userStatus = this.authService.getCurrentStatus();
+      console.log("userStatus " + userStatus);
+      if (response.data && token.length > 0 && localStorage.getItem("token")) {
+        if (!userStatus) {
+          this.router.navigate(['/create-user-profile'])
+          this.toastrService.info(Messages.success);
         }
-      }, responseError => {
-        console.log("responseError.data.message " + JSON.stringify(responseError.error.message));
-        
-        if (responseError.error.message == "User Not Found")
-          this.toastrService.info(Messages.userNotFound)
-        if (responseError.error.message == "Password Error")
-          this.toastrService.info(Messages.passwordError)
-        this.router.navigate(['/login'])  
-      });
+        else{
+          this.router.navigate(['/view'])
+          this.toastrService.info(Messages.success);
+        }
+      }
+    }, responseError => {
+      console.log("responseError.data.message " + JSON.stringify(responseError.error.message));
+
+      if (responseError.error.message == "User Not Found")
+        this.toastrService.info(Messages.userNotFound)
+      if (responseError.error.message == "Password Error")
+        this.toastrService.info(Messages.passwordError)
+      this.router.navigate(['/login'])
+    });
   }
   onSubmit(): void {
     if (!this.loginForm.valid)
       return;
     this.login();
   }
-  checkRequiredForDisable():boolean
-  {
+  checkRequiredForDisable(): boolean {
     return (this.loginForm.get("email").hasError('required') || this.loginForm.get("password").hasError('required'))
   }
   isFieldInvalid(fieldName: string): boolean {

@@ -1,0 +1,50 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="d-flex justify-content-center align-self-center">
+            <main class="form-signin">
+                <form [formGroup]="createProfileForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+                    <p-card header="Kullanıcı Bilgileri" class="border-round w-full lg:w-6">
+                        <div>
+                            <div class="form-floating text-left">
+                                <input pInputText formControlName="nickName" type="text" class="form-control"
+                                    id="floatingInput" placeholder="" pTooltip="Kullanıcı Adın" />
+                                <label htmlFor="floatingInput">Kullanıcı Adın
+                                    <small *ngIf="isFieldInvalid('nickName')" class="p-error">
+                                        {{ getErrorMessage('nickName') }}
+                                    </small>
+                                </label>
+                            </div>
+                            <div class="form-floating text-left">
+                                <input pInputText formControlName="firstName" type="text" class="form-control"
+                                    id="floatingFirstName" placeholder="" pTooltip="Adın" pAutoFocus
+                                    [autofocus]="true" />
+                                <label htmlFor="floatingFirstName">Adın
+                                    <small *ngIf="isFieldInvalid('firstName')" class="p-error">
+                                        {{ getErrorMessage('firstName') }}
+                                    </small>
+                                </label>
+                            </div>
+                            <div class="form-floating text-left">
+                                <input pInputText formControlName="lastName" type="text" class="form-control"
+                                    id="floatingLastName" placeholder="" pTooltip="Soyadın" />
+                                <label htmlFor="floatingLastName">Soyadın
+                                    <small *ngIf="isFieldInvalid('lastName')" class="p-error">
+                                        {{ getErrorMessage('lastName') }}
+                                    </small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-self-center">
+                            <div class="pt-3">
+                                <p-button type="submit" icon="pi pi-arrow-right"
+                                    styleClass="p-button-rounded p-button-success"
+                                    [disabled]="checkRequiredForDisable()">
+                                </p-button>
+                            </div>
+                        </div>
+                    </p-card>
+                </form>
+            </main>
+        </div>
+    </div>
+</div>

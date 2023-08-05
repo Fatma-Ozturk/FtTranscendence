@@ -28,7 +28,7 @@ export class RedirectionAuth42Component {
     this.token = this.route.snapshot.paramMap.get('token');
     this.success = this.route.snapshot.paramMap.get('success');
     this.message = this.route.snapshot.paramMap.get('message');
-
+    let userStatus: boolean = false;
     if (this.success === 'false'){
       if (this.message === 'User Already Exists'){
         this.toastrService.error(Messages.userAlreadyExists);
@@ -38,7 +38,14 @@ export class RedirectionAuth42Component {
     if (this.success === 'true'){
       if (this.jwtControllerService.isActive(this.token)) {
         this.localStorageService.saveItem("token", this.token);
-        this.router.navigate(['/view']);
+        if (!userStatus) {
+          this.router.navigate(['/create-user-profile'])
+          this.toastrService.info(Messages.success);
+        }
+        else{
+          this.router.navigate(['/view'])
+          this.toastrService.info(Messages.success);
+        }
       }
     }
   }

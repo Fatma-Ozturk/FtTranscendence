@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ChangeDetectorRef, Component, OnInit, SimpleChange } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ActivePageNameService } from './services/active-page-name.service';
@@ -19,13 +20,15 @@ export class AppComponent implements OnInit {
   isAuth: boolean
   activePageNameString:string;
   isMainClass: string;
+  userStatus: boolean = false;
   public dataObsevable: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   constructor(private authService: AuthService,
     private loadProgressService: LoadProgressService,
     private sidebarService: SidebarService,
     private changeDetectorRef: ChangeDetectorRef,
-    private activePageNameService: ActivePageNameService){
+    private activePageNameService: ActivePageNameService,
+    private router:Router){
       this.getActivePageName()
     }
 
@@ -36,22 +39,14 @@ export class AppComponent implements OnInit {
       this.isAutherMainPanel();
       this.isAuther();
       this.getActivePageName()
-      console.log(this.activePageNameString)
-      // this.authService.isAuth.subscribe(response => {
-      //   this.isAuth=response
-      //   this.isAuthClass(response);
-      //   if (response) {
-      //     this.isMainClass = "main-panel";
-      //   } else if (response == false) {
-      //     this.isMainClass = "";
-      //   }
-      //   //console.log(response);
-      // })
-  
-     //this.isVisibleApp=false;
     }
     ngOnChanges(changes: SimpleChange): void {
       this.getActivePageName()
+      // this.userStatus = this.authService.getCurrentStatus();
+      // if (this.authService.isAuthenticadet() && !this.userStatus && window.location.href.toString().indexOf("create-user-profile") <= -1){
+      //   console.log("ok oko kokoko");
+      //   this.router.navigate(['/create-user-profile'])
+      // }
     }
     ngAfterViewInit():void{
       this.isAuther()
@@ -75,6 +70,11 @@ export class AppComponent implements OnInit {
         this.isAuthBool=response;
         //console.log(this.isAuthBool)
       })
+      // this.userStatus = this.authService.getCurrentStatus();
+      // if (this.authService.isAuthenticadet() && !this.userStatus && window.location.href.toString().indexOf("create-user-profile") <= -1){
+      //   console.log("ok oko kokoko");
+      //   this.router.navigate(['/create-user-profile'])
+      // }
     }
     isAuthClass() {
       let result: boolean;

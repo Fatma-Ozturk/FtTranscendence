@@ -1,3 +1,4 @@
+import { CreateUserProfileComponent } from './components/create-user-profile/create-user-profile.component';
 import { SearchUsersComponent } from './components/search-users/search-users.component';
 import { RedirectionAuth42Component } from './components/redirection-auth42/redirection-auth42.component';
 import { NgModule } from '@angular/core';
@@ -26,7 +27,9 @@ const routes: Routes = [
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
-	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] }
+	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
+	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },
+	{ path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({

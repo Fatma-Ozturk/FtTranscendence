@@ -1,3 +1,4 @@
+import { CreateUserProfileComponent } from './components/create-user-profile/create-user-profile.component';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -96,7 +97,8 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     SearchUsersComponent,
     UserProfileComponent,
     UserProfileCardComponent,
-    UserProfileEditComponent
+    UserProfileEditComponent,
+    CreateUserProfileComponent
   ],
   imports: [
     BrowserModule,

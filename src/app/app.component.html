@@ -1,4 +1,4 @@
-<div class="progress-container" *ngIf="isAuthBool==true">
+<div class="progress-container" *ngIf="isAuthBool==true && userStatus==true">
   <div class="progress-bar" id="scrollBar"></div>
 </div>
 <div>
@@ -14,7 +14,7 @@
               <router-outlet appScrollProgresbar></router-outlet>
           </div>
       </div>
-      <app-footer *ngIf="isAuthBool==true"></app-footer>
+      <app-footer *ngIf="isAuthBool==true && userStatus== true"></app-footer>
   </div>
   <small>
   <div class="card-footer fixed-bottom text-muted py-0 " *ngIf="isAuthBool==false" small>
