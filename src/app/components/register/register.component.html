@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <main class="form-signin">
+        <main class="form-register">
           <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
             <p-card header="Kayıt Ol" class="border-round w-full lg:w-6">
               <div>
@@ -14,7 +14,15 @@
                       {{ getErrorMessage('email') }}
                     </small>
                   </label>
-
+                </div>
+                <div class="form-floating text-left">
+                  <input pInputText formControlName="nickName" type="text" class="form-control" id="floatingInput"
+                    placeholder="" pTooltip="Kullanıcı Adı" pAutoFocus [autofocus]="true" />
+                  <label htmlFor="floatingInput">Kullanıcı Adı
+                    <small *ngIf="isFieldInvalid('nickName')" class="p-error">
+                      {{ getErrorMessage('nickName') }}
+                    </small>
+                  </label>
                 </div>
                 <div class="form-floating text-left">
                   <input pInputText formControlName="password" type="password" class="form-control"
@@ -26,7 +34,7 @@
                   </label>
                 </div>
                 <div class="form-floating text-left">
-                  <input pInputText formControlName="password1" type="password" class="form-control"
+                  <input pInputText formControlName="password1" type="password" class="form-control form-register-end"
                     id="floatingPassword" placeholder="" pTooltip="Şifre Yeniden" />
                   <label htmlFor="floatingPassword">Şifre
                     <small *ngIf="isFieldInvalid('password')" class="p-error">
@@ -55,7 +63,7 @@
       </div>
     </div>
     <div class="row">
-      <main class="form-signin-auth">
+      <main class="form-register-auth">
         <p-card class="border-round w-full lg:w-6">
           <div class="d-flex justify-content-between text-center">
             <div class="col-md-6">

@@ -1,8 +1,11 @@
+import { UserService } from './../../services/user.service';
+import { AuthService } from './../../services/auth.service';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { MessageService } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
+import { User } from 'src/app/models/entities/user';
 import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 
@@ -14,7 +17,7 @@ import { LocalStorageService } from 'src/app/services/local-storage.service';
 })
 export class RedirectionAuthGoogleComponent {
   private token: string = "";
-  private success: string= "";
+  private success: string = "";
   private message: string = "";
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -28,24 +31,20 @@ export class RedirectionAuthGoogleComponent {
     this.token = this.route.snapshot.paramMap.get('token');
     this.success = this.route.snapshot.paramMap.get('success');
     this.message = this.route.snapshot.paramMap.get('message');
-    let userStatus: boolean = false;
-    if (this.success === 'false'){
-      if (this.message === 'User Already Exists'){
+    if (this.success === 'false') {
+      if (this.message === 'User Already Exists') {
         this.toastrService.error(Messages.userAlreadyExists);
-        this.router.navigate(['/main']);
       }
+      if (this.message === 'User Not Found') {
+        this.toastrService.error(Messages.userNotFound);
+      }
+      this.router.navigate(['/main']);
     }
-    if (this.success === 'true'){
+    if (this.success === 'true') {
       if (this.jwtControllerService.isActive(this.token)) {
         this.localStorageService.saveItem("token", this.token);
-        if (!userStatus) {
-          this.router.navigate(['/create-user-profile'])
-          this.toastrService.info(Messages.success);
-        }
-        else{
-          this.router.navigate(['/view'])
-          this.toastrService.info(Messages.success);
-        }
+        this.router.navigate(['/view'])
+        this.toastrService.info(Messages.success);
       }
     }
   }

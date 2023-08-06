@@ -61,6 +61,17 @@ export class AuthService {
     }
     return null;
   }
+  getCurrentNickName(): string {
+    let token: string = localStorage.getItem("token");
+    if (token) {
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "nickName");
+      if (nameClaim) {
+        return nameClaim.value;
+      }
+    }
+    return null;
+  }
   getCurrentUserId(): number {
     let token: string = localStorage.getItem("token");
     if (token) {
@@ -71,17 +82,6 @@ export class AuthService {
       }
     }
     return null;
-  }
-  getCurrentStatus(): boolean {
-    let token: string = localStorage.getItem("token");
-    if (token) {
-      let decoded = this.jwtControllerService.decodeToken(token);
-      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "status");
-      if (nameClaim) {
-        return nameClaim.value === "true" ? true : false;
-      }
-    }
-    return false;
   }
   getCurrentIsVerified(): boolean {
     let token: string = localStorage.getItem("token");

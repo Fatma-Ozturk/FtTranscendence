@@ -1,3 +1,5 @@
+import { User } from './models/entities/user';
+import { UserService } from './services/user.service';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef, Component, OnInit, SimpleChange } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
@@ -13,103 +15,90 @@ import { SidebarService } from './services/sidebar.service';
 })
 export class AppComponent implements OnInit {
   title = 'FtTranscendence';
-  isAuthBool:boolean;
+  isAuthBool: boolean;
   isAuthMainPanelApp: string;
   mainDisplay: string;
   loaderDisplay: string;
   isAuth: boolean
-  activePageNameString:string;
+  activePageNameString: string;
   isMainClass: string;
-  userStatus: boolean = false;
   public dataObsevable: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   constructor(private authService: AuthService,
+    private userService: UserService,
     private loadProgressService: LoadProgressService,
     private sidebarService: SidebarService,
     private changeDetectorRef: ChangeDetectorRef,
     private activePageNameService: ActivePageNameService,
-    private router:Router){
-      this.getActivePageName()
-    }
+    private router: Router) {
+    this.getActivePageName()
+  }
 
-    ngOnInit(): void {
-      this.authService.isAuthenticadet()
-      this.isAuthClass();
-      this.isAuthWrapperClass();
-      this.isAutherMainPanel();
-      this.isAuther();
-      this.getActivePageName()
-    }
-    ngOnChanges(changes: SimpleChange): void {
-      this.getActivePageName()
-      // this.userStatus = this.authService.getCurrentStatus();
-      // if (this.authService.isAuthenticadet() && !this.userStatus && window.location.href.toString().indexOf("create-user-profile") <= -1){
-      //   console.log("ok oko kokoko");
-      //   this.router.navigate(['/create-user-profile'])
-      // }
-    }
-    ngAfterViewInit():void{
-      this.isAuther()
-      this.getActivePageName()
-      console.log(this.activePageNameString)
-    }
-    isAutherMainPanel(){
-      this.authService.isAuthenticadet()
-      this.authService.isAuth.subscribe(response => {
-        if (response==true) {
-          this.isAuthMainPanelApp="main-panel"
-        }else{
-          this.isAuthMainPanelApp=""
-        }
-      })
-      //console.log(this.isAuthMainPanelApp);
-    }
-    isAuther(){
-      this.authService.isAuthenticadet()
-      this.authService.isAuth.subscribe(response => {
-        this.isAuthBool=response;
-        //console.log(this.isAuthBool)
-      })
-      // this.userStatus = this.authService.getCurrentStatus();
-      // if (this.authService.isAuthenticadet() && !this.userStatus && window.location.href.toString().indexOf("create-user-profile") <= -1){
-      //   console.log("ok oko kokoko");
-      //   this.router.navigate(['/create-user-profile'])
-      // }
-    }
-    isAuthClass() {
-      let result: boolean;
-      this.authService.isAuthenticadet()
-      this.authService.isAuth.subscribe(response => {
-        result = response;
-      })
-      //console.log(result)
-      if (result) {
-        return "sidebar visible";
+  ngOnInit(): void {
+    this.authService.isAuthenticadet()
+    this.isAuthClass();
+    this.isAuthWrapperClass();
+    this.isAutherMainPanel();
+    this.isAuther();
+    this.getActivePageName();
+  }
+  ngOnChanges(changes: SimpleChange): void {
+    this.getActivePageName();
+  }
+  ngAfterViewInit(): void {
+    this.isAuther();
+    this.getActivePageName();
+    console.log(this.activePageNameString)
+  }
+  isAutherMainPanel() {
+    this.authService.isAuthenticadet()
+    this.authService.isAuth.subscribe(response => {
+      if (response == true) {
+        this.isAuthMainPanelApp = "main-panel"
+      } else {
+        this.isAuthMainPanelApp = ""
       }
-      return "d-none w-0 h-0 invisible"
+    })
+  }
+  isAuther() {
+    this.authService.isAuthenticadet()
+    this.authService.isAuth.subscribe(response => {
+      this.isAuthBool = response;
+    })
+  }
+  isAuthClass() {
+    let result: boolean;
+    this.authService.isAuthenticadet()
+    this.authService.isAuth.subscribe(response => {
+      result = response;
+    })
+    if (result) {
+      return "sidebar visible";
     }
-    isAuthWrapperClass() {
-      let result: boolean;
-      this.authService.isAuthenticadet()
-      this.authService.isAuth.subscribe(response => {
-        result = response;
-      })
-      //console.log(result)
-      if (result) {
-        return "wrapper visible";
-      }
-      return "d-none w-0 h-0 invisible"
+    return "d-none w-0 h-0 invisible"
+  }
+  isAuthWrapperClass() {
+    let result: boolean;
+    this.authService.isAuthenticadet()
+    this.authService.isAuth.subscribe(response => {
+      result = response;
+    })
+    //console.log(result)
+    if (result) {
+      return "wrapper visible";
     }
-    sidebarVisibility():string{
-      return String(this.sidebarService.getVisibility());
-    }
-    getActivePageName() {
-      this.activePageNameService.loadActivePage();
-      this.activePageNameService.activePageName.subscribe(response => {
-        this.activePageNameString = response;
-      });
-    }
-    // prepareRoute(outlet: RouterOutlet) {
-    //   return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
-    // }
+    return "d-none w-0 h-0 invisible"
+  }
+  sidebarVisibility(): string {
+    return String(this.sidebarService.getVisibility());
+  }
+  getActivePageName() {
+    this.activePageNameService.loadActivePage();
+    this.activePageNameService.activePageName.subscribe(response => {
+      this.activePageNameString = response;
+    });
+  }
+  // prepareRoute(outlet: RouterOutlet) {
+  //   return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
+  // }
 }

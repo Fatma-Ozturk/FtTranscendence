@@ -26,7 +26,7 @@ const routes: Routes = [
 	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
-	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
+	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
 	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
 	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },
 	{ path: '**', component: NotFoundComponent },

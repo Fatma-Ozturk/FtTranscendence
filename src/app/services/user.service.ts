@@ -37,7 +37,7 @@ export class UserService extends BaseService<User>{
   //   return this.httpClient.get<SingleResponseModel<User>>(newPath);
   // }
   getById(id: number) {
-    return this.httpClient.post<SingleResponseModel<number>>(environment.appurl + "users/getbyid?id=", id);
+    return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbyid?id=" + id);
   }
   getByMail(email: string) {
     return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbymail?email=" + email);

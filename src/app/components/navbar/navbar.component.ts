@@ -116,8 +116,8 @@ export class NavbarComponent implements OnInit {
   isAuthenticadet() {
     return this.authService.isAuthenticadet();
   }
-  getFullName(): string {
-    return this.authService.getCurrentFullName();
+  getNickName(): string {
+    return this.authService.getCurrentNickName();
   }
   signOut() {
     this.isAuthenticadet();
