@@ -72,7 +72,6 @@ import { SearchUsersComponent } from './components/search-users/search-users.com
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
 import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
-import { ButtonModule } from 'primeng/button';
 
 @NgModule({
   declarations: [
@@ -144,7 +143,6 @@ import { ButtonModule } from 'primeng/button';
     AutoFocusModule,
     InputSwitchModule,
     ToastModule,
-    ButtonModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
