@@ -42,7 +42,7 @@ html{
   }
   
   .custom-button:hover {
-	background-color: #FFC109; /* Üzerine gelince arkaplan rengini değiştirir */
+	background-color: #00b327; /* Üzerine gelince arkaplan rengini değiştirir */
 	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Üzerine gelince gölge efektini arttırır */
   }
   

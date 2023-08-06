@@ -53,6 +53,27 @@ export class NavbarComponent implements OnInit {
         command: () => this.visibleMain(),
       },
       {
+        label: 'Chat',
+        icon: 'pi pi-fw pi-inbox',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.ChatRoute()
+      },
+      {
+        label: 'Leaderboard',
+        icon: 'pi pi-fw pi-table',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.leaderboardRoute()
+      },
+      {
+        label: 'Game',
+        icon: 'pi pi-fw pi-play',
+        //visible: this.isAuthenticadet(),
+        visible: true,
+        command: () => this.gameRoute()
+      },
+      {
         label: 'Menü',
         icon: 'pi pi-fw pi-bars',
         visible: this.isAuthenticadet(),
@@ -68,27 +89,24 @@ export class NavbarComponent implements OnInit {
           {
             label: 'Ara',
             icon: 'pi pi-fw pi-users',
-            routerLink: ['/search-users']
+            items: [
+              {
+                label: 'Filtre',
+                icon: 'pi pi-fw pi-filter',
+                items: [
+                  {
+                    label: 'Yazdır',
+                    icon: 'pi pi-fw pi-print'
+                  }
+                ]
+              },
+              {
+                icon: 'pi pi-fw pi-bars',
+                label: 'Görüntüle'
+              }
+            ]
           }
         ]
-      },
-      {
-        label: 'Chat',
-        icon: 'pi pi-fw pi-inbox',
-        visible: this.isAuthenticadet(),
-        routerLink: ['/chat']
-      },
-      {
-        label: 'Leaderboard',
-        icon: 'pi pi-fw pi-table',
-        visible: this.isAuthenticadet(),
-        routerLink: ['/leaderboard']
-      },
-      {
-        label: 'Game',
-        icon: 'pi pi-fw pi-play',
-        visible: this.isAuthenticadet(),
-        routerLink: "/game",
       },
       {
         label: 'Çıkış',

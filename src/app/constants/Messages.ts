@@ -11,7 +11,6 @@ export class Messages{
     static claimAdd:string="Rol eklendi"
     static claimUpdate:string="Rol güncellendi"
     static userFound:string="Kullanıcı bulundu"
-    static userAlreadyExists:string="Böyle bir kullanıcı kayıtlı"
     static userNotFound:string="Kullanıcı bulunamadı"
     static error:string="Hata"
     static success:string="Başarı"

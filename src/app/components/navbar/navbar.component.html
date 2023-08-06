@@ -1,24 +1,34 @@
 <p-menubar [model]="items" class="bg-danger">
-  <ng-template pTemplate="start">
-  </ng-template>
-  <ng-template pTemplate="end">
-      <div *ngIf="isAuthBool==false">
-        <button class="border-0 bg-transparent" routerLink="/login">
+    <ng-template pTemplate="start">
+    </ng-template>
+    <ng-template pTemplate="end">
+        <div *ngIf="isAuthBool==false">
+            <button class="border-0 bg-transparent" routerLink="/login">
           <p-avatar icon="pi pi-user" [style]="{ 'color': '#ffffff'}" shape="circle" styleClass="bg-warning"
             shape="circle">
           </p-avatar>
         </button>
-      </div>
-      <div *ngIf="isAuthBool==true" class="mt-2">
-        <p-chip [label]="getFullName()"
-        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"></p-chip>
-      </div>
-  </ng-template>
-</p-menubar>
-<div class="d-none position-fixed" style="top: 96px;right: 0px;z-index: 3;visibility: hidden;">
-  HemFikr
-</div>
-<div id="progress" class="position-fixed d-none">efyazılım</div>
-<p-sidebar [(visible)]="visibleSidebar1" [baseZIndex]="10000">
-  <app-sidebar></app-sidebar>
-</p-sidebar>
+        </div>
+        <div class="btn-group mr-2 align-middle text-dark" *ngIf="isAuthBool==true">
+            <i type="button" class="btn btn-secondary dropdown-toggle pi pi-check align-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+             {{getFullName()}}
+            </i>
+            <div class="dropdown-menu" style="right: 0px !important;">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+            </div>
+        </div>
+  
+    </ng-template>
+  </p-menubar>
+  <div class="d-none position-fixed" style="top: 96px;right: 0px;z-index: 3;visibility: hidden;">
+    HemFikr
+  </div>
+  <div id="progress" class="position-fixed d-none">efyazılım</div>
+  <p-sidebar [(visible)]="visibleSidebar1" [baseZIndex]="10000">
+    <app-sidebar></app-sidebar>
+  </p-sidebar>
+  
