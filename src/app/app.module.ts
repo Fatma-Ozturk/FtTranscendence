@@ -69,6 +69,7 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
 import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -83,7 +84,15 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     UserActivateComponent,
     LeaderboardComponent,
     ChatComponent,
-    GameComponent
+    GameComponent,
+    AuthGoogleComponent,
+    RedirectionAuthGoogleComponent,
+    ChatRoomComponent,
+    ChatRoomsComponent,
+    SearchUsersComponent,
+    UserProfileComponent,
+    UserProfileCardComponent,
+    UserProfileEditComponent,
   ],
   imports: [
     BrowserModule,

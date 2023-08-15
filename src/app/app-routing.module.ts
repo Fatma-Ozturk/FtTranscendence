@@ -12,15 +12,20 @@ import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
 
 const routes: Routes = [
-  { path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
-  { path: '404', pathMatch: "full", component: NotFoundComponent },
-  { path: "main", component: MainComponent, canActivate: [notLoginGuard] },
-  { path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
-  { path: "view", component: ViewComponent, canActivate: [loginGuard] },
-  { path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
-  { path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard]},
-  { path: "chat", component: ChatComponent, canActivate: [notLoginGuard]},
-  { path: "game", component: GameComponent, canActivate: [notLoginGuard]}
+	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
+	{ path: '404', pathMatch: "full", component: NotFoundComponent },
+	{ path: "main", component: MainComponent, canActivate: [notLoginGuard] },
+	{ path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
+	{ path: "view", component: ViewComponent, canActivate: [loginGuard] },
+	{ path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
+	{ path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component },
+	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
+	//{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
+	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard] },
+	//{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
+	{ path: "chat", component: ChatComponent, canActivate: [notLoginGuard] },
+	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
+	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] }
 ];
 
 @NgModule({
