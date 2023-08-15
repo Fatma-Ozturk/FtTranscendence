@@ -60,7 +60,14 @@ import { UserActivateComponent } from './components/user-activate/user-activate.
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
-import { ButtonModule } from 'primeng/button';
+import { AuthGoogleComponent } from './components/auth-google/auth-google.component';
+import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
+import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
+import { SearchUsersComponent } from './components/search-users/search-users.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
+import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
 
 @NgModule({
   declarations: [
@@ -120,7 +127,7 @@ import { ButtonModule } from 'primeng/button';
     RippleModule,
     AutoFocusModule,
     InputSwitchModule,
-    ButtonModule,
+    ToastModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
