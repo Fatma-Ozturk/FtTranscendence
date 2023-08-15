@@ -18,14 +18,11 @@ const routes: Routes = [
 	{ path: "login", component: LoginComponent, canActivate: [notLoginGuard] },
 	{ path: "view", component: ViewComponent, canActivate: [loginGuard] },
 	{ path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
-	{ path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component },
-	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
 	//{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard] },
 	//{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [notLoginGuard] },
-	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
-	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] }
+	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] }
 ];
 
 @NgModule({
