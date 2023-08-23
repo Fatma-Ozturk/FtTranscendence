@@ -42,6 +42,9 @@ export class UserService extends BaseService<User>{
   getByMail(email: string) {
     return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbymail?email=" + email);
   }
+  getByNickName(nickName: string) {
+    return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbynickname?nickname=" + nickName);
+  }
   getStatusByMail(email: string) {
     return this.httpClient.get<SingleResponseModel<boolean>>(environment.appurl + "users/getstatusbymail?email=" + email);
   }

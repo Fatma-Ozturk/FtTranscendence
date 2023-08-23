@@ -10,7 +10,7 @@
           <div class="row m-2">
             <div class="col-12 d-block">
               <span>Ad Soyad : </span>
-              <p>{{user?.firstName}} {{user?.lastName}}</p>
+              <p>{{user?.firstName == null ? "-" : user?.firstName}} {{user?.lastName == null ? "-" : user?.firstName}}</p>
             </div>
             <div class="col-12 d-block">
               <span>Kullanıcı Adı : </span>
@@ -28,7 +28,7 @@
       <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
         <p-button icon="pi pi-comment" styleClass="p-button-rounded p-button-success"></p-button>
         <p-button icon="pi pi-heart" styleClass="p-button-rounded p-button-danger"></p-button>
-        <p-button icon="pi pi-user" styleClass="p-button-rounded p-button-primary"></p-button>
+        <p-button icon="pi pi-user" styleClass="p-button-rounded p-button-primary" [routerLink]="'/user-profile/' + user.nickName"  routerLinkActive="active"></p-button>
       </div>
     </ng-template>
 </p-card>

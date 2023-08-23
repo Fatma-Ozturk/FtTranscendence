@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { Component, Input } from '@angular/core';
 import { User } from 'src/app/models/entities/user';
 
@@ -8,10 +9,14 @@ import { User } from 'src/app/models/entities/user';
 })
 export class UserProfileCardComponent {
   @Input() user: User;
-  constructor() {
+  constructor(private userService:UserService) {
   }
 
   ngOnInint(): void{
 
+  }
+
+  getUserProfile(){
+    
   }
 }
