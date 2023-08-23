@@ -30,6 +30,7 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { DropdownModule } from 'primeng/dropdown';
 import { TabViewModule } from 'primeng/tabview';
 import { DialogModule } from 'primeng/dialog';
+import { ChipsModule } from 'primeng/chips';
 import { GalleriaModule } from 'primeng/galleria';
 import { PaginatorModule } from 'primeng/paginator';
 import { CarouselModule } from 'primeng/carousel';
@@ -143,6 +144,7 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     AutoFocusModule,
     InputSwitchModule,
     ToastModule,
+    ChipsModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
