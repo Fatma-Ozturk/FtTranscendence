@@ -1,3 +1,5 @@
+import { GamePlayerEnum } from './../../models/enums/gamePlayer';
+import { GameService } from './../../services/game.service';
 import { PaddleGameModel } from './../../models/model/paddleGameModel';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
@@ -31,9 +33,11 @@ export class GameComponent {
 	isArrowUpPressed: boolean = false;
 	isArrowDownPressed: boolean = false;
 
-	constructor() {
+	constructor(private gameService: GameService) {
 		this.paddleGuest = new PaddleGameModel();
+		this.paddleGuest.whoIs = GamePlayerEnum.guest;
 		this.paddleHost = new PaddleGameModel();
+		this.paddleHost.whoIs = GamePlayerEnum.host;
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
 		//todo These are reassigned after api call
@@ -66,6 +70,7 @@ export class GameComponent {
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
 			if (this.bendCall++ % 10 == 0) {
+				this.gameService.sendGame(this.ball);
 				//BACKEND CALL
 				// console.log("Gameloop");
 			}
@@ -120,6 +125,8 @@ export class GameComponent {
 					this.paddleHost.height -
 					2;
 		}
+		if (this.isArrowUpPressed || this.isArrowDownPressed)
+			this.gameService.sendKeydown(this.paddleHost);
 	}
 
 	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>

@@ -27,9 +27,9 @@ export class RegisterComponent {
 
   ngOnInit(): void {
     // this.primengConfig.ripple = true;
-    this.createLoginFrom();
+    this.createRegisterFrom();
   }
-  createLoginFrom() {
+  createRegisterFrom() {
     this.registerForm = this.formBuilder.group({
       "email": ["", [Validators.required, Validators.email, Validators.minLength(3)]],
       "nickName": ["", [Validators.required, Validators.minLength(3)]],
@@ -37,7 +37,7 @@ export class RegisterComponent {
       "password1": ["", [Validators.required, Validators.minLength(1)]],
     })
   }
-  login() {
+  register() {
     let registerForm = Object.assign({}, this.registerForm.value);
     this.authService.register(registerForm).subscribe(response => {
       let token: string = String(response.data.token);
@@ -47,15 +47,18 @@ export class RegisterComponent {
         this.toastrService.info(Messages.success);
       }
     }, responseError => {
-      if (responseError.error == "User Not Found")
-        this.toastrService.info(Messages.userNotFound)
-      this.router.navigate(['/login'])
+      if (responseError.error) {
+        if (responseError.error.message == "User Not Found")
+          this.toastrService.info(Messages.userNotFound)
+        if (responseError.error.message == "User Already Exists")
+          this.toastrService.info(Messages.userAlreadyExists)
+      }
     });
   }
   onSubmit(): void {
     if (!this.registerForm.valid)
       return;
-    this.login();
+    this.register();
   }
   checkRequiredForDisable(): boolean {
     return (this.registerForm.get("email").hasError('required') || this.registerForm.get("password").hasError('required'))

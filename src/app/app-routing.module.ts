@@ -15,6 +15,7 @@ import { LeaderboardComponent } from './components/leaderboard/leaderboard.compo
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
 import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
+import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -28,6 +29,7 @@ const routes: Routes = [
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
+	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
 	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
 	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard] },
 	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },

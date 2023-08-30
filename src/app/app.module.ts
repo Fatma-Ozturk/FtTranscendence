@@ -73,6 +73,8 @@ import { SearchUsersComponent } from './components/search-users/search-users.com
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
 import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
+import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @NgModule({
   declarations: [
@@ -99,7 +101,8 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     UserProfileComponent,
     UserProfileCardComponent,
     UserProfileEditComponent,
-    CreateUserProfileComponent
+    CreateUserProfileComponent,
+    GameMatchmakingComponent
   ],
   imports: [
     BrowserModule,
@@ -145,6 +148,7 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     InputSwitchModule,
     ToastModule,
     ChipsModule,
+    ProgressBarModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,

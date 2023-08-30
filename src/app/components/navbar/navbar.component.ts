@@ -88,7 +88,7 @@ export class NavbarComponent implements OnInit {
         label: 'Game',
         icon: 'pi pi-fw pi-play',
         visible: this.isAuthenticadet(),
-        routerLink: "/game",
+        routerLink: "/game-matchmaking",
       },
       {
         label: 'Çıkış',
@@ -122,8 +122,7 @@ export class NavbarComponent implements OnInit {
   signOut() {
     this.isAuthenticadet();
     localStorage.clear();
-    location.reload();
-    this.router.navigate(['login']);
+    this.router.navigate(['/']);
   }
   visibleSidebar() {
     this.visibleSidebar1 = true
