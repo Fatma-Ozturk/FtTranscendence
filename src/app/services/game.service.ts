@@ -11,10 +11,15 @@ export class GameService {
   public keydown$: BehaviorSubject<string> = new BehaviorSubject('');
   public game$: BehaviorSubject<string> = new BehaviorSubject('');
   public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
+  public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   private token: string;
   private socket: Socket; // Socket tipinde bir değişken tanımlayın
 
   constructor() {
+
+  }
+
+  public connectSocket(){
     this.token = localStorage.getItem('token');
     this.socket = io(environment.appurlSocket, {
       auth: { token: this.token }
@@ -30,7 +35,10 @@ export class GameService {
       this.game$.next(message);
     });
     this.socket.on('matchmaking', (message: any) => {
-      this.game$.next(message);
+      this.matchmaking$.next(message);
+    });
+    this.socket.on('matchmakingResponse', (message: any) => {
+      this.matchmakingResponse$.next(message);
     });
   }
 
@@ -56,5 +64,9 @@ export class GameService {
 
   public getNewMatchmaking = () => {
     return this.matchmaking$.asObservable();
+  };
+
+  public getNewMatchmakingResponse = () => {
+    return this.matchmakingResponse$.asObservable();
   };
 }

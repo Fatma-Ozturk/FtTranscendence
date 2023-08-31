@@ -7,15 +7,15 @@
             <div class="row align-items-center justify-content-center">
                 <div class="w-100">
                     <div class="text-center" *ngIf="gameTextDivVisible" >
-                        <label #gameTextDiv>Oyuna Katıl</label>
+                        <label>{{gameText}}</label>
                     </div>
-                    <div class="text-center" *ngIf="progressBarDivVisible">
+                    <div class="text-center mb-2 mt-3" *ngIf="progressBarDivVisible">
                         <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" #progressBarDiv></p-progressBar>
                     </div>
                 </div>
                 <div class="w-100 mt-3">
                     <div class="text-center">
-                        <p-button label="Ara" styleClass="p-button-rounded w-100" icon="pi pi-search" iconPos="left"></p-button>
+                        <p-button label="Ara" (onClick)="matchGame()" styleClass="p-button-rounded w-100" icon="pi pi-search" iconPos="left"></p-button>
                     </div>
                 </div>
             </div>

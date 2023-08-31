@@ -7,8 +7,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
   styleUrls: ['./game-matchmaking.component.css']
 })
 export class GameMatchmakingComponent {
-  @ViewChild('gameTextDiv', { static: true })
-  gameTextDivRef: ElementRef<HTMLDivElement>;
+  gameText:string;
 
   @ViewChild('processDiv', { static: true })
   processDivRef: ElementRef<HTMLDivElement>;
@@ -22,9 +21,27 @@ export class GameMatchmakingComponent {
   ngOnInit() {
     this.progressBarDivVisible = false;
     this.gameTextDivVisible = true;
+    this.gameText = "Oyuna katıl";
+  }
+
+  ngDoCheck(){
+    this.gameService.getNewMatchmakingResponse().subscribe(
+      (response: any) => {
+        console.log("response" + JSON.stringify(response));
+        if (response.message === "Matchmaking Search"){
+          this.progressBarDivVisible = true;
+          this.gameText = "Oyuncu Aranıyor..."
+        }
+      },
+      (error) => {
+        console.error('Error reading matchmaking response:', error);
+      }
+    );
   }
 
   matchGame(){
+    this.gameService.connectSocket();
+    console.log("this.gameService.getNewMatchmakingResponse() " + JSON.stringify(this.gameService.getNewMatchmakingResponse));
     this.gameService.sendMatchmaking('');
   }
 }
