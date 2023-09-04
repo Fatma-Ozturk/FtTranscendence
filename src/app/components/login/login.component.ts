@@ -1,3 +1,4 @@
+import { UserService } from 'src/app/services/user.service';
 import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -5,6 +6,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PrimeNGConfig } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
+import { User } from 'src/app/models/entities/user';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -18,6 +20,7 @@ export class LoginComponent {
 
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService,
+    private userService:UserService,
     private toastrService: ToastrService,
     private router: Router,
     private sanitizer: DomSanitizer,
@@ -34,30 +37,28 @@ export class LoginComponent {
     })
   }
   login() {
-      let loginModel = Object.assign({}, this.loginForm.value);
-      this.authService.login(loginModel).subscribe(response => {
-        let token:string = String(response.data.token);
-        localStorage.setItem("token", token);
-        if(response.data && token.length > 0 && localStorage.getItem("token")){
+    let loginModel = Object.assign({}, this.loginForm.value);
+    this.authService.login(loginModel).subscribe(response => {
+      let token: string = String(response.data.token);
+      localStorage.setItem("token", token);
+      if (response.data && token.length > 0 && localStorage.getItem("token")) {
           this.router.navigate(['/view'])
-        }
-      }, responseError => {
-        console.log("responseError.data.message " + JSON.stringify(responseError.error.message));
-        
-        if (responseError.error.message == "User Not Found")
-          this.toastrService.info(Messages.userNotFound)
-        if (responseError.error.message == "Password Error")
-          this.toastrService.info(Messages.passwordError)
-        this.router.navigate(['/login'])  
-      });
+          this.toastrService.info(Messages.success);
+      }
+    }, responseError => {
+      if (responseError.error.message == "User Not Found")
+        this.toastrService.info(Messages.userNotFound)
+      if (responseError.error.message == "Password Error")
+        this.toastrService.info(Messages.passwordError)
+      this.router.navigate(['/login'])
+    });
   }
   onSubmit(): void {
     if (!this.loginForm.valid)
       return;
     this.login();
   }
-  checkRequiredForDisable():boolean
-  {
+  checkRequiredForDisable(): boolean {
     return (this.loginForm.get("email").hasError('required') || this.loginForm.get("password").hasError('required'))
   }
   isFieldInvalid(fieldName: string): boolean {

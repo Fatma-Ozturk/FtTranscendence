@@ -39,11 +39,33 @@ export class AuthService {
       return (false);
     }
   }
+  getCurrentMail(): string {
+    let token: string = localStorage.getItem("token");
+    if (token) {
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "email");
+      if (nameClaim) {
+        return nameClaim.value;
+      }
+    }
+    return null;
+  }
   getCurrentFullName(): string {
     let token: string = localStorage.getItem("token");
     if (token) {
       let decoded = this.jwtControllerService.decodeToken(token);
       let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "name");
+      if (nameClaim) {
+        return nameClaim.value;
+      }
+    }
+    return null;
+  }
+  getCurrentNickName(): string {
+    let token: string = localStorage.getItem("token");
+    if (token) {
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "nickName");
       if (nameClaim) {
         return nameClaim.value;
       }
@@ -60,6 +82,17 @@ export class AuthService {
       }
     }
     return null;
+  }
+  getCurrentIsVerified(): boolean {
+    let token: string = localStorage.getItem("token");
+    if (token) {
+      let decoded = this.jwtControllerService.decodeToken(token);
+      let nameClaim = decoded.claims.find((claim: { name: string; }) => claim.name === "isVerified");
+      if (nameClaim) {
+        return nameClaim.value === "true" ? true : false;
+      }
+    }
+    return false;
   }
   getCurrentRole():string{
     let token: string = localStorage.getItem("token")

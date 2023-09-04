@@ -4,6 +4,7 @@
 
 export const environment = {
     appurl:"http://localhost:3000/api/",
+    appurlSocket:"http://localhost:3000/socket/game",
     production: false,
   };
   

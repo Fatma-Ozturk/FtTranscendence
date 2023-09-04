@@ -4,13 +4,21 @@
             <h1>Kullanıcı Ara</h1>
         </div>
         <form [formGroup]="searchUsersForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
-            <div class="row d-flex justify-content-center">
-                <div class="col-6 m-2">
-                    <span class="p-input-icon-left w-100">
-                        <i class="pi pi-search"></i>
-                        <input pInputText formControlName="searchtext" type="text" id="floatingInput" placeholder=""
-                            pTooltip="Kullanıcı" pAutoFocus [autofocus]="true" class="w-100" />
-                    </span>
+            <div class="row d-flex justify-content-center align-self-center">
+                <div class="col-12">
+                    <div class="row d-flex justify-content-center align-self-center">
+                        <div class="col-6 ml-2">
+                            <div class="card p-fluid">
+                                <p-chips formControlName="searchtext" type="text" id="floatingInput" placeholder=""
+                                    pTooltip="Kullanıcı" pAutoFocus [autofocus]="true" class="w-100"
+                                    styleClass="{'width': '100%'}" (enter)="onSubmit()">
+                                </p-chips>
+                            </div>
+                        </div>
+                        <div class="col-1 d-flex align-self-center">
+                            <p-button (onClick)="clearAll()" icon="pi pi-times" styleClass="p-button-rounded p-button-danger"></p-button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>

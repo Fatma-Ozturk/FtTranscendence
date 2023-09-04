@@ -37,10 +37,19 @@ export class UserService extends BaseService<User>{
   //   return this.httpClient.get<SingleResponseModel<User>>(newPath);
   // }
   getById(id: number) {
-    return this.httpClient.post<SingleResponseModel<number>>(environment.appurl + "users/getbyid", id)
+    return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbyid?id=" + id);
+  }
+  getByMail(email: string) {
+    return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbymail?email=" + email);
+  }
+  getByNickName(nickName: string) {
+    return this.httpClient.get<SingleResponseModel<User>>(environment.appurl + "users/getbynickname?nickname=" + nickName);
+  }
+  getStatusByMail(email: string) {
+    return this.httpClient.get<SingleResponseModel<boolean>>(environment.appurl + "users/getstatusbymail?email=" + email);
   }
   getByAttributes(userForSearchDto: UserForSearchDto) {
-    return this.httpClient.post<ListResponseModel<User>>(environment.appurl + "users/getbyattributes", userForSearchDto)
+    return this.httpClient.post<ListResponseModel<User>>(environment.appurl + "users/getbyattributes", userForSearchDto);
   }
   getAllOperationClaimRank(userId: number): Observable<ListResponseModel<OperationClaim>> {
     let newPath = environment.appurl + "users/getalloperationclaimrank?userId=" + userId

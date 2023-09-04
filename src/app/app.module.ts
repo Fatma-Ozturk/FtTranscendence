@@ -1,3 +1,4 @@
+import { CreateUserProfileComponent } from './components/create-user-profile/create-user-profile.component';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -29,6 +30,7 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { DropdownModule } from 'primeng/dropdown';
 import { TabViewModule } from 'primeng/tabview';
 import { DialogModule } from 'primeng/dialog';
+import { ChipsModule } from 'primeng/chips';
 import { GalleriaModule } from 'primeng/galleria';
 import { PaginatorModule } from 'primeng/paginator';
 import { CarouselModule } from 'primeng/carousel';
@@ -71,6 +73,8 @@ import { SearchUsersComponent } from './components/search-users/search-users.com
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { UserProfileCardComponent } from './components/user-profile-card/user-profile-card.component';
 import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
+import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @NgModule({
   declarations: [
@@ -96,7 +100,9 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     SearchUsersComponent,
     UserProfileComponent,
     UserProfileCardComponent,
-    UserProfileEditComponent
+    UserProfileEditComponent,
+    CreateUserProfileComponent,
+    GameMatchmakingComponent
   ],
   imports: [
     BrowserModule,
@@ -141,6 +147,8 @@ import { UserProfileEditComponent } from './components/user-profile-edit/user-pr
     AutoFocusModule,
     InputSwitchModule,
     ToastModule,
+    ChipsModule,
+    ProgressBarModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,

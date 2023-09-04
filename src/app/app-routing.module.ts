@@ -1,3 +1,5 @@
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { CreateUserProfileComponent } from './components/create-user-profile/create-user-profile.component';
 import { SearchUsersComponent } from './components/search-users/search-users.component';
 import { RedirectionAuth42Component } from './components/redirection-auth42/redirection-auth42.component';
 import { NgModule } from '@angular/core';
@@ -13,6 +15,7 @@ import { LeaderboardComponent } from './components/leaderboard/leaderboard.compo
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
 import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
+import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -25,8 +28,12 @@ const routes: Routes = [
 	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
-	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
-	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] }
+	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
+	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
+	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
+	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard] },
+	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },
+	{ path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({

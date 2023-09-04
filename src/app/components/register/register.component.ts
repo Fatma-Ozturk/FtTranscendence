@@ -27,40 +27,40 @@ export class RegisterComponent {
 
   ngOnInit(): void {
     // this.primengConfig.ripple = true;
-    this.createLoginFrom();
+    this.createRegisterFrom();
   }
-  createLoginFrom() {
+  createRegisterFrom() {
     this.registerForm = this.formBuilder.group({
       "email": ["", [Validators.required, Validators.email, Validators.minLength(3)]],
+      "nickName": ["", [Validators.required, Validators.minLength(3)]],
       "password": ["", [Validators.required, Validators.minLength(1)]],
       "password1": ["", [Validators.required, Validators.minLength(1)]],
-      "firstName": ["", [Validators.required, Validators.minLength(1)]],
-      "lastName": ["", [Validators.required, Validators.minLength(1)]],
-      "nickName": ["", [Validators.required, Validators.minLength(1)]],
     })
   }
-  login() {
-      let registerForm = Object.assign({}, this.registerForm.value);
-      this.authService.register(registerForm).subscribe(response => {
-        let token:string = String(response.data.token);
-        localStorage.setItem("token", token);
-        if(response.data && token.length > 0 && localStorage.getItem("token")){
-          this.toastrService.info(Messages.success);
-          this.router.navigate(['/view'])
-        }
-      }, responseError => {
-        // if (responseError.error == "User Not Found")
-        //   this.toastrService.info(Messages.userNotFound)
-        this.router.navigate(['/login'])
-      });
+  register() {
+    let registerForm = Object.assign({}, this.registerForm.value);
+    this.authService.register(registerForm).subscribe(response => {
+      let token: string = String(response.data.token);
+      localStorage.setItem("token", token);
+      if (response.data && token.length > 0 && localStorage.getItem("token")) {
+        this.router.navigate(['/view'])
+        this.toastrService.info(Messages.success);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        if (responseError.error.message == "User Not Found")
+          this.toastrService.info(Messages.userNotFound)
+        if (responseError.error.message == "User Already Exists")
+          this.toastrService.info(Messages.userAlreadyExists)
+      }
+    });
   }
   onSubmit(): void {
     if (!this.registerForm.valid)
       return;
-    this.login();
+    this.register();
   }
-  checkRequiredForDisable():boolean
-  {
+  checkRequiredForDisable(): boolean {
     return (this.registerForm.get("email").hasError('required') || this.registerForm.get("password").hasError('required'))
   }
   isFieldInvalid(fieldName: string): boolean {
@@ -85,18 +85,18 @@ export class RegisterComponent {
 
     return '';
   }
-  
-  onAvatarSelected(event: any) {
-    const file: File | null = event.target.files ? event.target.files[0] : null;
 
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.avatarUrl = reader.result as string;
-      };
-    } else {
-      this.avatarUrl = null;
-    }
-  }
+  // onAvatarSelected(event: any) {
+  //   const file: File | null = event.target.files ? event.target.files[0] : null;
+
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => {
+  //       this.avatarUrl = reader.result as string;
+  //     };
+  //   } else {
+  //     this.avatarUrl = null;
+  //   }
+  // }
 }
