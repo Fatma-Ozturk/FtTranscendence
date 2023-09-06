@@ -1,5 +1,6 @@
 import { GameService } from './../../services/game.service';
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-matchmaking',
@@ -14,7 +15,7 @@ export class GameMatchmakingComponent {
 
   progressBarDivVisible: boolean;
   gameTextDivVisible: boolean
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService, private router:Router) {
 
   }
 
@@ -31,6 +32,18 @@ export class GameMatchmakingComponent {
         if (response.message === "Matchmaking Search"){
           this.progressBarDivVisible = true;
           this.gameText = "Oyuncu Aranıyor..."
+        }
+        else if (response.message === "Matchmaking Join"){
+          this.progressBarDivVisible = false;
+          this.gameText = "Oyuncu Bulundu..."
+        }
+        else if (response.message === "Matchmaking Finish"){
+          this.progressBarDivVisible = false;
+          this.gameText = "Yönlendiriliyor..."
+          setTimeout(() => {
+            this.router.navigate(['/game']);
+          }, 1000);
+          
         }
       },
       (error) => {
