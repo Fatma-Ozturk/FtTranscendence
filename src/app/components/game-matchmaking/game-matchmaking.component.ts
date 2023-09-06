@@ -32,6 +32,17 @@ export class GameMatchmakingComponent {
           this.progressBarDivVisible = true;
           this.gameText = "Oyuncu Aranıyor..."
         }
+        else if (response.message === "Matchmaking Join"){
+          this.progressBarDivVisible = false;
+          this.gameText = "Oyuncu Bulundu..."
+        }
+        else if (response.message === "Matchmaking Finish"){
+          this.progressBarDivVisible = false;
+          this.gameText = "Yönlendiriliyor..."
+          setTimeout(() => {
+            this.router.navigate(['/game']);
+          }, 1000);
+        }
       },
       (error) => {
         console.error('Error reading matchmaking response:', error);
