@@ -1,3 +1,11 @@
 <div class="d-flex justify-content-center align-self-center">
 	<canvas #gameCanvas class="game-canvas"></canvas>
 </div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Header" [(visible)]="visibleGameDisconnectPopup" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <p class="m-0">
+            Oyun bağlantınız koptu lütfen siktir olup gidin!
+        </p>
+    </p-dialog>
+</div>

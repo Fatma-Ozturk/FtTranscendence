@@ -40,10 +40,14 @@ export class GameMatchmakingComponent {
         else if (response.message === "Matchmaking Finish"){
           this.progressBarDivVisible = false;
           this.gameText = "Yönlendiriliyor..."
-          setTimeout(() => {
-            this.router.navigate(['/game']);
-          }, 1000);
-          
+          this.gameService.getGameRoomId().subscribe((response: any)=>{
+            if (response != null && response !== undefined){
+              setTimeout(() => {
+                const queryParams = { 'room-id': response.message};
+                this.router.navigate(['/game'], {queryParams});
+            }, 1000);
+            }
+        })
         }
       },
       (error) => {
