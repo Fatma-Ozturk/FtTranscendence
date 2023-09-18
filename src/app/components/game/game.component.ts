@@ -3,6 +3,7 @@ import { GameService } from './../../services/game.service';
 import { PaddleGameModel } from './../../models/model/paddleGameModel';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
 	selector: 'app-game',
@@ -33,7 +34,10 @@ export class GameComponent {
 	isArrowUpPressed: boolean = false;
 	isArrowDownPressed: boolean = false;
 
-	constructor(private gameService: GameService) {
+	visibleGameDisconnectPopup: boolean = false;
+	private gameRoomId: number = 0;
+
+	constructor(private gameService: GameService, private route: ActivatedRoute) {
 		this.paddleGuest = new PaddleGameModel();
 		this.paddleGuest.whoIs = GamePlayerEnum.guest;
 		this.paddleHost = new PaddleGameModel();
@@ -60,17 +64,36 @@ export class GameComponent {
 		this.getScreenSize();
 		this.setCanvasSize();
 		this.initGameModels();
+		this.route.queryParams.subscribe((data:any)=>{
+			this.gameRoomId = Number(data['room-id']);
+		})
+	}
+
+	ngDoCheck(){
+		// console.log("ok");
+		// this.gameService.getGameDisconnected().subscribe((response: any)=>{
+		// 	console.log("response.message " + response.message);
+		// 	if (response.message){
+		// 		if (response.message === 'true'){
+		// 			console.log("true");
+		// 			this.visibleGameDisconnectPopup = true;
+		// 		}
+		// 	}
+		// },
+		// (error) => {
+		//   console.error('Error reading game disconnected:', error);
+		// })
 	}
 
 	//* ^^ eventloophooks and constructor^^
-
 	gameLoop = (): void => {
 		this.gameUpdate();
 		this.gameDraw();
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
+			this.gameService.sendGame(this.ball);
 			if (this.bendCall++ % 10 == 0) {
-				this.gameService.sendGame(this.ball);
+				//get gameRoom reflesh
 				//BACKEND CALL
 				// console.log("Gameloop");
 			}
@@ -125,8 +148,10 @@ export class GameComponent {
 					this.paddleHost.height -
 					2;
 		}
-		if (this.isArrowUpPressed || this.isArrowDownPressed)
-			this.gameService.sendKeydown(this.paddleHost);
+		if (this.isArrowUpPressed || this.isArrowDownPressed){
+			this.gameService.getNewMatchmaking
+		}
+			// this.gameService.sendKeydown(this.paddleHost);
 	}
 
 	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>
