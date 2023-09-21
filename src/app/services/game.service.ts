@@ -30,22 +30,22 @@ export class GameService {
   }
 
   private setupSocketListeners() {
-    this.socket.on('keydown', (message: any) => {
+    this.socket.on('keydown', (message: any):any => {
       this.keydown$.next(message);
     });
-    this.socket.on('game', (message: any) => {
+    this.socket.on('game', (message: any):any => {
       this.game$.next(message);
     });
-    this.socket.on('matchmaking', (message: any) => {
+    this.socket.on('matchmaking', (message: any):any => {
       this.matchmaking$.next(message);
     });
-    this.socket.on('matchmakingResponse', (message: any) => {
+    this.socket.on('matchmakingResponse', (message: any):any => {
       this.matchmakingResponse$.next(message);
     });
-    this.socket.on('gameRoomId', (message: any) => {
+    this.socket.on('gameRoomId', (message: any):any => {
       this.gameRoomId$.next(message);
     });
-    this.socket.on('gameDisconnected', (message: any) => {
+    this.socket.on('gameDisconnected', (message: any):any => {
       this.gameDisconnected$.next(message);
     });
   }
