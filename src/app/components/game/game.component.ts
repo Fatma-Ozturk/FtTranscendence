@@ -1,3 +1,6 @@
+import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import { GameRoomSocket } from './../../models/entities/gameRoomSocket';
 import { GamePlayerEnum } from './../../models/enums/gamePlayer';
 import { GameService } from './../../services/game.service';
 import { PaddleGameModel } from './../../models/model/paddleGameModel';
@@ -35,13 +38,16 @@ export class GameComponent {
 	isArrowDownPressed: boolean = false;
 
 	visibleGameDisconnectPopup: boolean = false;
-	private gameRoomId: number = 0;
 
-	constructor(private gameService: GameService, private route: ActivatedRoute) {
+	//
+	gameRoomId: number = 0;
+	gameRoomSocket: GameRoomSocket;
+
+	constructor(private gameService: GameService, private route: ActivatedRoute, private authService: AuthService) {
 		this.paddleGuest = new PaddleGameModel();
-		this.paddleGuest.whoIs = GamePlayerEnum.guest;
+		// this.paddleGuest.whoIs = GamePlayerEnum.guest;
 		this.paddleHost = new PaddleGameModel();
-		this.paddleHost.whoIs = GamePlayerEnum.host;
+		// this.paddleHost.whoIs = GamePlayerEnum.host;
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
 		//todo These are reassigned after api call
@@ -61,15 +67,37 @@ export class GameComponent {
 	}
 
 	ngOnInit(): void {
+		let whoIs: number = -1;
 		this.getScreenSize();
 		this.setCanvasSize();
 		this.initGameModels();
-		this.route.queryParams.subscribe((data:any)=>{
+		this.route.queryParams.subscribe((data: any) => {
 			this.gameRoomId = Number(data['room-id']);
 		})
+		this.gameService.sendGameRoomSocket(this.gameRoomId);
+		this.gameService.gameRoomSocketResponse().subscribe((response: any) => {
+			if (response.message === "GameRoomSocketResponse Info") {
+				this.gameRoomSocket = JSON.parse(response.data);
+				whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
+				if (whoIs == -1)
+					return;
+				console.log("whoIs " + whoIs);
+				if (whoIs == 0){
+					this.paddleHost.whoIs = GamePlayerEnum.host;
+				}
+				if (whoIs == 1) {
+					this.paddleGuest.whoIs = GamePlayerEnum.guest;
+				}
+				console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs );
+				console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs );
+			}
+		},
+			(error) => {
+				console.error('Error reading gameRoomSocket response:', error);
+			});
 	}
 
-	ngDoCheck(){
+	ngDoCheck() {
 		// console.log("ok");
 		// this.gameService.getGameDisconnected().subscribe((response: any)=>{
 		// 	console.log("response.message " + response.message);
@@ -91,7 +119,7 @@ export class GameComponent {
 		this.gameDraw();
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
-			this.gameService.sendGame(this.ball);
+			this.gameService.sendGame(null);
 			if (this.bendCall++ % 10 == 0) {
 				//get gameRoom reflesh
 				//BACKEND CALL
@@ -148,10 +176,10 @@ export class GameComponent {
 					this.paddleHost.height -
 					2;
 		}
-		if (this.isArrowUpPressed || this.isArrowDownPressed){
+		if (this.isArrowUpPressed || this.isArrowDownPressed) {
 			this.gameService.getNewMatchmaking
 		}
-			// this.gameService.sendKeydown(this.paddleHost);
+		// this.gameService.sendKeydown(this.paddleHost);
 	}
 
 	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>
@@ -332,5 +360,17 @@ export class GameComponent {
 				? fixedWidthRatio
 				: fixedHeightRatio;
 		this.speedmultiplier = this.speedmultiplier * this.fixedScreenRatio;
+	}
+
+	//util
+	whoIsHostOrGuest(gameRoomSocket: GameRoomSocket): number {
+		const userId = this.authService.getCurrentUserId();
+
+		if (!userId)
+			return -1;
+		if (gameRoomSocket.userHostId == userId) {
+			return 0;
+		}
+		return 1;
 	}
 }

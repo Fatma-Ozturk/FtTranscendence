@@ -13,6 +13,8 @@ export class GameService {
   public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
   public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameRoomId$: BehaviorSubject<string> = new BehaviorSubject('');
+  public gameRoomSocket$: BehaviorSubject<string> = new BehaviorSubject('');
+  public gameRoomSocketResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameDisconnected$: BehaviorSubject<string> = new BehaviorSubject('');
   private token: string;
   private socket: Socket; // Socket tipinde bir değişken tanımlayın
@@ -45,6 +47,12 @@ export class GameService {
     this.socket.on('gameRoomId', (message: any):any => {
       this.gameRoomId$.next(message);
     });
+    this.socket.on('gameRoomSocket', (message: any):any => {
+      this.gameRoomSocket$.next(message);
+    });
+    this.socket.on('gameRoomSocketResponse', (message: any):any => {
+      this.gameRoomSocketResponse$.next(message);
+    });
     this.socket.on('gameDisconnected', (message: any):any => {
       this.gameDisconnected$.next(message);
     });
@@ -60,6 +68,10 @@ export class GameService {
 
   public sendGame(game: any) {
     this.socket.emit('game', game);
+  }
+
+  public sendGameRoomSocket(gameRoomSocket: any) {
+    this.socket.emit('gameRoomSocket', gameRoomSocket);
   }
 
   public getNewGame = () => {
@@ -80,6 +92,14 @@ export class GameService {
 
   public getGameRoomId = () => {
     return this.gameRoomId$.asObservable();
+  };
+
+  public getGameRoomSocket = () => {
+    return this.gameRoomSocket$.asObservable();
+  };
+
+  public gameRoomSocketResponse = () => {
+    return this.gameRoomSocketResponse$.asObservable();
   };
 
   public getGameDisconnected = () => {
