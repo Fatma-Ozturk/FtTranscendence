@@ -42,6 +42,7 @@ export class GameComponent {
 	//
 	gameRoomId: number = 0;
 	gameRoomSocket: GameRoomSocket;
+	whoIs: number = -1;
 
 	constructor(private gameService: GameService, private route: ActivatedRoute, private authService: AuthService) {
 		this.paddleGuest = new PaddleGameModel();
@@ -50,16 +51,34 @@ export class GameComponent {
 		// this.paddleHost.whoIs = GamePlayerEnum.host;
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
+		this.gameService.getGameRoomSocketResponse().subscribe((response: any) => {
+			if (response.message === "GameRoomSocketResponse Info") {
+				this.gameRoomSocket = JSON.parse(response.data);
+				this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
+				if (this.whoIs == -1)
+					return;
+				if (this.whoIs == 0) {
+					this.leftPaddle = this.paddleHost;
+					this.rightPaddle = this.paddleGuest;
+					this.paddleHost.whoIs = GamePlayerEnum.host;
+					this.paddleGuest.whoIs = GamePlayerEnum.guest;
+					this.ball.whoIs = this.paddleHost.whoIs;
+				}
+				else if (this.whoIs == 1) {
+					this.leftPaddle = this.paddleGuest;
+					this.rightPaddle = this.paddleHost;
+					this.paddleHost.whoIs = GamePlayerEnum.guest;
+					this.paddleGuest.whoIs = GamePlayerEnum.host;
+					this.ball.whoIs = this.paddleGuest.whoIs;
+				}
+				console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs);
+				console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs);
+			}
+		},
+			(error) => {
+				console.error('Error reading gameRoomSocket response:', error);
+			});
 		//todo These are reassigned after api call
-		if (Math.floor(Math.random() * 100) % 2 == 0) {
-			this.leftPaddle = this.paddleGuest;
-			this.rightPaddle = this.paddleHost;
-			console.log("host is right");
-		} else {
-			this.leftPaddle = this.paddleHost;
-			this.rightPaddle = this.paddleGuest;
-			console.log("host is left");
-		}
 	}
 
 	ngAfterViewInit(): void {
@@ -67,34 +86,12 @@ export class GameComponent {
 	}
 
 	ngOnInit(): void {
-		let whoIs: number = -1;
 		this.getScreenSize();
 		this.setCanvasSize();
 		this.initGameModels();
 		this.route.queryParams.subscribe((data: any) => {
 			this.gameRoomId = Number(data['room-id']);
 		})
-		this.gameService.sendGameRoomSocket(this.gameRoomId);
-		this.gameService.gameRoomSocketResponse().subscribe((response: any) => {
-			if (response.message === "GameRoomSocketResponse Info") {
-				this.gameRoomSocket = JSON.parse(response.data);
-				whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
-				if (whoIs == -1)
-					return;
-				console.log("whoIs " + whoIs);
-				if (whoIs == 0){
-					this.paddleHost.whoIs = GamePlayerEnum.host;
-				}
-				if (whoIs == 1) {
-					this.paddleGuest.whoIs = GamePlayerEnum.guest;
-				}
-				console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs );
-				console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs );
-			}
-		},
-			(error) => {
-				console.error('Error reading gameRoomSocket response:', error);
-			});
 	}
 
 	ngDoCheck() {
@@ -119,13 +116,41 @@ export class GameComponent {
 		this.gameDraw();
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
-			this.gameService.sendGame(null);
-			if (this.bendCall++ % 10 == 0) {
-				//get gameRoom reflesh
-				//BACKEND CALL
-				// console.log("Gameloop");
-			}
-		}, 10);
+			// if (this.bendCall++ % 10 == 0) {
+			this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+			this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+			this.gameService.sendBallLocation(this.ball);
+			this.gameService.getBallLocationResponse().subscribe((response: any) => {
+				if (response.message == "Ball Location") {
+					if (this.whoIs == 1) {
+						this.ball.x = response.data.fixedX * this.fixedScreenRatio;
+						this.ball.y = response.data.fixedY * this.fixedScreenRatio;
+						this.ball.xVel = response.data.xVel;
+						this.ball.yVel = response.data.yVel;
+					}
+				}
+			})
+			this.gameService.getPaddleResponse().subscribe((response: any) => {
+				if (response.message === "Paddle") {
+					// console.log("response data" + JSON.stringify(response.data));
+					const serializeData = JSON.parse(response.data);
+					console.log( "response.data : " + serializeData[0].x);
+					console.log( "response.data : " + serializeData[0].y);
+					if (response.data[0]) {
+						this.paddleHost = serializeData[0].x;
+						this.paddleHost = serializeData[0].y;
+					}
+					if (response.data[1]) {
+						this.paddleGuest = serializeData[1].x;
+						this.paddleGuest = serializeData[1].y;
+					}
+				}
+			})
+			//get gameRoom reflesh
+			//BACKEND CALL
+			// console.log("Gameloop");
+			// }
+		}, 1);
 	};
 
 	initGameModels(): void {
@@ -179,7 +204,12 @@ export class GameComponent {
 		if (this.isArrowUpPressed || this.isArrowDownPressed) {
 			this.gameService.getNewMatchmaking
 		}
-		// this.gameService.sendKeydown(this.paddleHost);
+		if (this.whoIs == 0) {
+			this.gameService.sendKeydown(this.paddleHost);
+		}
+		else if (this.whoIs == 1) {
+			this.gameService.sendKeydown(this.paddleGuest);
+		}
 	}
 
 	paddleUpdateGuest(): void { } //TODO: COMES FROM BACKEND :>

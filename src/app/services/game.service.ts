@@ -12,9 +12,12 @@ export class GameService {
   public game$: BehaviorSubject<string> = new BehaviorSubject('');
   public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
   public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+  public ballLocation$: BehaviorSubject<string> = new BehaviorSubject('');
+  public ballLocationResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameRoomId$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameRoomSocket$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameRoomSocketResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+  public paddleResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameDisconnected$: BehaviorSubject<string> = new BehaviorSubject('');
   private token: string;
   private socket: Socket; // Socket tipinde bir değişken tanımlayın
@@ -38,6 +41,9 @@ export class GameService {
     this.socket.on('game', (message: any):any => {
       this.game$.next(message);
     });
+    this.socket.on('ballLocation', (message: any):any => {
+      this.ballLocation$.next(message);
+    });
     this.socket.on('matchmaking', (message: any):any => {
       this.matchmaking$.next(message);
     });
@@ -52,6 +58,12 @@ export class GameService {
     });
     this.socket.on('gameRoomSocketResponse', (message: any):any => {
       this.gameRoomSocketResponse$.next(message);
+    });
+    this.socket.on('ballLocationResponse', (message: any):any => {
+      this.ballLocationResponse$.next(message);
+    });
+    this.socket.on('paddleResponse', (message: any):any => {
+      this.paddleResponse$.next(message);
     });
     this.socket.on('gameDisconnected', (message: any):any => {
       this.gameDisconnected$.next(message);
@@ -70,17 +82,25 @@ export class GameService {
     this.socket.emit('game', game);
   }
 
+  public sendBallLocation(ballLocation: any) {
+    this.socket.emit('ballLocation', ballLocation);
+  }
+
   public sendGameRoomSocket(gameRoomSocket: any) {
     this.socket.emit('gameRoomSocket', gameRoomSocket);
   }
 
-  public getNewGame = () => {
-    return this.keydown$.asObservable();
-  };
-
   public sendMatchmaking(matchmaking: any) {
     this.socket.emit('matchmaking', matchmaking);
   }
+
+  public getGame = () => {
+    return this.game$.asObservable();
+  };
+
+  public getBallLocation = () => {
+    return this.ballLocation$.asObservable();
+  };
 
   public getNewMatchmaking = () => {
     return this.matchmaking$.asObservable();
@@ -98,8 +118,16 @@ export class GameService {
     return this.gameRoomSocket$.asObservable();
   };
 
-  public gameRoomSocketResponse = () => {
+  public getGameRoomSocketResponse = () => {
     return this.gameRoomSocketResponse$.asObservable();
+  };
+
+  public getBallLocationResponse = () => {
+    return this.ballLocationResponse$.asObservable();
+  };
+
+  public getPaddleResponse = () => {
+    return this.paddleResponse$.asObservable();
   };
 
   public getGameDisconnected = () => {
