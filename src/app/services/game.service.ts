@@ -133,4 +133,9 @@ export class GameService {
   public getGameDisconnected = () => {
     return this.gameDisconnected$.asObservable();
   };
+
+  isConnected(): boolean {
+    return this.socket.connected;
+  }
+
 }

@@ -55,6 +55,8 @@ export class GameComponent {
 			if (response.message === "GameRoomSocketResponse Info") {
 				this.gameRoomSocket = JSON.parse(response.data);
 				this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
+				console.log("whois " + this.whoIs);
+
 				if (this.whoIs == -1)
 					return;
 				if (this.whoIs == 0) {
@@ -65,14 +67,14 @@ export class GameComponent {
 					this.ball.whoIs = this.paddleHost.whoIs;
 				}
 				else if (this.whoIs == 1) {
-					this.leftPaddle = this.paddleGuest;
-					this.rightPaddle = this.paddleHost;
-					this.paddleHost.whoIs = GamePlayerEnum.guest;
-					this.paddleGuest.whoIs = GamePlayerEnum.host;
+					this.leftPaddle = this.paddleHost;
+					this.rightPaddle = this.paddleGuest;
+					this.paddleHost.whoIs = GamePlayerEnum.host;
+					this.paddleGuest.whoIs = GamePlayerEnum.guest;
 					this.ball.whoIs = this.paddleGuest.whoIs;
 				}
-				console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs);
-				console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs);
+				// console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs);
+				// console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs);
 			}
 		},
 			(error) => {
@@ -95,19 +97,9 @@ export class GameComponent {
 	}
 
 	ngDoCheck() {
-		// console.log("ok");
-		// this.gameService.getGameDisconnected().subscribe((response: any)=>{
-		// 	console.log("response.message " + response.message);
-		// 	if (response.message){
-		// 		if (response.message === 'true'){
-		// 			console.log("true");
-		// 			this.visibleGameDisconnectPopup = true;
-		// 		}
-		// 	}
-		// },
-		// (error) => {
-		//   console.error('Error reading game disconnected:', error);
-		// })
+		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+		this.gameService.sendBallLocation(this.ball);
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -116,12 +108,8 @@ export class GameComponent {
 		this.gameDraw();
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
-			// if (this.bendCall++ % 10 == 0) {
-			this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
-			this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
-			this.gameService.sendBallLocation(this.ball);
 			this.gameService.getBallLocationResponse().subscribe((response: any) => {
-				if (response.message == "Ball Location") {
+				if (response.message == "Ball Location" && response.data) {
 					if (this.whoIs == 1) {
 						this.ball.x = response.data.fixedX * this.fixedScreenRatio;
 						this.ball.y = response.data.fixedY * this.fixedScreenRatio;
@@ -131,25 +119,20 @@ export class GameComponent {
 				}
 			})
 			this.gameService.getPaddleResponse().subscribe((response: any) => {
-				if (response.message === "Paddle") {
-					// console.log("response data" + JSON.stringify(response.data));
-					const serializeData = JSON.parse(response.data);
-					console.log( "response.data : " + serializeData[0].x);
-					console.log( "response.data : " + serializeData[0].y);
+				if (response.message === "Paddle" && response.data) {
+					let serializeData: PaddleGameModel[] = JSON.parse(response.data);
+
 					if (response.data[0]) {
-						this.paddleHost = serializeData[0].x;
-						this.paddleHost = serializeData[0].y;
+						this.paddleHost.x = serializeData[0]?.x;
+						this.paddleHost.y = serializeData[0]?.y;
 					}
 					if (response.data[1]) {
-						this.paddleGuest = serializeData[1].x;
-						this.paddleGuest = serializeData[1].y;
+						this.paddleGuest.x = serializeData[1]?.x;
+						this.paddleGuest.y = serializeData[1]?.y;
 					}
 				}
 			})
-			//get gameRoom reflesh
-			//BACKEND CALL
-			// console.log("Gameloop");
-			// }
+
 		}, 1);
 	};
 
@@ -186,28 +169,43 @@ export class GameComponent {
 	}
 
 	paddleUpdateHost(): void {
-		if (this.isArrowUpPressed) {
-			this.paddleHost.y = this.paddleHost.y - this.speedmultiplier;
-			if (this.paddleHost.y < 0) this.paddleHost.y = 2;
-		}
-		if (this.isArrowDownPressed) {
-			this.paddleHost.y = this.paddleHost.y + this.speedmultiplier;
-			if (
-				this.paddleHost.y + this.paddleHost.height >
-				this.canvasRef.nativeElement.height
-			)
-				this.paddleHost.y =
-					this.canvasRef.nativeElement.height -
-					this.paddleHost.height -
-					2;
-		}
-		if (this.isArrowUpPressed || this.isArrowDownPressed) {
-			this.gameService.getNewMatchmaking
-		}
+		// if (this.isArrowUpPressed || this.isArrowDownPressed) {
+		// 	this.gameService.getNewMatchmaking
+		// }
 		if (this.whoIs == 0) {
+			if (this.isArrowUpPressed) {
+				this.paddleHost.y = this.paddleHost.y - this.speedmultiplier;
+				if (this.paddleHost.y < 0) this.paddleHost.y = 2;
+			}
+			if (this.isArrowDownPressed) {
+				this.paddleHost.y = this.paddleHost.y + this.speedmultiplier;
+				if (
+					this.paddleHost.y + this.paddleHost.height >
+					this.canvasRef.nativeElement.height
+				)
+					this.paddleHost.y =
+						this.canvasRef.nativeElement.height -
+						this.paddleHost.height -
+						2;
+			}
 			this.gameService.sendKeydown(this.paddleHost);
 		}
-		else if (this.whoIs == 1) {
+		if (this.whoIs == 1) {
+			if (this.isArrowUpPressed) {
+				this.paddleGuest.y = this.paddleGuest.y - this.speedmultiplier;
+				if (this.paddleGuest.y < 0) this.paddleGuest.y = 2;
+			}
+			if (this.isArrowDownPressed) {
+				this.paddleGuest.y = this.paddleGuest.y + this.speedmultiplier;
+				if (
+					this.paddleGuest.y + this.paddleGuest.height >
+					this.canvasRef.nativeElement.height
+				)
+					this.paddleGuest.y =
+						this.canvasRef.nativeElement.height -
+						this.paddleGuest.height -
+						2;
+			}
 			this.gameService.sendKeydown(this.paddleGuest);
 		}
 	}
