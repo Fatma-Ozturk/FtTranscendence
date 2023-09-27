@@ -97,9 +97,6 @@ export class GameComponent {
 	}
 
 	ngDoCheck() {
-		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
-		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
-		this.gameService.sendBallLocation(this.ball);
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -108,6 +105,9 @@ export class GameComponent {
 		this.gameDraw();
 		setTimeout(() => {
 			window.requestAnimationFrame(this.gameLoop);
+			this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+			this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+			this.gameService.sendBallLocation(this.ball);
 			this.gameService.getBallLocationResponse().subscribe((response: any) => {
 				if (response.message == "Ball Location" && response.data) {
 					if (this.whoIs == 1) {
