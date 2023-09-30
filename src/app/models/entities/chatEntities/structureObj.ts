@@ -1,4 +1,4 @@
-export class Structure {
+export class structureObj {
 	w: number;
 	h: number;
 	x: number;
@@ -29,4 +29,6 @@ export class Structure {
 	  this.frames = frames || 1;
 	  this.curFrame = 1;
 	}
+  
   }
+  

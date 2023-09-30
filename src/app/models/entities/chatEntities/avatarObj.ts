@@ -1,105 +1,118 @@
-import { canvas, h } from "src/app/components/chat/chat.component";
-import { chatBar } from "./chatBar";
-import { cmd } from "./cmd";
-import { npcs } from "./npcs";
-import { player } from "./player";
-import { screenText } from "./screenText";
-import { worldObjs } from "./worldObjs";
+import { ChatBarService } from "src/app/services/chat-bar.service";
+import { CmdService } from "src/app/services/cmd.service";
+import { TextService } from "src/app/services/text.service";
 
-export class avatar{
-	name: string;
-	gender: any;
-	skinTone: any;
-	w : number;
-	h: number;
-	speed: number;
-	curFrame: number;
-	frames: number;
-	dir: number;
-	isMoving: boolean;
-	canMove: boolean;
-	x: number;
-	y: number;
-	lvl: number;
-	lastMsg: string;
-	msgTimer: number;
-	msgMaxTime: number;
-	msgFadeTime: number;
-	sendMsg: (msg: string) => void;
+export class avatarObj {
+  name: string;
+  gender: any;
+  skinTone: any;
+  w: number;
+  h: number;
+  speed: number;
+  curFrame: number;
+  frames: number;
+  dir: number;
+  isMoving: boolean;
+  canMove: boolean;
+  x: number;
+  y: number;
+  lvl: number;
+  lastMsg: string;
+  msgTimer: number;
+  msgMaxTime: number;
+  msgFadeTime: number;
 
-	constructor(name: string, gender: any, skinTone: any, width: number, height: number, speed: number, frames: number, dir: any, x: number, y: number, lvl: number) {
-	  const nameLenLimit = 16;
-	  this.name = name.length > nameLenLimit ? name.substr(0, nameLenLimit) : name || "Anonymous";
-	  this.gender = gender || 0;
-	  this.skinTone = skinTone || 0;
-	  this.w = width || 0;
-	  this.h = height || 0;
-	  this.speed = speed || 0;
-	  this.curFrame = 1;
-	  this.frames = frames || 1;
-	  this.dir = dir || null;
-	  this.isMoving = false;
-	  this.canMove = true;
-	  this.x = x || 0;
-	  this.y = y || 0;
-	  this.lvl = lvl || 0;
-	  this.lastMsg = "";
-	  this.msgTimer = 0;
-	  this.msgMaxTime = 3000;
-	  this.msgFadeTime = 150;
-	  this.sendMsg = function(msg: string) {
+  constructor(
+    name: string,
+    gender: any,
+    skinTone: any,
+    w: number,
+    h: number,
+    speed: number,
+    frames: number,
+    dir: number,
+    x: number,
+    y: number,
+    lvl: number,
+    private chatBarService: ChatBarService,
+    private cmdService: CmdService,
+    private textService: TextService
+  ) {
+    const nameLenLimit = 16;
+    this.name = name.length > nameLenLimit ? name.substr(0, nameLenLimit) : name || "Anonymous";
+    this.gender = gender || 0;
+    this.skinTone = skinTone || 0;
+    this.w = w || 0;
+    this.h = h || 0;
+    this.speed = speed || 0;
+    this.curFrame = 1;
+    this.frames = frames || 1;
+    this.dir = dir || null;
+    this.isMoving = false;
+    this.canMove = true;
+    this.x = x || 0;
+    this.y = y || 0;
+    this.lvl = lvl || 0;
+    this.lastMsg = "";
+    this.msgTimer = 0;
+    this.msgMaxTime = 3000;
+    this.msgFadeTime = 150;
+  }
+
+  sendMsg(msg: string, npcs: any[], worldObjs: any[], canvas: HTMLCanvasElement){
+
 		if (msg.length > 0) {
 			let isCmd = false;
-			chatBar.curAutoCmpltCmd = -1;
-			chatBar.arg1pg = -1;
-			chatBar.arg2pg = -1;
-			
+			this.chatBarService.curAutoCmpltCmd = -1;
+			this.chatBarService.arg1pg = -1;
+			this.chatBarService.arg2pg = -1;
+
 			// update last message if not a command
 			if (msg[0] != "/") {
 				this.lastMsg = msg;
 			} else {
 				isCmd = true;
 			}
-			
+
 			let chatLog = document.querySelector(".chat-log"),
 				newEntry = document.createElement("span");
-			
+
 			/* if command, execute if used by player (whose level is always 0,
 			and NPCs never send anything if they too are set at level 0) */
 			if (this.lvl === 0 && isCmd) {
-				switch (msg.substr(1,msg.length - 1).split(" ")[0]) {
+				switch (msg.substr(1, msg.length - 1).split(" ")[0]) {
 					// display help
 					case "help":
 						let helpHeading = "----- Help -----",
-							cmdInfo : any[] = [],
+							cmdInfo: any[] = [],
 							helpScrnTxt = "";
 
-						for (var c in cmd) {
-							cmdInfo[c] = "/" + cmd[c].name + " " + cmd[c].args + (cmd[c].args.length > 0 ? " " : "") + "- " + cmd[c].desc;
+						for (var c in this.cmdService.cmd) {
+							cmdInfo[c] = "/" + this.cmdService.cmd[c].name + " " + this.cmdService.cmd[c].args + (this.cmdService.cmd[c].args.length > 0 ? " " : "") + "- " + this.cmdService.cmd[c].desc;
 						}
-						
+
 						newEntry.className = "help-text";
 						newEntry.appendChild(document.createTextNode(helpHeading));
 						helpScrnTxt += helpHeading + "%";
-						
+
 						// show available commands
 						for (var ci in cmdInfo) {
 							newEntry.appendChild(document.createElement("br"));
 							newEntry.appendChild(document.createTextNode(cmdInfo[ci]));
 							helpScrnTxt += cmdInfo[ci] + "%";
 						}
-						
-						screenText.updateText(helpScrnTxt,h - chatBar.barH - (screenText.fontS*1.5*(cmdInfo.length)),screenText.fontS*2*(cmdInfo.length),"#4f4");
+
+						this.textService.screenText.updateText(helpScrnTxt, this.h - this.chatBarService.barH - (this.textService.screenText.fontS * 1.5 * (cmdInfo.length)), this.textService.screenText.fontS * 2 * (cmdInfo.length), "#4f4");
 						break;
-						
+
 					// clear chat
 					case "clear":
 						let clearMsg = "Chat cleared";
 						chatLog.innerHTML = "";
 						newEntry.appendChild(document.createTextNode(clearMsg));
-						screenText.updateText(clearMsg,h - chatBar.barH,screenText.fontS*2, "#fff");
+						this.textService.screenText.updateText(clearMsg, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#fff");
 						break;
-						
+
 					// get entity details
 					case "entityinfo":
 						let eiArgs = msg.split(" "),
@@ -107,34 +120,34 @@ export class avatar{
 							eiSearch = worldObjs.find(s => s.name === eiTarget) || 0,
 							eiFBLines = [],
 							eiFeedback = "";
-						
-							if (eiSearch !== 0 && eiTarget) {
-								eiFBLines[0] = "----- " + eiSearch.name +  " -----";
-								eiFBLines[1] = "Gender - " + (eiSearch.gender === 0 ? "male" : "female");
-								eiFBLines[2] = "Skin - " + eiSearch.skinTone;
-								eiFBLines[3] = "Speed - " + eiSearch.speed;
-								eiFBLines[4] = "Coordinates - " + Math.round(eiSearch.x) + "," + Math.round(eiSearch.y);
-								eiFBLines[5] = "AI activity level - " + eiSearch.lvl;
-								
-								newEntry.className = "info-text";
-								
-								for (var ei in eiFBLines) {
-									newEntry.appendChild(document.createTextNode(eiFBLines[ei]));
-									newEntry.appendChild(document.createElement("br"));
-									eiFeedback += eiFBLines[ei] + "%";
-								}
 
-							} else {
-								eiFeedback = !eiArgs[1] ? "Please specify an entity." : "Entity not found";
-								newEntry.className = "error-text";
-								newEntry.appendChild(document.createTextNode(eiFeedback));
+						if (eiSearch !== 0 && eiTarget) {
+							eiFBLines[0] = "----- " + eiSearch.name + " -----";
+							eiFBLines[1] = "Gender - " + (eiSearch.gender === 0 ? "male" : "female");
+							eiFBLines[2] = "Skin - " + eiSearch.skinTone;
+							eiFBLines[3] = "Speed - " + eiSearch.speed;
+							eiFBLines[4] = "Coordinates - " + Math.round(eiSearch.x) + "," + Math.round(eiSearch.y);
+							eiFBLines[5] = "AI activity level - " + eiSearch.lvl;
+
+							newEntry.className = "info-text";
+
+							for (var ei in eiFBLines) {
+								newEntry.appendChild(document.createTextNode(eiFBLines[ei]));
+								newEntry.appendChild(document.createElement("br"));
+								eiFeedback += eiFBLines[ei] + "%";
 							}
-						
-							let eiFBLen = eiFBLines.length > 0 ? eiFBLines.length : 1;
-						
-						screenText.updateText(eiFeedback,h - chatBar.barH - (screenText.fontS*1.5*(eiFBLen - 1)),screenText.fontS*2*(eiFBLen - 1),eiSearch !== 0 && eiArgs[1] ? "#ff4" : "#f44");
+
+						} else {
+							eiFeedback = !eiArgs[1] ? "Please specify an entity." : "Entity not found";
+							newEntry.className = "error-text";
+							newEntry.appendChild(document.createTextNode(eiFeedback));
+						}
+
+						let eiFBLen = eiFBLines.length > 0 ? eiFBLines.length : 1;
+
+						this.textService.screenText.updateText(eiFeedback, this.h - this.chatBarService.barH - (this.textService.screenText.fontS * 1.5 * (eiFBLen - 1)), this.textService.screenText.fontS * 2 * (eiFBLen - 1), eiSearch !== 0 && eiArgs[1] ? "#ff4" : "#f44");
 						break;
-						
+
 					// modify entity
 					case "modentity":
 						let meArgs = msg.split(" "),
@@ -148,7 +161,7 @@ export class avatar{
 							meInvalid = false,
 							meValidArgCt = 0,
 							meFeedback = "Entity modified successfully";
-						
+
 						if (meTarget) {
 							if (meSearch !== 0) {
 								if (meName) {
@@ -168,7 +181,7 @@ export class avatar{
 																if (meLevel) {
 																	if (parseInt(meLevel) >= 0 && parseInt(meLevel) <= 20) {
 																		++meValidArgCt;
-																		if (meTarget == player.name) {
+																		if (meTarget == this.name) {
 																			meInvalid = true;
 																			meFeedback = "Entity must be an NPC to modify AI activity level.";
 																		}
@@ -177,7 +190,7 @@ export class avatar{
 																		meFeedback = "Level must be between 0 and 20.";
 																	}
 																}
-															}  else {
+															} else {
 																meInvalid = true;
 																meFeedback = "Speed must be between 0 and 9.";
 															}
@@ -208,10 +221,10 @@ export class avatar{
 							meInvalid = true;
 							meFeedback = "Usage: /modentity <name> <newname> [gender] [skin] [speed] [level]";
 						}
-						
+
 						if (!meInvalid) {
 							let nameLenLimit = 16;
-							meSearch.name = meName.length > nameLenLimit ? meName.substr(0,nameLenLimit) : meName;
+							meSearch.name = meName.length > nameLenLimit ? meName.substr(0, nameLenLimit) : meName;
 							if (meValidArgCt >= 3)
 								meSearch.gender = meGender == "male" || meGender == "m" ? 0 : (meGender == "female" || meGender == "f" ? 1 : meGender);
 							if (meValidArgCt >= 4)
@@ -221,12 +234,12 @@ export class avatar{
 							if (meValidArgCt == 6)
 								meSearch.lvl = +meLevel;
 						}
-						
+
 						newEntry.className = !meInvalid ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(meFeedback));
-						screenText.updateText(meFeedback,h - chatBar.barH,screenText.fontS*2,!meInvalid ? "#fff" : "#f44");
+						this.textService.screenText.updateText(meFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, !meInvalid ? "#fff" : "#f44");
 						break;
-					
+
 					// npc add/delete
 					case "npc":
 						let npcArgs = msg.split(" "),
@@ -241,7 +254,7 @@ export class avatar{
 							npcFeedback = "NPC successfully added",
 							npcInvalid = false,
 							npcUsage = "Usage: /npc <add|del> <name> [gender] [skin] [speed] [level] [<x> <y>]";
-						
+
 						if (npcAction == "add") {
 							if (npcName) {
 								let npcNameUsed = worldObjs.find(np => np.name === npcName) || 0;
@@ -258,10 +271,10 @@ export class avatar{
 																		if (npcY) {
 																			if (!isNaN(parseInt(npcX)) && !isNaN(parseInt(npcY))) {
 																				let xMax = canvas.offsetWidth;
-																				if (parseInt(npcX) < 0 && parseInt(npcX) > xMax && parseInt(npcY) < 0 && parseInt(npcY) > h - chatBar.barH) {
-																					
+																				if (parseInt(npcX) < 0 && parseInt(npcX) > xMax && parseInt(npcY) < 0 && parseInt(npcY) > this.h - this.chatBarService.barH) {
+
 																					npcInvalid = true;
-																					npcFeedback = "Placement is out of bounds. X limit is 0-" + xMax + ". Y limit is 0-" + (h - chatBar.barH) + ".";
+																					npcFeedback = "Placement is out of bounds. X limit is 0-" + xMax + ". Y limit is 0-" + (this.h - this.chatBarService.barH) + ".";
 																				}
 																			} else {
 																				npcInvalid = true;
@@ -277,7 +290,7 @@ export class avatar{
 																	npcFeedback = "Level must be between 0 and 20.";
 																}
 															}
-														}  else {
+														} else {
 															npcInvalid = true;
 															npcFeedback = "Speed must be between 0 and 9.";
 														}
@@ -306,30 +319,30 @@ export class avatar{
 									aSkin = npcSkin || 0,
 									aSpeed = npcSpeed || 3,
 									aLevel = npcLevel || 8,
-									aX = npcX || player.x,
-									aY = npcY || player.y,
-									newNPC = new avatar(npcName,aGender,aSkin,30,60,+aSpeed,28,2,+aX,+aY,+aLevel);
+									aX = npcX || this.x,
+									aY = npcY || this.y,
+									newNPC = new avatarObj(npcName, aGender, aSkin, 30, 60, +aSpeed, 28, 2, +aX, +aY, +aLevel, this.chatBarService, this.cmdService, this.textService);
 
-									npcs.push(newNPC);
-									worldObjs.push(npcs[npcs.length - 1]);
+								npcs.push(newNPC);
+								worldObjs.push(npcs[npcs.length - 1]);
 							}
-						
+
 						} else if (npcAction == "del") {
 							if (npcName) {
 								let npcSearch = npcs.find(s => s.name === npcName) || null;
 								if (npcSearch !== null) {
-									
+
 									for (var n in npcs) {
 										if (npcs[n].name == npcSearch.name) {
-											npcs.splice(parseInt(n),1);
+											npcs.splice(parseInt(n), 1);
 										}
 									}
 									for (var w in worldObjs) {
 										if (worldObjs[w].name == npcSearch.name) {
-											worldObjs.splice(parseInt(w),1);
+											worldObjs.splice(parseInt(w), 1);
 										}
 									}
-									
+
 									npcFeedback = "NPC successfully deleted";
 								} else {
 									npcInvalid = true;
@@ -343,13 +356,13 @@ export class avatar{
 							npcInvalid = true;
 							npcFeedback = npcUsage;
 						}
-						
+
 						newEntry.className = !npcInvalid ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(npcFeedback));
-						screenText.updateText(npcFeedback,h - chatBar.barH,screenText.fontS*2,!npcInvalid ? "#fff" : "#f44");
-						
+						this.textService.screenText.updateText(npcFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, !npcInvalid ? "#fff" : "#f44");
+
 						break;
-					
+
 					// teleport
 					case "tp":
 						let tpArgs = msg.split(" "),
@@ -360,45 +373,45 @@ export class avatar{
 							tpOK = false,
 							tpFeedback = "",
 							tpUsage = "Usage: /tp <name> <x> <y> or <name> <targetname>";
-							
+
 						if (tpAfterEn) {
 							if (isNaN(parseInt(tpAfterEn)) && tpAfterEn[0] != rel) {
 								let tarEntity = tpAfterEn,
 									tEnSearch = worldObjs.find(ts => ts.name === tarEntity) || 0,
 									bothNames = tpEntity && tarEntity ? true : false;
-							
+
 								tpOK = bothNames && enSearch !== 0 && tEnSearch !== 0 ? true : false;
 								tpFeedback = bothNames ? (enSearch !== 0 ? (tEnSearch !== 0 ? "Teleported " + tpEntity + " to " + tarEntity : "Target entity does not exist") : "Entity does not exist") : tpUsage;
-							
+
 								if (tpOK) {
 									enSearch.x = tEnSearch.x;
 									enSearch.y = tEnSearch.y;
 								}
-							
+
 							} else {
 								let tpX = tpAfterEn,
 									tpY = tpArgs[3];
-								
+
 								if (tpX && tpY) {
-									 // convert relative positions to regular
+									// convert relative positions to regular
 									if (tpX[0] == rel) {
-										tpX = +tpX.substr(1,tpX.length - 1) + enSearch.x;
+										tpX = +tpX.substr(1, tpX.length - 1) + enSearch.x;
 									} else {
 										tpX = parseInt(tpX).toString();
 									}
 									if (tpY[0] == rel) {
-										tpY = +tpY.substr(1,tpY.length - 1) + enSearch.y;
+										tpY = +tpY.substr(1, tpY.length - 1) + enSearch.y;
 									} else {
 										tpY = parseInt(tpY).toString();
 									}
 								}
-								
+
 								let cw = canvas.offsetWidth,
 									allValues = tpEntity && (tpX || parseInt(tpX) === 0) && (tpY || parseInt(tpY) === 0) ? true : false,
-									wthnScrn = parseInt(tpX) >= 0 && parseInt(tpX) <= cw && parseInt(tpY) >= 0 && parseInt(tpY) <= h - chatBar.barH ? true : false;
-								
+									wthnScrn = parseInt(tpX) >= 0 && parseInt(tpX) <= cw && parseInt(tpY) >= 0 && parseInt(tpY) <= this.h - this.chatBarService.barH ? true : false;
+
 								tpOK = enSearch !== 0 && allValues && wthnScrn ? true : false,
-								tpFeedback = allValues ? (enSearch !== 0 ? (wthnScrn ? "Teleported " + tpEntity + " to " + Math.round(parseInt(tpX)) + "," + Math.round(parseInt(tpY)) : "Coordinates are out of bounds. X limit is 0-" + cw + ". Y limit is 0-" + (h - chatBar.barH) + ".") : "Entity does not exist.") : tpUsage;
+									tpFeedback = allValues ? (enSearch !== 0 ? (wthnScrn ? "Teleported " + tpEntity + " to " + Math.round(parseInt(tpX)) + "," + Math.round(parseInt(tpY)) : "Coordinates are out of bounds. X limit is 0-" + cw + ". Y limit is 0-" + (this.h - this.chatBarService.barH) + ".") : "Entity does not exist.") : tpUsage;
 								if (tpOK) {
 									enSearch.x = tpX;
 									enSearch.y = tpY;
@@ -407,61 +420,63 @@ export class avatar{
 						} else {
 							tpFeedback = tpUsage;
 						}
-						
+
 						newEntry.className = tpOK ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(tpFeedback));
-						screenText.updateText(tpFeedback,h - chatBar.barH,screenText.fontS*2,tpOK ? "#fff" : "#f44");
+						this.textService.screenText.updateText(tpFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, tpOK ? "#fff" : "#f44");
 						break;
-					
+
 					// get list of all entities in alphabetical order
 					case "who":
-						let getEntities = [player.name],
+						let getEntities = [this.name],
 							displayEntNames = "Entity list: ";
-						
-							for (var ge in npcs) {
-								const index = parseInt(ge);
-								getEntities[index] = npcs[index - 1].name;
-							  }
-						
-						getEntities.sort(function(a, b){
+
+						for (var ge in npcs) {
+							const index = parseInt(ge);
+							getEntities[index] = npcs[index - 1].name;
+						}
+
+						getEntities.sort(function (a, b) {
 							if (a.toLowerCase() < b.toLowerCase())
 								return -1;
 							if (a.toLowerCase() > b.toLowerCase())
 								return 1;
 							return 0;
 						});
-						
+
 						for (var de in getEntities) {
 							displayEntNames += (de > "0" ? ", " : "") + getEntities[de];
-						  }
-						  
-						
+						}
+
+
 						newEntry.appendChild(document.createTextNode(displayEntNames));
-						screenText.updateText(displayEntNames,h - chatBar.barH,screenText.fontS*2, "#fff");
+						this.textService.screenText.updateText(displayEntNames, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#fff");
 						break;
-					
+
 					// invalid command
 					default:
 						let cmdErr = "Invalid command. See /help for a list of available commands.";
-						
+
 						newEntry.className = "error-text";
 						newEntry.appendChild(document.createTextNode(cmdErr));
-						screenText.updateText(cmdErr,h - chatBar.barH,screenText.fontS*2,"#f44");
+						this.textService.screenText.updateText(cmdErr, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#f44");
 						break;
 				}
-				
+
 			} else {
 				this.msgTimer = this.msgMaxTime;
 				newEntry.appendChild(document.createTextNode(this.name + ": " + this.lastMsg));
 			}
 			// add new line
 			chatLog.insertBefore(newEntry, chatLog.childNodes[0]);
-			
+
 			// cut off oldest line if at max lines allowed
-			if (chatLog.childNodes.length > chatBar.maxLines) {
-				chatLog.removeChild(chatLog.getElementsByTagName("span")[chatBar.maxLines]);
+			if (chatLog.childNodes.length > this.chatBarService.maxLines) {
+				chatLog.removeChild(chatLog.getElementsByTagName("span")[this.chatBarService.maxLines]);
 			}
 		}
-	  }
-	}
+
+
+	};
+
 }
