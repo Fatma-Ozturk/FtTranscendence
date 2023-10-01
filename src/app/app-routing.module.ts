@@ -10,6 +10,7 @@ import { notLoginGuard } from './guards/not-login.guard';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
+import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -22,7 +23,10 @@ const routes: Routes = [
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [notLoginGuard] },
 	//{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: "chat", component: ChatComponent, canActivate: [notLoginGuard] },
-	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] }
+	{ path: "game", component: GameComponent, canActivate: [notLoginGuard] },
+	{ path: 'chat-rooms', component: ChatRoomsComponent },
+  { path: 'chat/:roomId', component: ChatComponent }, // ChatComponent'e yönlendirme
+  //{ path: '', redirectTo: '/chat-rooms', pathMatch: 'full' },
 ];
 
 @NgModule({

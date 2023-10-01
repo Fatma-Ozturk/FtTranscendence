@@ -1,0 +1,6 @@
+<h2>Chat Rooms</h2>
+<ul>
+  <li *ngFor="let room of chatRooms">
+	<a (click)="joinRoom(room.id)">{{ room.name }}</a>
+  </li>
+</ul>

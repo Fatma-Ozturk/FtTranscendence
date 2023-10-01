@@ -1,8 +1,12 @@
-import { ChatBarService } from "src/app/services/chat-bar.service";
 import { CmdService } from "src/app/services/cmd.service";
 import { TextService } from "src/app/services/text.service";
+import { ChatBarObj } from "./chatBarObj";
 
 export class avatarObj {
+private chatBarObj: ChatBarObj;
+private cmdService: CmdService;
+private textService: TextService;
+
   name: string;
   gender: any;
   skinTone: any;
@@ -34,11 +38,9 @@ export class avatarObj {
     x: number,
     y: number,
     lvl: number,
-    private chatBarService: ChatBarService,
-    private cmdService: CmdService,
-    private textService: TextService
   ) {
-    const nameLenLimit = 16;
+	this.chatBarObj = new ChatBarObj();
+	const nameLenLimit = 16;
     this.name = name.length > nameLenLimit ? name.substr(0, nameLenLimit) : name || "Anonymous";
     this.gender = gender || 0;
     this.skinTone = skinTone || 0;
@@ -63,9 +65,9 @@ export class avatarObj {
 
 		if (msg.length > 0) {
 			let isCmd = false;
-			this.chatBarService.curAutoCmpltCmd = -1;
-			this.chatBarService.arg1pg = -1;
-			this.chatBarService.arg2pg = -1;
+			this.chatBarObj.curAutoCmpltCmd = -1;
+			this.chatBarObj.arg1pg = -1;
+			this.chatBarObj.arg2pg = -1;
 
 			// update last message if not a command
 			if (msg[0] != "/") {
@@ -102,7 +104,7 @@ export class avatarObj {
 							helpScrnTxt += cmdInfo[ci] + "%";
 						}
 
-						this.textService.screenText.updateText(helpScrnTxt, this.h - this.chatBarService.barH - (this.textService.screenText.fontS * 1.5 * (cmdInfo.length)), this.textService.screenText.fontS * 2 * (cmdInfo.length), "#4f4");
+						this.textService.screenText.updateText(helpScrnTxt, this.h - this.chatBarObj.barH - (this.textService.screenText.fontS * 1.5 * (cmdInfo.length)), this.textService.screenText.fontS * 2 * (cmdInfo.length), "#4f4");
 						break;
 
 					// clear chat
@@ -110,7 +112,7 @@ export class avatarObj {
 						let clearMsg = "Chat cleared";
 						chatLog.innerHTML = "";
 						newEntry.appendChild(document.createTextNode(clearMsg));
-						this.textService.screenText.updateText(clearMsg, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#fff");
+						this.textService.screenText.updateText(clearMsg, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#fff");
 						break;
 
 					// get entity details
@@ -145,7 +147,7 @@ export class avatarObj {
 
 						let eiFBLen = eiFBLines.length > 0 ? eiFBLines.length : 1;
 
-						this.textService.screenText.updateText(eiFeedback, this.h - this.chatBarService.barH - (this.textService.screenText.fontS * 1.5 * (eiFBLen - 1)), this.textService.screenText.fontS * 2 * (eiFBLen - 1), eiSearch !== 0 && eiArgs[1] ? "#ff4" : "#f44");
+						this.textService.screenText.updateText(eiFeedback, this.h - this.chatBarObj.barH - (this.textService.screenText.fontS * 1.5 * (eiFBLen - 1)), this.textService.screenText.fontS * 2 * (eiFBLen - 1), eiSearch !== 0 && eiArgs[1] ? "#ff4" : "#f44");
 						break;
 
 					// modify entity
@@ -237,7 +239,7 @@ export class avatarObj {
 
 						newEntry.className = !meInvalid ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(meFeedback));
-						this.textService.screenText.updateText(meFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, !meInvalid ? "#fff" : "#f44");
+						this.textService.screenText.updateText(meFeedback, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, !meInvalid ? "#fff" : "#f44");
 						break;
 
 					// npc add/delete
@@ -271,10 +273,10 @@ export class avatarObj {
 																		if (npcY) {
 																			if (!isNaN(parseInt(npcX)) && !isNaN(parseInt(npcY))) {
 																				let xMax = canvas.offsetWidth;
-																				if (parseInt(npcX) < 0 && parseInt(npcX) > xMax && parseInt(npcY) < 0 && parseInt(npcY) > this.h - this.chatBarService.barH) {
+																				if (parseInt(npcX) < 0 && parseInt(npcX) > xMax && parseInt(npcY) < 0 && parseInt(npcY) > this.h - this.chatBarObj.barH) {
 
 																					npcInvalid = true;
-																					npcFeedback = "Placement is out of bounds. X limit is 0-" + xMax + ". Y limit is 0-" + (this.h - this.chatBarService.barH) + ".";
+																					npcFeedback = "Placement is out of bounds. X limit is 0-" + xMax + ". Y limit is 0-" + (this.h - this.chatBarObj.barH) + ".";
 																				}
 																			} else {
 																				npcInvalid = true;
@@ -321,7 +323,7 @@ export class avatarObj {
 									aLevel = npcLevel || 8,
 									aX = npcX || this.x,
 									aY = npcY || this.y,
-									newNPC = new avatarObj(npcName, aGender, aSkin, 30, 60, +aSpeed, 28, 2, +aX, +aY, +aLevel, this.chatBarService, this.cmdService, this.textService);
+									newNPC = new avatarObj(npcName, aGender, aSkin, 30, 60, +aSpeed, 28, 2, +aX, +aY, +aLevel);
 
 								npcs.push(newNPC);
 								worldObjs.push(npcs[npcs.length - 1]);
@@ -359,7 +361,7 @@ export class avatarObj {
 
 						newEntry.className = !npcInvalid ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(npcFeedback));
-						this.textService.screenText.updateText(npcFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, !npcInvalid ? "#fff" : "#f44");
+						this.textService.screenText.updateText(npcFeedback, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, !npcInvalid ? "#fff" : "#f44");
 
 						break;
 
@@ -408,10 +410,10 @@ export class avatarObj {
 
 								let cw = canvas.offsetWidth,
 									allValues = tpEntity && (tpX || parseInt(tpX) === 0) && (tpY || parseInt(tpY) === 0) ? true : false,
-									wthnScrn = parseInt(tpX) >= 0 && parseInt(tpX) <= cw && parseInt(tpY) >= 0 && parseInt(tpY) <= this.h - this.chatBarService.barH ? true : false;
+									wthnScrn = parseInt(tpX) >= 0 && parseInt(tpX) <= cw && parseInt(tpY) >= 0 && parseInt(tpY) <= this.h - this.chatBarObj.barH ? true : false;
 
 								tpOK = enSearch !== 0 && allValues && wthnScrn ? true : false,
-									tpFeedback = allValues ? (enSearch !== 0 ? (wthnScrn ? "Teleported " + tpEntity + " to " + Math.round(parseInt(tpX)) + "," + Math.round(parseInt(tpY)) : "Coordinates are out of bounds. X limit is 0-" + cw + ". Y limit is 0-" + (this.h - this.chatBarService.barH) + ".") : "Entity does not exist.") : tpUsage;
+									tpFeedback = allValues ? (enSearch !== 0 ? (wthnScrn ? "Teleported " + tpEntity + " to " + Math.round(parseInt(tpX)) + "," + Math.round(parseInt(tpY)) : "Coordinates are out of bounds. X limit is 0-" + cw + ". Y limit is 0-" + (this.h - this.chatBarObj.barH) + ".") : "Entity does not exist.") : tpUsage;
 								if (tpOK) {
 									enSearch.x = tpX;
 									enSearch.y = tpY;
@@ -423,7 +425,7 @@ export class avatarObj {
 
 						newEntry.className = tpOK ? "" : "error-text";
 						newEntry.appendChild(document.createTextNode(tpFeedback));
-						this.textService.screenText.updateText(tpFeedback, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, tpOK ? "#fff" : "#f44");
+						this.textService.screenText.updateText(tpFeedback, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, tpOK ? "#fff" : "#f44");
 						break;
 
 					// get list of all entities in alphabetical order
@@ -450,7 +452,7 @@ export class avatarObj {
 
 
 						newEntry.appendChild(document.createTextNode(displayEntNames));
-						this.textService.screenText.updateText(displayEntNames, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#fff");
+						this.textService.screenText.updateText(displayEntNames, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#fff");
 						break;
 
 					// invalid command
@@ -459,7 +461,7 @@ export class avatarObj {
 
 						newEntry.className = "error-text";
 						newEntry.appendChild(document.createTextNode(cmdErr));
-						this.textService.screenText.updateText(cmdErr, this.h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#f44");
+						this.textService.screenText.updateText(cmdErr, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#f44");
 						break;
 				}
 
@@ -471,8 +473,8 @@ export class avatarObj {
 			chatLog.insertBefore(newEntry, chatLog.childNodes[0]);
 
 			// cut off oldest line if at max lines allowed
-			if (chatLog.childNodes.length > this.chatBarService.maxLines) {
-				chatLog.removeChild(chatLog.getElementsByTagName("span")[this.chatBarService.maxLines]);
+			if (chatLog.childNodes.length > this.chatBarObj.maxLines) {
+				chatLog.removeChild(chatLog.getElementsByTagName("span")[this.chatBarObj.maxLines]);
 			}
 		}
 

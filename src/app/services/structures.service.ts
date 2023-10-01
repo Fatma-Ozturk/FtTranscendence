@@ -1,25 +1,34 @@
 import { Injectable } from '@angular/core';
 import { structureObj } from '../models/entities/chatEntities/structureObj';
-import { ChatBarService } from './chat-bar.service';
+import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StructuresService {
 
-  constructor(private chatBarService: ChatBarService) { }
+  private chatBarObj: ChatBarObj;
 
-  images: HTMLImageElement[] = [];
+  constructor() {
+    this.chatBarObj = new ChatBarObj();
+    this.img = new Image();
+    this.img.src = "https://i.ibb.co/GTsDmJF/fountain.png";
+
+    this.structures = [
+      new structureObj(this.w, 50, 0, -40, 0, null, false, 1),
+      new structureObj(10, this.h - this.chatBarObj.barH - 10, 0, 10, 0, null, false, 1),
+      new structureObj(10, this.h - this.chatBarObj.barH - 10, this.w - 10, 10, 0, null, false, 1),
+      //new structureObj(300, 200, this.w / 2 - 100, 100, 70, this.img, true, 12)
+      new structureObj(300, 200, this.w / 2 + 130, 100, 70, this.img, true, 12)
+      ];
+  }
+
   w : number = 0;
   h : number = 0;
 
-  structures = [
-    new structureObj(this.w, 50, 0, -40, 0, null, false, 1),
-    new structureObj(10, this.h - this.chatBarService.barH - 10, 0, 10, 0, null, false, 1),
-    new structureObj(10, this.h - this.chatBarService.barH - 10, this.w - 10, 10, 0, null, false, 1),
-    new structureObj(300, 200, this.w / 2 - 150, 100, 70, this.images[1], true, 12)
-    
-    ];
+  img: HTMLImageElement;
+  structures: structureObj[] = [];
+
 
     drawStructure(strctr: structureObj, ctx: CanvasRenderingContext2D) {
       if (strctr.img === null) {

@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
-import { ChatBarService } from './chat-bar.service';
+import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TextService {
 
-  constructor(private chatBarService : ChatBarService) { }
+  private chatBarObj: ChatBarObj;
+
+
+  constructor() { 
+    this.chatBarObj = new ChatBarObj();
+  }
 
   screenText = {
     text: "",
@@ -28,7 +33,7 @@ export class TextService {
 
   writeScrnText(txtObj: typeof this.screenText, ctx: CanvasRenderingContext2D, w: number) {
     if (txtObj.timer > 0) {
-      if (!this.chatBarService.showLog) {
+      if (!this.chatBarObj.showLog) {
         let adj = 2,
           fadeTime = txtObj.fadeTime,
           txtTimeFwd = txtObj.maxTime - txtObj.timer;

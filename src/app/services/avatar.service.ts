@@ -6,17 +6,28 @@ import { avatarObj } from '../models/entities/chatEntities/avatarObj';
 import { randNum } from '../models/entities/chatEntities/randNum';
 import { findCllsn } from '../models/entities/chatEntities/findCllsn';
 import { TextService } from './text.service';
-import { ChatBarService } from './chat-bar.service';
+import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AvatarService {
+	private chatBarObj: ChatBarObj;
 
 	constructor(private structuresService: StructuresService,
 		private cmdService: CmdService,
-		private textService: TextService,
-		private chatBarService: ChatBarService) { }
+		private textService: TextService) {
+		this.chatBarObj = new ChatBarObj();
+		this.imgF = new Image();
+		this.imgM = new Image();
+
+		this.imgM.src = "https://i.ibb.co/59SRcxm/chibi-m.png";
+		this.imgF.src = "https://i.ibb.co/PChphHS/chibi-f.png";
+	}
+
+	imgF: HTMLImageElement;
+	imgM: HTMLImageElement;
+
 
 	stopControl(avatar: avatarObj) {
 		avatar.isMoving = false;
@@ -24,7 +35,7 @@ export class AvatarService {
 
 	control = (avatar: avatarObj, e: KeyboardEvent): void => {
 		// avatar.dir values: 0 = up, 1 = right, 2 = down, 3 = left
-		if (e && !this.chatBarService.active) {
+		if (e && !this.chatBarObj.active) {
 			avatar.isMoving = true;
 			avatar.canMove = true;
 			switch (e.keyCode) {
@@ -109,7 +120,7 @@ export class AvatarService {
 		}
 	}
 
-	drawAvatar(avatar: avatarObj, player: avatarObj, ctx: CanvasRenderingContext2D, images: HTMLImageElement[]) {
+	drawAvatar(avatar: avatarObj, player: avatarObj, ctx: CanvasRenderingContext2D) {
 		let lastMsg = avatar.lastMsg;
 		// chat bubble
 		if (lastMsg.length > 0 && avatar.msgTimer > 0) {
@@ -203,7 +214,7 @@ export class AvatarService {
 		ctx.closePath();
 		// avatar
 		ctx.drawImage(
-			avatar.gender == 1 ? images[3] : images[2],
+			avatar.gender == 1 ? this.imgF : this.imgM,
 			avatar.w * (avatar.curFrame - 1) + (avatar.w * avatar.frames * avatar.dir),
 			avatar.h * avatar.skinTone,
 			avatar.w,

@@ -1,73 +1,61 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { randNum } from 'src/app/models/entities/chatEntities/randNum';
 import { findCllsn } from 'src/app/models/entities/chatEntities/findCllsn';
 import { AvatarService } from 'src/app/services/avatar.service';
 import { StructuresService } from 'src/app/services/structures.service';
 import { avatarObj } from 'src/app/models/entities/chatEntities/avatarObj';
-import { TextService } from 'src/app/services/text.service';
-import { ChatBarService } from 'src/app/services/chat-bar.service';
 import { CmdService } from 'src/app/services/cmd.service';
+import { TextService } from 'src/app/services/text.service';
+import { ChatBarObj } from 'src/app/models/entities/chatEntities/chatBarObj';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit {
+
+  private chatBarObj: ChatBarObj;
+  isArrowUpPressed: boolean = false;
+  isArrowDownPressed: boolean = false;
+
+  @ViewChild('myCanvas')
+  canvas: ElementRef<HTMLCanvasElement>;
+  context: CanvasRenderingContext2D;
+  w: number;
+  h: number;
+  s: number;
+
+  
   constructor(private avatarService: AvatarService,
     private structuresService: StructuresService,
     private textService: TextService,
-    private chatBarService: ChatBarService,
-    private cmdService: CmdService) {
+    private cmdService: CmdService,
+    private renderer: Renderer2, private el: ElementRef) {
+      this.chatBarObj = new ChatBarObj();
+    }
+    
+    player = new avatarObj("Fatma", 1, 0, 30, 60, 3, 28, 2, 568 / 2 - 15, 480 * 0.8 - 54, 0);
 
+
+  ngOnInit(): void {
   }
 
+  ngAfterViewInit(): void {
 
-ngOnInit(): void {
-    var canvas = document.getElementsByTagName("canvas")[0];
-    var ctx = canvas.getContext("2d");
-    //canvas: ElementRef<HTMLCanvasElement>;
-    //ctx: CanvasRenderingContext2D;
-    var w = 800;
-    var h = 600;
-    var s = 2;
-
-    canvas.width = w * s;
-    canvas.height = h * s;
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-    ctx.scale(s, s);
-
-    var sprites = [
-      "https://i.ibb.co/TqMC0Dp/grass.png",
-      "https://i.ibb.co/GTsDmJF/fountain.png",
-      "https://i.ibb.co/59SRcxm/chibi-m.png",
-      "https://i.ibb.co/PChphHS/chibi-f.png"
-    ];
-
-    var images: HTMLImageElement[] = [];
-
-    for (var sprite of sprites) {
-      var img = new Image();
-      img.src = sprite;
-      images.push(img);
-    }
-
-
+    this.context = this.canvas.nativeElement.getContext('2d');
+    this.w = 568;
+    this.h = 480;
+    this.s = 2;
+ 
     const npcs: any[] = [];
     const worldObjs: any[] = [];
- 
-    this.chatBarService.canvas = canvas;
-    this.chatBarService.s = s;
-    this.structuresService.images = images;
-    this.structuresService.w = w;
-    this.structuresService.h = h;
 
-    
-    var player = new avatarObj("Fatma", 0, 0, 30, 60, 3, 28, 2, w / 2 - 15, h * 0.8 - this.chatBarService.barH, 0, this.chatBarService, this.cmdService, this.textService);
-    
-    this.createNPCs(player, w, h, npcs);
-    worldObjs[0] = player;
+    this.structuresService.w = this.w;
+    this.structuresService.h = this.h;
+
+    this.createNPCs(this.player, npcs);
+    worldObjs[0] = this.player;
 
     for (var sn in npcs) {
       const numericSn = +sn + 1;
@@ -81,230 +69,234 @@ ngOnInit(): void {
       worldObjs[numericSs] = this.structuresService.structures[numericSs - avatars];
     }
 
-    // onboarding
-    let onboardingTxt = "Welcome! To get started, enter /help for commands.",
-      chatLog = document.querySelector(".chat-log"),
-      newEntry = document.createElement("span");
+    this.addOnboardingText();
 
-    newEntry.className = "info-text";
-    newEntry.appendChild(document.createTextNode(onboardingTxt));
-    chatLog.insertBefore(newEntry, chatLog.childNodes[0]);
-    this.textService.screenText.updateText(onboardingTxt, h - this.chatBarService.barH, this.textService.screenText.fontS * 2, "#ff4");
+    this.runAI(this.player, npcs, worldObjs);
 
-    this.runAI(player, npcs, worldObjs, h, canvas);
+    this.runDisplay(worldObjs, this.player);
 
-    this.runDisplay(w, h, worldObjs, images, ctx, player);
 
-     // player moving
-     document.addEventListener("keydown", (e) => {
-      let field = document.querySelector("input") as HTMLInputElement,
-          send = document.querySelector(".send") as HTMLButtonElement,
-          viewChat = document.querySelector(".view-chat") as HTMLButtonElement;
-    
-      // Send button availability
-      setTimeout(() => {
-        send.disabled = field.value.length > 0 ? false : true;
-      }, 10);
-    
-      // move only if not using chat
-      if (!this.chatBarService.active) {
-        this.avatarService.control(player, e);
-      } else if (this.chatBarService.history.length > 0) {
-        if (e.keyCode == 38 && this.chatBarService.curHistoryItem != this.chatBarService.history.length - 1) {
-          ++this.chatBarService.curHistoryItem;
-          field.value = this.chatBarService.history[this.chatBarService.history.length - this.chatBarService.curHistoryItem - 1];
-          e.preventDefault();
-          field.setSelectionRange(field.value.length, field.value.length);
-        } else if (e.keyCode == 40 && this.chatBarService.curHistoryItem > -1) {
-          --this.chatBarService.curHistoryItem;
-          field.value = this.chatBarService.curHistoryItem == -1 ? "" : this.chatBarService.history[this.chatBarService.history.length - this.chatBarService.curHistoryItem - 1];
-        }
-      }
-    
-      let spaces = 0;
-      for (let char of field.value) {
-        if (char === " ") {
-          ++spaces;
-        }
-      }
-      
-      this.chatBarService.autoCmpltLvl = spaces;
-    
-      if (e.keyCode == 9 && field.value[0] == "/" && this.chatBarService.active) {
-        e.preventDefault();
-        let chatLog = document.querySelector(".chat-log"),
-            availOpts = document.createElement("span"),
-            entityResults = [player.name],
-            displayEntResults = "";
-    
-            for (let er in npcs) {
-              let index = +er + 1;
-              entityResults[index] = npcs[index - 1].name;
-            }
-            
-    
-        entityResults.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-    
-        for (let der in entityResults) {
-          //der = +der;
-          displayEntResults += (parseInt(der) > 0 ? ", " : "") + entityResults[der];
-        }
-    
-        if (this.chatBarService.autoCmpltLvl === 0) {
-          let curString = field.value.substr(1, field.value.length - 1);
-          let foundCmdMatch = false;
-    
-          for (let fm in this.cmdService.cmd) {
-            if (this.cmdService.cmd[fm].name.indexOf(curString) === 0 && curString.length >= 1 && curString != this.cmdService.cmd[fm].name) {
-              this.chatBarService.curAutoCmpltCmd = +fm;
-              foundCmdMatch = true;
-              field.value = "/" + this.cmdService.cmd[this.chatBarService.curAutoCmpltCmd].name;
-            }
-          }
-    
-          if (!foundCmdMatch && field.value.length > 0 && (this.cmdService.cmd.find(c => c.name == curString) || field.value == "/")) {
-            if (this.chatBarService.curAutoCmpltCmd == -1) {
-              let getCmds = "";
-              for (let ac in this.cmdService.cmd) {
-                getCmds += (parseInt(ac) > 0 ? ", " : "") + "/" + this.cmdService.cmd[ac].name;
-              }
-              availOpts.appendChild(document.createTextNode(getCmds));
-              chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
-            }
-    
-            ++this.chatBarService.curAutoCmpltCmd;
-    
-            if (this.chatBarService.curAutoCmpltCmd > this.cmdService.cmd.length - 1) {
-              this.chatBarService.curAutoCmpltCmd = 0;
-            }
-    
-            field.value = "/" + this.cmdService.cmd[this.chatBarService.curAutoCmpltCmd].name;
-          }
-        } else if (this.chatBarService.autoCmpltLvl == 1) {
-          let curCmd = field.value.split(" ")[0].substring(1);
-          let cmdInHand = this.cmdService.cmd.find(c => c.name === curCmd) || null;
-          let reqArgs = (cmdInHand.args.match(/</g) || []).length;
-    
-          if (curCmd !== null && reqArgs >= 1) {
-            let arg1Result = "";
-            if (cmdInHand.args.indexOf("name") == 1) {
-    
-              if (this.chatBarService.arg1pg == -1) {
-                availOpts.appendChild(document.createTextNode(displayEntResults));
-                chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
-              }
-    
-              ++this.chatBarService.arg1pg;
-    
-              if (this.chatBarService.arg1pg > entityResults.length - 1) {
-                this.chatBarService.arg1pg = 0;
-              }
-    
-              arg1Result = entityResults[this.chatBarService.arg1pg];
-    
-            } else if (cmdInHand.args.indexOf("add") == 1 || cmdInHand.args.indexOf("del") == 1) {
-              let opResults = ["add", "del"];
-    
-              if (this.chatBarService.arg1pg == -1) {
-                availOpts.appendChild(document.createTextNode("add, del"));
-                chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
-              }
-    
-              ++this.chatBarService.arg1pg;
-    
-              if (this.chatBarService.arg1pg > opResults.length - 1) {
-                this.chatBarService.arg1pg = 0;
-              }
-    
-              arg1Result = opResults[this.chatBarService.arg1pg];
-            }
-            field.value = "/" + cmdInHand.name + " " + arg1Result;
-          }
-        } else if (this.chatBarService.autoCmpltLvl == 2) {
-          let curCmd = field.value.substring(1).split(" ");
-          let cmdInHand = this.cmdService.cmd.find(c => c.name === curCmd[0]) || null;
-          let curArgs = curCmd[1];
-          let reqArgs = (cmdInHand.args.match(/</g) || []).length;
-    
-          if (curCmd[0] !== null && reqArgs >= 2) {
-            if (cmdInHand.args.indexOf("name") > -1) {
-    
-              if (this.chatBarService.arg2pg == -1) {
-                availOpts.appendChild(document.createTextNode(displayEntResults));
-                chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
-              }
-    
-              ++this.chatBarService.arg2pg;
-    
-              if (this.chatBarService.arg2pg > entityResults.length - 1) {
-                this.chatBarService.arg2pg = 0;
-              }
-    
-              field.value = "/" + cmdInHand.name + " " + curCmd[1] + " " + entityResults[this.chatBarService.arg2pg];
-            }
-          }
-        }
-      } else {
-        this.chatBarService.curAutoCmpltCmd = -1;
-        this.chatBarService.arg1pg = -1;
-        this.chatBarService.arg2pg = -1;
-      }
-    
-      if (e.keyCode == 86 && !this.chatBarService.active) {
-        e.preventDefault();
-        this.chatBarService.logToggle();
-      } else if (e.keyCode == 191 && !this.chatBarService.active) {
-        field.value = "";
-        this.chatBarService.logToggle();
-      } else if (e.keyCode == 27) {
-        this.chatBarService.active = false;
-        this.chatBarService.logHide();
-        field.blur();
-        send.blur();
-        viewChat.blur();
-      }
-    });
-    
-    
-  // player stop moving
-  document.addEventListener("keyup", () => {
-  this.avatarService.stopControl(player);
-  });
-  // player send chat messages
-  document.querySelector("input")?.addEventListener("focus", () => {
-    this.chatBarService.active = true;
-  });
-  document.querySelector("input")?.addEventListener("blur", () => {
-    this.chatBarService.active = false;
-  });
-  document.querySelector(".send")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  let field = document.querySelector("input");
-  if (field.value.length > 0) {
-    player.sendMsg(field.value, npcs, worldObjs, canvas);
-    this.chatBarService.history.push(field.value);
-    this.chatBarService.curHistoryItem = -1;
-    if (!this.chatBarService.showLog) {
-      this.chatBarService.active = false;
-      field.blur();
-    }
+    /*     // player moving
+        document.addEventListener("keydown", (e) => {
+         let field = document.querySelector("input") as HTMLInputElement,
+             send = document.querySelector(".send") as HTMLButtonElement,
+             viewChat = document.querySelector(".view-chat") as HTMLButtonElement;
+       
+         // Send button availability
+         setTimeout(() => {
+           send.disabled = field.value.length > 0 ? false : true;
+         }, 10);
+       
+         // move only if not using chat
+         if (!this.chatBarObj.active) {
+           this.avatarService.control(player, e);
+         } else if (this.chatBarObj.history.length > 0) {
+           if (e.keyCode == 38 && this.chatBarObj.curHistoryItem != this.chatBarObj.history.length - 1) {
+             ++this.chatBarObj.curHistoryItem;
+             field.value = this.chatBarObj.history[this.chatBarObj.history.length - this.chatBarObj.curHistoryItem - 1];
+             e.preventDefault();
+             field.setSelectionRange(field.value.length, field.value.length);
+           } else if (e.keyCode == 40 && this.chatBarObj.curHistoryItem > -1) {
+             --this.chatBarObj.curHistoryItem;
+             field.value = this.chatBarObj.curHistoryItem == -1 ? "" : this.chatBarObj.history[this.chatBarObj.history.length - this.chatBarObj.curHistoryItem - 1];
+           }
+         }
+       
+         let spaces = 0;
+         for (let char of field.value) {
+           if (char === " ") {
+             ++spaces;
+           }
+         }
+         
+         this.chatBarObj.autoCmpltLvl = spaces;
+       
+         if (e.keyCode == 9 && field.value[0] == "/" && this.chatBarObj.active) {
+           e.preventDefault();
+           let chatLog = document.querySelector(".chat-log"),
+               availOpts = document.createElement("span"),
+               entityResults = [player.name],
+               displayEntResults = "";
+       
+               for (let er in npcs) {
+                 let index = +er + 1;
+                 entityResults[index] = npcs[index - 1].name;
+               }
+               
+       
+           entityResults.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+       
+           for (let der in entityResults) {
+             //der = +der;
+             displayEntResults += (parseInt(der) > 0 ? ", " : "") + entityResults[der];
+           }
+       
+           if (this.chatBarObj.autoCmpltLvl === 0) {
+             let curString = field.value.substr(1, field.value.length - 1);
+             let foundCmdMatch = false;
+       
+             for (let fm in this.cmdService.cmd) {
+               if (this.cmdService.cmd[fm].name.indexOf(curString) === 0 && curString.length >= 1 && curString != this.cmdService.cmd[fm].name) {
+                 this.chatBarObj.curAutoCmpltCmd = +fm;
+                 foundCmdMatch = true;
+                 field.value = "/" + this.cmdService.cmd[this.chatBarObj.curAutoCmpltCmd].name;
+               }
+             }
+       
+             if (!foundCmdMatch && field.value.length > 0 && (this.cmdService.cmd.find(c => c.name == curString) || field.value == "/")) {
+               if (this.chatBarObj.curAutoCmpltCmd == -1) {
+                 let getCmds = "";
+                 for (let ac in this.cmdService.cmd) {
+                   getCmds += (parseInt(ac) > 0 ? ", " : "") + "/" + this.cmdService.cmd[ac].name;
+                 }
+                 availOpts.appendChild(document.createTextNode(getCmds));
+                 chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
+               }
+       
+               ++this.chatBarObj.curAutoCmpltCmd;
+       
+               if (this.chatBarObj.curAutoCmpltCmd > this.cmdService.cmd.length - 1) {
+                 this.chatBarObj.curAutoCmpltCmd = 0;
+               }
+       
+               field.value = "/" + this.cmdService.cmd[this.chatBarObj.curAutoCmpltCmd].name;
+             }
+           } else if (this.chatBarObj.autoCmpltLvl == 1) {
+             let curCmd = field.value.split(" ")[0].substring(1);
+             let cmdInHand = this.cmdService.cmd.find(c => c.name === curCmd) || null;
+             let reqArgs = (cmdInHand.args.match(/</g) || []).length;
+       
+             if (curCmd !== null && reqArgs >= 1) {
+               let arg1Result = "";
+               if (cmdInHand.args.indexOf("name") == 1) {
+       
+                 if (this.chatBarObj.arg1pg == -1) {
+                   availOpts.appendChild(document.createTextNode(displayEntResults));
+                   chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
+                 }
+       
+                 ++this.chatBarObj.arg1pg;
+       
+                 if (this.chatBarObj.arg1pg > entityResults.length - 1) {
+                   this.chatBarObj.arg1pg = 0;
+                 }
+       
+                 arg1Result = entityResults[this.chatBarObj.arg1pg];
+       
+               } else if (cmdInHand.args.indexOf("add") == 1 || cmdInHand.args.indexOf("del") == 1) {
+                 let opResults = ["add", "del"];
+       
+                 if (this.chatBarObj.arg1pg == -1) {
+                   availOpts.appendChild(document.createTextNode("add, del"));
+                   chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
+                 }
+       
+                 ++this.chatBarObj.arg1pg;
+       
+                 if (this.chatBarObj.arg1pg > opResults.length - 1) {
+                   this.chatBarObj.arg1pg = 0;
+                 }
+       
+                 arg1Result = opResults[this.chatBarObj.arg1pg];
+               }
+               field.value = "/" + cmdInHand.name + " " + arg1Result;
+             }
+           } else if (this.chatBarObj.autoCmpltLvl == 2) {
+             let curCmd = field.value.substring(1).split(" ");
+             let cmdInHand = this.cmdService.cmd.find(c => c.name === curCmd[0]) || null;
+             let curArgs = curCmd[1];
+             let reqArgs = (cmdInHand.args.match(/</g) || []).length;
+       
+             if (curCmd[0] !== null && reqArgs >= 2) {
+               if (cmdInHand.args.indexOf("name") > -1) {
+       
+                 if (this.chatBarObj.arg2pg == -1) {
+                   availOpts.appendChild(document.createTextNode(displayEntResults));
+                   chatLog.insertBefore(availOpts, chatLog.childNodes[0]);
+                 }
+       
+                 ++this.chatBarObj.arg2pg;
+       
+                 if (this.chatBarObj.arg2pg > entityResults.length - 1) {
+                   this.chatBarObj.arg2pg = 0;
+                 }
+       
+                 field.value = "/" + cmdInHand.name + " " + curCmd[1] + " " + entityResults[this.chatBarObj.arg2pg];
+               }
+             }
+           }
+         } else {
+           this.chatBarObj.curAutoCmpltCmd = -1;
+           this.chatBarObj.arg1pg = -1;
+           this.chatBarObj.arg2pg = -1;
+         }
+       
+         if (e.keyCode == 86 && !this.chatBarObj.active) {
+           e.preventDefault();
+           this.chatBarObj.logToggle();
+         } else if (e.keyCode == 191 && !this.chatBarObj.active) {
+           field.value = "";
+           this.chatBarObj.logToggle();
+         } else if (e.keyCode == 27) {
+           this.chatBarObj.active = false;
+           this.chatBarObj.logHide();
+           field.blur();
+           send.blur();
+           viewChat.blur();
+         }
+       });
+       
+       
+     // player stop moving
+     document.addEventListener("keyup", () => {
+     this.avatarService.stopControl(player);
+     });
+     // player send chat messages
+     document.querySelector("input")?.addEventListener("focus", () => {
+       this.chatBarObj.active = true;
+     });
+     document.querySelector("input")?.addEventListener("blur", () => {
+       this.chatBarObj.active = false;
+     });
+     document.querySelector(".send")?.addEventListener("click", (e) => {
+     e.preventDefault();
+     let field = document.querySelector("input");
+     if (field.value.length > 0) {
+       player.sendMsg(field.value, npcs, worldObjs, this.canvas.nativeElement);
+       this.chatBarObj.history.push(field.value);
+       this.chatBarObj.curHistoryItem = -1;
+       if (!this.chatBarObj.showLog) {
+         this.chatBarObj.active = false;
+         field.blur();
+       }
+     }
+       field.value = "";
+     });
+     // show/hide chat using button
+     document.querySelector(".view-chat")?.addEventListener("click", (e) => {
+     e.preventDefault();
+     this.chatBarObj.logToggle();
+     });
+   
+     this.canvas?.nativeElement.addEventListener("click", () => {
+       this.chatBarObj.logHide();
+       }); */
+
   }
-    field.value = "";
-  });
-  // show/hide chat using button
-  document.querySelector(".view-chat")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  this.chatBarService.logToggle();
-  });
 
-  canvas?.addEventListener("click", () => {
-    this.chatBarService.logHide();
-    });
+  addOnboardingText() {
 
+    const onboardingTxt = 'Welcome! To get started, enter /help for commands.';
+    const chatLog = this.el.nativeElement.querySelector('.chat-log');
+    const newEntry = this.renderer.createElement('span');
 
- }
+    this.renderer.addClass(newEntry, 'info-text');
+    this.renderer.appendChild(newEntry, this.renderer.createText(onboardingTxt));
+    this.renderer.insertBefore(chatLog, newEntry, chatLog.childNodes[0]);
+    this.textService.screenText.updateText(onboardingTxt, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#ff4");
+  }
 
-  createNPCs(player: avatarObj, w: number, h: number, npcs: any[]) {
+  createNPCs(player: avatarObj, npcs: any[]) {
     const NameObj = (name: string, gender: string) => ({
       name: name,
       gender: gender
@@ -322,8 +314,8 @@ ngOnInit(): void {
 
     for (const npcn in npcNames) {
       let chooseSkin = randNum(0, 3),
-        placeX = randNum(0, w - avatarW),
-        placeY = randNum(avatarH, h - this.chatBarService.barH - avatarH);
+        placeX = randNum(0, this.w - avatarW),
+        placeY = randNum(avatarH, this.h - this.chatBarObj.barH - avatarH);
 
       npcs[npcn] = new avatarObj(
         npcNames[npcn].name,
@@ -336,10 +328,7 @@ ngOnInit(): void {
         2,
         placeX,
         placeY,
-        8,
-        this.chatBarService,
-        this.cmdService,
-        this.textService
+        8
       );
 
       if (findCllsn(npcs[npcn], this.structuresService.structures)) {
@@ -349,31 +338,34 @@ ngOnInit(): void {
     }
   }
 
-  runAI(player: avatarObj, npcs: any[], worldObjs: any[], h: number, canvas: HTMLCanvasElement) {
+  runAI(player: avatarObj, npcs: any[], worldObjs: any[]) {
     for (var ai in npcs) {
-      this.avatarService.npcAI(npcs[ai], player, npcs, worldObjs, h, canvas);
+      this.avatarService.npcAI(npcs[ai], player, npcs, worldObjs, this.h, this.canvas.nativeElement);
     }
     setTimeout(this.runAI, 400);
   }
 
-  runDisplay = (w: number, h: number, worldObjs: any[], images: HTMLImageElement[], ctx: CanvasRenderingContext2D, player: avatarObj) =>  {
-    //this.drawScreen(w, h, worldObjs, images, ctx, player);
-    ctx.clearRect(0, 0, w, h);
+  runDisplay = (worldObjs: any[], player: avatarObj) => {
 
-    let ground = ctx.createPattern(images[0], 'repeat'),
+    this.context.clearRect(0, 0, this.w, this.h);
+
+    var imgG: HTMLImageElement = new Image();
+    imgG.src = "https://i.ibb.co/TqMC0Dp/grass.png";
+
+    let ground = this.context.createPattern(imgG, 'repeat'),
       pathW = 50,
-      path = ctx.createLinearGradient(w / 2 - pathW / 2, 0, w / 2 + pathW / 2, 0);
+      path = this.context.createLinearGradient(this.w / 2 - pathW / 2, 0, this.w / 2 + pathW / 2, 0);
 
     path.addColorStop(0.05, "#863");
     path.addColorStop(0.05, "#974");
     path.addColorStop(0.95, "#974");
     path.addColorStop(0.95, "#753");
 
-    ctx.fillStyle = ground;
-    ctx.fillRect(0, 0, w, h);
+    this.context.fillStyle = ground;
+    this.context.fillRect(0, 0, this.w, this.h);
 
-    ctx.fillStyle = path;
-    ctx.fillRect(w / 2 - pathW / 2, 220, pathW, 210);
+    this.context.fillStyle = path;
+    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 210);
 
     // sort avatars and structures ascending by Y position so that they each arent standing on top of another
     worldObjs.sort(function (a, b) {
@@ -384,18 +376,40 @@ ngOnInit(): void {
     for (var wo in worldObjs) {
       // to determine if avatar, test for name
       if (worldObjs[wo].name) {
-        this.avatarService.moveAvatar(worldObjs[wo], player, w, h);
-        this.avatarService.drawAvatar(worldObjs[wo], player, ctx, images);
+        this.avatarService.moveAvatar(worldObjs[wo], player, this.w, this.h);
+        this.avatarService.drawAvatar(worldObjs[wo], player, this.context);
       } else {
-        this.structuresService.drawStructure(worldObjs[wo], ctx);
+        this.structuresService.drawStructure(worldObjs[wo], this.context);
       }
     }
 
     // screen text
-    this.textService.writeScrnText(this.textService.screenText, ctx, w);
+    this.textService.writeScrnText(this.textService.screenText, this.context, this.w);
     setTimeout(() => {
-      this.runDisplay(w, h, worldObjs, images, ctx, player);
+      this.runDisplay(worldObjs, player);
     }, 1000 / 60);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onkeydown(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') {
+      this.isArrowUpPressed = true;
+      console.log("arrow up");
+    } else if (event.key === 'ArrowDown') {
+      this.isArrowDownPressed = true;
+      console.log("arrow down");
+    }
+    this.avatarService.control(this.player, event); 
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp') {
+      this.isArrowUpPressed = false;
+    } else if (event.key === 'ArrowDown') {
+      this.isArrowDownPressed = false;
+    }
+    this.avatarService.stopControl(this.player);
   }
 
 }
