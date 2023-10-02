@@ -6,4 +6,5 @@ export class GameModel {
 	xVel: number = 0;
 	yVel: number = 0;
 	whoIs?: number;
+	remainingTime: Date; 
 }

@@ -4,4 +4,6 @@ export interface GameRoomSocket {
   userHostScore: number;
   userGuestScore: number;
   resultNameId: number;
+  startTime: Date;
+  timer: number;
 }

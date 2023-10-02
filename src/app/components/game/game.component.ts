@@ -65,6 +65,7 @@ export class GameComponent {
 					this.paddleHost.whoIs = GamePlayerEnum.host;
 					this.paddleGuest.whoIs = GamePlayerEnum.guest;
 					this.ball.whoIs = this.paddleHost.whoIs;
+					this.ball.remainingTime = this.gameRoomSocket.startTime;
 				}
 				else if (this.whoIs == 1) {
 					this.leftPaddle = this.paddleHost;
@@ -72,9 +73,8 @@ export class GameComponent {
 					this.paddleHost.whoIs = GamePlayerEnum.host;
 					this.paddleGuest.whoIs = GamePlayerEnum.guest;
 					this.ball.whoIs = this.paddleGuest.whoIs;
+					this.ball.remainingTime = this.gameRoomSocket.startTime;
 				}
-				// console.log("this.paddleHost.whoIs " + this.paddleHost.whoIs);
-				// console.log("this.paddleGuest.whoIs " + this.paddleGuest.whoIs);
 			}
 		},
 			(error) => {
@@ -103,37 +103,39 @@ export class GameComponent {
 	gameLoop = (): void => {
 		this.gameUpdate();
 		this.gameDraw();
-		setTimeout(() => {
-			window.requestAnimationFrame(this.gameLoop);
-			this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
-			this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
-			this.gameService.sendBallLocation(this.ball);
-			this.gameService.getBallLocationResponse().subscribe((response: any) => {
-				if (response.message == "Ball Location" && response.data) {
-					if (this.whoIs == 1) {
-						this.ball.x = response.data.fixedX * this.fixedScreenRatio;
-						this.ball.y = response.data.fixedY * this.fixedScreenRatio;
-						this.ball.xVel = response.data.xVel;
-						this.ball.yVel = response.data.yVel;
-					}
+		// setTimeout(() => {
+		window.requestAnimationFrame(this.gameLoop);
+		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+		this.gameService.sendBallLocation(this.ball);
+		this.gameService.getBallLocationResponse().subscribe((response: any) => {
+			if (response.message == "Ball Location" && response.data) {
+				if (this.whoIs == 1) {
+					this.ball.x = response.data.fixedX * this.fixedScreenRatio;
+					this.ball.y = response.data.fixedY * this.fixedScreenRatio;
+					this.ball.xVel = response.data.xVel;
+					this.ball.yVel = response.data.yVel;
 				}
-			})
-			this.gameService.getPaddleResponse().subscribe((response: any) => {
-				if (response.message === "Paddle" && response.data) {
-					let serializeData: PaddleGameModel[] = JSON.parse(response.data);
+			}
+		})
+		this.gameService.getPaddleResponse().subscribe((response: any) => {
+			if (response.message === "Paddle" && response.data) {
+				let serializeData: PaddleGameModel[] = JSON.parse(response.data);
 
-					if (response.data[0]) {
-						this.paddleHost.x = serializeData[0]?.x;
-						this.paddleHost.y = serializeData[0]?.y;
-					}
-					if (response.data[1]) {
-						this.paddleGuest.x = serializeData[1]?.x;
-						this.paddleGuest.y = serializeData[1]?.y;
-					}
+				if (response.data[0]) {
+					this.paddleHost.x = serializeData[0]?.x;
+					this.paddleHost.y = serializeData[0]?.y;
+					this.paddleHost.score = serializeData[0]?.score;
 				}
-			})
+				if (response.data[1]) {
+					this.paddleGuest.x = serializeData[1]?.x;
+					this.paddleGuest.y = serializeData[1]?.y;
+					this.paddleGuest.score = serializeData[1]?.score;
+				}
+			}
+		})
 
-		}, 1);
+		// }, 1);
 	};
 
 	initGameModels(): void {
@@ -231,7 +233,9 @@ export class GameComponent {
 				this.ball.xVel = 1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.rightPaddle.score++;
+				// this.rightPaddle.score++;
+				this.paddleGuest.score += 1;
+				this.gameService.sendKeydown(this.paddleGuest);
 				this.ballInit();
 			}
 		}
@@ -247,7 +251,9 @@ export class GameComponent {
 				this.ball.xVel = -1;
 			else {
 				//todo: API CALL with reset game objects!
-				this.leftPaddle.score++;
+				// this.leftPaddle.score++;
+				this.paddleHost.score += 1;
+				this.gameService.sendKeydown(this.paddleHost);
 				this.ballInit();
 			}
 		}
@@ -287,6 +293,20 @@ export class GameComponent {
 			10,
 			60,
 			this.fixedScreenRatio * 5
+		);
+		const nowDate = new Date();
+		console.log("this.gameRoomSocket.startTime " + this.gameRoomSocket.startTime);
+		
+		const date = (new Date(this.gameRoomSocket.startTime).getTime() + this.gameRoomSocket.timer * 1000)- nowDate.getTime();
+		const minute = Math.floor(date / 60000); // Bir dakika 60,000 milisaniyeye eşittir
+		const second = ((date % 60000) / 1000).toFixed(0);
+		this.context.fillText(
+			`${minute} : ${second}`,
+			this.canvasRef.nativeElement.width / 2 +
+			this.fixedScreenRatio * 10 -
+			10,
+			80,
+			this.fixedScreenRatio * 50
 		);
 	}
 
