@@ -1,3 +1,8 @@
+import { ToastrService } from 'ngx-toastr';
+import { GameHistoryService } from './../../services/game-history.service';
+import { GameScoreService } from './../../services/game-score.service';
+import { GameHistory } from './../../models/entities/gameHistory';
+import { GameScore } from './../../models/entities/gameScore';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { GameRoomSocket } from './../../models/entities/gameRoomSocket';
@@ -6,7 +11,9 @@ import { GameService } from './../../services/game.service';
 import { PaddleGameModel } from './../../models/model/paddleGameModel';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Messages } from 'src/app/constants/Messages';
+import { timeInterval } from 'rxjs';
 
 @Component({
 	selector: 'app-game',
@@ -43,12 +50,24 @@ export class GameComponent {
 	gameRoomId: number = 0;
 	gameRoomSocket: GameRoomSocket;
 	whoIs: number = -1;
+	gameRunning: boolean = true;
+	gameMessage: string = "";
 
-	constructor(private gameService: GameService, private route: ActivatedRoute, private authService: AuthService) {
+	//time
+	gameRemainingTime: number;
+	gameNowDate: Date;
+	intervalMs = 1000;
+	intervalId:any;
+
+	constructor(private gameService: GameService,
+		private gameScoreService: GameScoreService,
+		private gameHistoryService: GameHistoryService,
+		private toastrService: ToastrService,
+		private route: ActivatedRoute,
+		private router: Router,
+		private authService: AuthService) {
 		this.paddleGuest = new PaddleGameModel();
-		// this.paddleGuest.whoIs = GamePlayerEnum.guest;
 		this.paddleHost = new PaddleGameModel();
-		// this.paddleHost.whoIs = GamePlayerEnum.host;
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
 		this.gameService.getGameRoomSocketResponse().subscribe((response: any) => {
@@ -88,6 +107,7 @@ export class GameComponent {
 	}
 
 	ngOnInit(): void {
+		this.getTimeNow();
 		this.getScreenSize();
 		this.setCanvasSize();
 		this.initGameModels();
@@ -101,9 +121,10 @@ export class GameComponent {
 
 	//* ^^ eventloophooks and constructor^^
 	gameLoop = (): void => {
+		if (!this.gameRunning)
+			return;
 		this.gameUpdate();
 		this.gameDraw();
-		// setTimeout(() => {
 		window.requestAnimationFrame(this.gameLoop);
 		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
 		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
@@ -134,8 +155,10 @@ export class GameComponent {
 				}
 			}
 		})
-
-		// }, 1);
+		this.gameRemainingTime = (new Date(this.gameRoomSocket.startTime).getTime() + this.gameRoomSocket.timer * 1000) - this.gameNowDate.getTime();
+		if (this.gameRemainingTime <= 0){
+			this.gameFinish();
+		}
 	};
 
 	initGameModels(): void {
@@ -281,30 +304,32 @@ export class GameComponent {
 			this.fixedScreenRatio * 5
 		);
 		this.context.fillText(
-			this.leftPaddle.score.toString(),
+			String(this.leftPaddle.score),
 			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
 			60,
 			this.fixedScreenRatio * 5
 		);
 		this.context.fillText(
-			this.rightPaddle.score.toString(),
+			String(this.rightPaddle.score),
 			this.canvasRef.nativeElement.width / 2 +
 			this.fixedScreenRatio * 10 -
 			10,
 			60,
 			this.fixedScreenRatio * 5
 		);
-		const nowDate = new Date();
 		console.log("this.gameRoomSocket.startTime " + this.gameRoomSocket.startTime);
-		
-		const date = (new Date(this.gameRoomSocket.startTime).getTime() + this.gameRoomSocket.timer * 1000)- nowDate.getTime();
-		const minute = Math.floor(date / 60000); // Bir dakika 60,000 milisaniyeye eşittir
-		const second = ((date % 60000) / 1000).toFixed(0);
+
+		let minute = Math.floor(this.gameRemainingTime / 60000); // Bir dakika 60,000 milisaniyeye eşittir
+		let second = ((this.gameRemainingTime % 60000) / 1000).toFixed(0);
+		if (this.gameRemainingTime < 0) {
+			minute = 0;
+			second = "0";
+		}
 		this.context.fillText(
 			`${minute} : ${second}`,
 			this.canvasRef.nativeElement.width / 2 +
 			this.fixedScreenRatio * 10 -
-			10,
+			30,
 			80,
 			this.fixedScreenRatio * 50
 		);
@@ -420,5 +445,67 @@ export class GameComponent {
 			return 0;
 		}
 		return 1;
+	}
+
+	gameFinish() {
+		// this.gameMessage = "Oyun bağlantınız koptu lütfen siktir olup gidin!";
+		clearInterval(this.intervalId)
+		this.gameScoreAdd();
+		this.gameHistoryAdd();
+		this.gameMessage = "Oyun sonladı lütfen siktir olup gidin!";
+		this.gameRunning = false;
+		this.visibleGameDisconnectPopup = true;
+	}
+
+	printDateTime = () => {
+		const date = new Date();
+		this.gameNowDate = date;
+	  };
+
+	getTimeNow(){
+		this.gameNowDate = new Date();
+		this.intervalId = setInterval(this.printDateTime, this.intervalMs);
+	}
+
+	//servies
+
+	gameScoreAdd() {
+		let gameScore: GameScore = {
+			id: 0,
+			userHostScore: this.paddleHost.score,
+			userGuestScore: this.paddleGuest.score,
+			resultNameId: 0,
+			updateTime: new Date(),
+			status: true
+		}
+		this.gameScoreService.add(gameScore).subscribe(response => {
+		}, responseError => {
+			if (responseError.error){
+				this.toastrService.info(Messages.error)
+				this.router.navigate(['/login'])
+			}
+		});
+	}
+	gameHistoryAdd() {
+		let gameHistory: GameHistory = {
+			id: 0,
+			userHostId: this.gameRoomSocket.userHostId,
+			userGuestId: this.gameRoomSocket.userGuestId,
+			finishDate: new Date(),
+			updateTime: new Date(),
+			status: true
+		}
+		this.gameHistoryService.add(gameHistory).subscribe(response => {
+		}, responseError => {
+			if (responseError.error){
+				this.toastrService.info(Messages.error)
+				this.router.navigate(['/login'])
+			}
+		});
+	}
+	navigeMainPage(){
+		console.log("aaaa");
+		
+		this.router.navigate(['main']);
 	}
 }
