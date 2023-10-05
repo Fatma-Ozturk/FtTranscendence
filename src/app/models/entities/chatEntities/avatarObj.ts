@@ -61,7 +61,24 @@ private textService: TextService;
     this.msgFadeTime = 150;
   }
 
-  sendMsg(msg: string, npcs: any[], worldObjs: any[], canvas: HTMLCanvasElement){
+  sendMsg(msg: string) {
+
+	if (msg.length > 0) {
+		let isCmd = false;
+		// update last message if not a command
+		if (msg[0] != "/") {
+			this.lastMsg = msg;
+		} else {
+			isCmd = true;
+		}
+		this.msgTimer = this.msgMaxTime;
+		//newEntry.appendChild(document.createTextNode(this.name + ": " + this.lastMsg))
+
+	}
+};
+
+
+  /* sendMsg(msg: string, npcs: any[], worldObjs: any[], canvas: HTMLCanvasElement){
 
 		if (msg.length > 0) {
 			let isCmd = false;
@@ -79,43 +96,10 @@ private textService: TextService;
 			let chatLog = document.querySelector(".chat-log"),
 				newEntry = document.createElement("span");
 
-			/* if command, execute if used by player (whose level is always 0,
-			and NPCs never send anything if they too are set at level 0) */
+			//if command, execute if used by player (whose level is always 0,
+			//and NPCs never send anything if they too are set at level 0) 
 			if (this.lvl === 0 && isCmd) {
 				switch (msg.substr(1, msg.length - 1).split(" ")[0]) {
-					// display help
-					case "help":
-						let helpHeading = "----- Help -----",
-							cmdInfo: any[] = [],
-							helpScrnTxt = "";
-
-						for (var c in this.cmdService.cmd) {
-							cmdInfo[c] = "/" + this.cmdService.cmd[c].name + " " + this.cmdService.cmd[c].args + (this.cmdService.cmd[c].args.length > 0 ? " " : "") + "- " + this.cmdService.cmd[c].desc;
-						}
-
-						newEntry.className = "help-text";
-						newEntry.appendChild(document.createTextNode(helpHeading));
-						helpScrnTxt += helpHeading + "%";
-
-						// show available commands
-						for (var ci in cmdInfo) {
-							newEntry.appendChild(document.createElement("br"));
-							newEntry.appendChild(document.createTextNode(cmdInfo[ci]));
-							helpScrnTxt += cmdInfo[ci] + "%";
-						}
-
-						this.textService.screenText.updateText(helpScrnTxt, this.h - this.chatBarObj.barH - (this.textService.screenText.fontS * 1.5 * (cmdInfo.length)), this.textService.screenText.fontS * 2 * (cmdInfo.length), "#4f4");
-						break;
-
-					// clear chat
-					case "clear":
-						let clearMsg = "Chat cleared";
-						chatLog.innerHTML = "";
-						newEntry.appendChild(document.createTextNode(clearMsg));
-						this.textService.screenText.updateText(clearMsg, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#fff");
-						break;
-
-					// get entity details
 					case "entityinfo":
 						let eiArgs = msg.split(" "),
 							eiTarget = eiArgs[1],
@@ -242,8 +226,7 @@ private textService: TextService;
 						this.textService.screenText.updateText(meFeedback, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, !meInvalid ? "#fff" : "#f44");
 						break;
 
-					// npc add/delete
-					case "npc":
+					
 						let npcArgs = msg.split(" "),
 							npcAction = npcArgs[1],
 							npcName = npcArgs[2],
@@ -429,7 +412,7 @@ private textService: TextService;
 						break;
 
 					// get list of all entities in alphabetical order
-					case "who":
+					
 						let getEntities = [this.name],
 							displayEntNames = "Entity list: ";
 
@@ -479,6 +462,6 @@ private textService: TextService;
 		}
 
 
-	};
+	}; */
 
 }

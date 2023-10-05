@@ -1,7 +1,11 @@
 <div class="d-flex justify-content-center align-items-center">
     <div style="position: relative;">
         <canvas #myCanvas width="800" height="600"></canvas>
-        <app-chat-bar></app-chat-bar>
+        <form>
+            <input type="text" placeholder="Enter your message">
+            <button class="send">Send</button>
+            <button class="view-chat">View Chat</button>
+          </form>
     </div>
     <div class="chat-log"></div>
   </div>

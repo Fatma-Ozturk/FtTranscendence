@@ -245,7 +245,8 @@ export class AvatarService {
 				const numFromBag = +Math.random().toFixed(2);
 
 				if (numFromBag < msgChance) {
-					npc.sendMsg(msgs[randNum(0, msgs.length)], npcs, worldObjs, canvas);
+					//npc.sendMsg(msgs[randNum(0, msgs.length)], npcs, worldObjs, canvas);
+					npc.sendMsg(msgs[randNum(0, msgs.length)]);
 				}
 			}
 		}

@@ -19,6 +19,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
   isArrowUpPressed: boolean = false;
   isArrowDownPressed: boolean = false;
 
+
   @ViewChild('myCanvas')
   canvas: ElementRef<HTMLCanvasElement>;
   context: CanvasRenderingContext2D;
@@ -74,6 +75,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.runAI(this.player, npcs, worldObjs);
 
     this.runDisplay(worldObjs, this.player);
+
 
 
     /*     // player moving
@@ -390,6 +392,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     }, 1000 / 60);
   }
 
+
   @HostListener('window:keydown', ['$event'])
   onkeydown(event: KeyboardEvent) {
     if (event.key === 'ArrowUp') {
@@ -410,6 +413,16 @@ export class ChatComponent implements OnInit, AfterViewInit {
       this.isArrowDownPressed = false;
     }
     this.avatarService.stopControl(this.player);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('send')) {
+      event.preventDefault();
+      const field = this.el.nativeElement.querySelector('input');
+      this.player.sendMsg(field.value);
+    }
   }
 
 }
