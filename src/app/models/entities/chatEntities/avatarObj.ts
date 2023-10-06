@@ -1,12 +1,4 @@
-import { CmdService } from "src/app/services/cmd.service";
-import { TextService } from "src/app/services/text.service";
-import { ChatBarObj } from "./chatBarObj";
-
 export class avatarObj {
-private chatBarObj: ChatBarObj;
-private cmdService: CmdService;
-private textService: TextService;
-
   name: string;
   gender: any;
   skinTone: any;
@@ -39,7 +31,6 @@ private textService: TextService;
     y: number,
     lvl: number,
   ) {
-	this.chatBarObj = new ChatBarObj();
 	const nameLenLimit = 16;
     this.name = name.length > nameLenLimit ? name.substr(0, nameLenLimit) : name || "Anonymous";
     this.gender = gender || 0;
@@ -72,8 +63,6 @@ private textService: TextService;
 			isCmd = true;
 		}
 		this.msgTimer = this.msgMaxTime;
-		//newEntry.appendChild(document.createTextNode(this.name + ": " + this.lastMsg))
-
 	}
 };
 

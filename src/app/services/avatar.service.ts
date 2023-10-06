@@ -70,7 +70,7 @@ export class AvatarService {
 
 		if (avatar.isMoving && avatar.canMove) {
 
-			switch (avatar.dir) {
+		 	switch (avatar.dir) {
 				case 3:
 					avatar.x -= avatar.speed;
 					// collision with right side of structure, collisions apply to walls as well

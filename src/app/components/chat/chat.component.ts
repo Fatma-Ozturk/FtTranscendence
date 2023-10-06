@@ -30,7 +30,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
   
   constructor(private avatarService: AvatarService,
     private structuresService: StructuresService,
-    private textService: TextService,
+    //private textService: TextService,
     private cmdService: CmdService,
     private renderer: Renderer2, private el: ElementRef) {
       this.chatBarObj = new ChatBarObj();
@@ -52,9 +52,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
     const npcs: any[] = [];
     const worldObjs: any[] = [];
 
-    this.structuresService.w = this.w;
-    this.structuresService.h = this.h;
-
     this.createNPCs(this.player, npcs);
     worldObjs[0] = this.player;
 
@@ -64,13 +61,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
     }
 
     // load structures
-    let avatars = worldObjs.length;
+     let avatars = worldObjs.length;
     for (var ss in this.structuresService.structures) {
       var numericSs = +ss + avatars;
       worldObjs[numericSs] = this.structuresService.structures[numericSs - avatars];
     }
 
-    this.addOnboardingText();
+    //this.addOnboardingText();
 
     this.runAI(this.player, npcs, worldObjs);
 
@@ -286,7 +283,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   }
 
-  addOnboardingText() {
+/*   addOnboardingText() {
 
     const onboardingTxt = 'Welcome! To get started, enter /help for commands.';
     const chatLog = this.el.nativeElement.querySelector('.chat-log');
@@ -296,7 +293,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.renderer.appendChild(newEntry, this.renderer.createText(onboardingTxt));
     this.renderer.insertBefore(chatLog, newEntry, chatLog.childNodes[0]);
     this.textService.screenText.updateText(onboardingTxt, this.h - this.chatBarObj.barH, this.textService.screenText.fontS * 2, "#ff4");
-  }
+  } */
 
   createNPCs(player: avatarObj, npcs: any[]) {
     const NameObj = (name: string, gender: string) => ({
@@ -354,8 +351,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
     var imgG: HTMLImageElement = new Image();
     imgG.src = "https://i.ibb.co/TqMC0Dp/grass.png";
 
-    let ground = this.context.createPattern(imgG, 'repeat'),
-      pathW = 50,
+    let ground = this.context.createPattern(imgG, 'repeat');
+    let   pathW = 50,
       path = this.context.createLinearGradient(this.w / 2 - pathW / 2, 0, this.w / 2 + pathW / 2, 0);
 
     path.addColorStop(0.05, "#863");
@@ -367,7 +364,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.context.fillRect(0, 0, this.w, this.h);
 
     this.context.fillStyle = path;
-    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 210);
+    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 260);
 
     // sort avatars and structures ascending by Y position so that they each arent standing on top of another
     worldObjs.sort(function (a, b) {
@@ -386,7 +383,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     }
 
     // screen text
-    this.textService.writeScrnText(this.textService.screenText, this.context, this.w);
+    //this.textService.writeScrnText(this.textService.screenText, this.context, this.w);
     setTimeout(() => {
       this.runDisplay(worldObjs, player);
     }, 1000 / 60);

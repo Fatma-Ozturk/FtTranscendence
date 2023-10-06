@@ -47,34 +47,12 @@
 	width: 15%;
   }
   
-  .send:hover {
-	background-color: #6c6;
-  }
-  
-  .send:active {
-	background-color: #4a4;
-  }
-  
-  .send:disabled {
-	opacity: 0.7;
-  }
-  
-  .send:disabled:hover {
-	background-color: #5b5;
-  }
-  
+ 
   .view-chat {
 	background-color: #48c;
 	width: 10%;
   }
   
-  .view-chat:hover {
-	background-color: #59d;
-  }
-  
-  .view-chat:active {
-	background-color: #37b;
-  }
   
   .chat-log {
 	background-color: rgba(0, 0, 0, 0.5);
@@ -84,19 +62,6 @@
 	overflow-y: scroll;
   }
   
-  .chat-log span {
-	line-height: 24px;
-  }
-  
-  .help-text {
-	color: #4f4;
-  }
-  
-  .info-text {
-	color: #ff4;
-  }
-  
-  .error-text {
-	color: #f44;
-  }
+
+ 
   
