@@ -1,0 +1,40 @@
+/* chat-rooms.component.css */
+
+/* Başlık stilleri */
+h2 {
+	text-align: center;
+	font-size: 50px;
+	margin-bottom: 20px;
+	color: #040303; /* Mavi renk kullanabilirsiniz */
+	font-family: "Arial", sans-serif; /* İstediğiniz bir yazı tipini kullanabilirsiniz */
+  }
+  
+  /* Liste stilleri */
+  ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+  }
+  
+  li {
+	text-align: center;
+	margin-bottom: 15px;
+  }
+  
+  /* Link stilleri */
+  a {
+	text-decoration: none;
+	color: #333333;
+	font-weight: bold;
+	font-size: 18px; /* Link metni boyutunu ayarlayabilirsiniz */
+	font-family: "Helvetica", sans-serif; /* İstediğiniz bir yazı tipini kullanabilirsiniz */
+	transition: color 0.2s;
+	background-color: #f7f7f7; /* Arka plan rengini ayarlayabilirsiniz */
+	padding: 10px; /* Kenar dolgusunu ayarlayabilirsiniz */
+	border-radius: 5px; /* Köşe yuvarlama ekleyebilirsiniz */
+  }
+  
+  a:hover {
+	background-color: #3fa92e; /* Hover durumunda arka plan rengini ayarlayabilirsiniz */
+  }
+  

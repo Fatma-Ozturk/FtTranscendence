@@ -92,7 +92,8 @@ export class NavbarComponent implements OnInit {
         icon: 'pi pi-fw pi-inbox',
         //visible: this.isAuthenticadet(),
         visible: true,
-        routerLink: ['/chat']
+        //routerLink: ['/chat']
+        routerLink: ['/chat-rooms']
       },
       {
         label: 'Leaderboard',
