@@ -60,7 +60,6 @@ import { UserActivateComponent } from './components/user-activate/user-activate.
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
-import { AvatarComponent } from './components/avatar/avatar.component';
 import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
 
 
@@ -79,7 +78,6 @@ import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component
     LeaderboardComponent,
     ChatComponent,
     GameComponent,
-    AvatarComponent,
     ChatRoomsComponent,
   ],
   imports: [

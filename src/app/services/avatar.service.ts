@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { StructuresService } from './structures.service';
 import { BubbleObj } from '../models/entities/chatEntities/BubbleObj';
-import { CmdService } from './cmd.service';
 import { avatarObj } from '../models/entities/chatEntities/avatarObj';
 import { randNum } from '../models/entities/chatEntities/randNum';
 import { findCllsn } from '../models/entities/chatEntities/findCllsn';
-import { TextService } from './text.service';
 import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 
 @Injectable({
@@ -14,9 +11,7 @@ import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 export class AvatarService {
 	private chatBarObj: ChatBarObj;
 
-	constructor(private structuresService: StructuresService,
-		private cmdService: CmdService,
-		private textService: TextService) {
+	constructor() {
 		this.chatBarObj = new ChatBarObj();
 		this.imgF = new Image();
 		this.imgM = new Image();
@@ -66,7 +61,7 @@ export class AvatarService {
 		}
 	};
 
-	moveAvatar(avatar: avatarObj, player: avatarObj, w: number, h: number) {
+	moveAvatar(avatar: avatarObj, player: avatarObj, w: number, h: number, worldObjs: any[]) {
 
 		if (avatar.isMoving && avatar.canMove) {
 
@@ -74,7 +69,7 @@ export class AvatarService {
 				case 3:
 					avatar.x -= avatar.speed;
 					// collision with right side of structure, collisions apply to walls as well
-					if (findCllsn(avatar, this.structuresService.structures) || avatar.x < 0) {
+					if (findCllsn(avatar, worldObjs) || avatar.x < 0) {
 						avatar.x += avatar.speed;
 						avatar.curFrame = 1;
 					} else {
@@ -84,7 +79,7 @@ export class AvatarService {
 				case 0:
 					avatar.y -= avatar.speed;
 					// bottom side
-					if (findCllsn(avatar, this.structuresService.structures) || avatar.y < 0) {
+					if (findCllsn(avatar, worldObjs) || avatar.y < 0) {
 						avatar.y += avatar.speed;
 						avatar.curFrame = 1;
 					} else {
@@ -94,7 +89,7 @@ export class AvatarService {
 				case 1:
 					avatar.x += avatar.speed;
 					// left side
-					if (findCllsn(avatar, this.structuresService.structures) || avatar.x + avatar.w > w) {
+					if (findCllsn(avatar, worldObjs) || avatar.x + avatar.w > w) {
 						avatar.x -= avatar.speed;
 						avatar.curFrame = 1;
 					} else {
@@ -104,7 +99,7 @@ export class AvatarService {
 				case 2:
 					avatar.y += avatar.speed;
 					// top side
-					if (findCllsn(avatar, this.structuresService.structures) || avatar.y + avatar.h > h) {
+					if (findCllsn(avatar, worldObjs) || avatar.y + avatar.h > h) {
 						avatar.y -= avatar.speed;
 						avatar.curFrame = 1;
 					} else {
@@ -233,7 +228,7 @@ export class AvatarService {
 		ctx.fillText(avatar.name, avatar.x + avatar.w / 2, avatar.y + 3);
 	}
 
-	npcAI(npc: avatarObj, player: avatarObj, npcs: any[], worldObjs: any[], h: number, canvas: HTMLCanvasElement) {
+	npcAI(npc: avatarObj) {
 		if (npc.lvl > 0) {
 			npc.isMoving = randNum(0, npc.lvl + 1) === 0 ? false : true;
 			// just like player, NPCs can chat if not moving
@@ -245,7 +240,6 @@ export class AvatarService {
 				const numFromBag = +Math.random().toFixed(2);
 
 				if (numFromBag < msgChance) {
-					//npc.sendMsg(msgs[randNum(0, msgs.length)], npcs, worldObjs, canvas);
 					npc.sendMsg(msgs[randNum(0, msgs.length)]);
 				}
 			}
