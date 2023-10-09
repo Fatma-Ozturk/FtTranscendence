@@ -19,6 +19,7 @@ export class GameService {
   public gameRoomSocketResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public paddleResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public gameDisconnected$: BehaviorSubject<string> = new BehaviorSubject('');
+  // public gameDisconnect$: BehaviorSubject<string> = new BehaviorSubject('');
   private token: string;
   private socket: Socket; // Socket tipinde bir değişken tanımlayın
 
@@ -68,6 +69,9 @@ export class GameService {
     this.socket.on('gameDisconnected', (message: any):any => {
       this.gameDisconnected$.next(message);
     });
+    // this.socket.on('gameDisconnect', (message: any):any => {
+    //   this.gameDisconnect$.next(message);
+    // });
   }
 
   public sendKeydown(keydown: any) {
@@ -93,6 +97,10 @@ export class GameService {
   public sendMatchmaking(matchmaking: any) {
     this.socket.emit('matchmaking', matchmaking);
   }
+
+  // public sendGameDisconnect(data?: any) {
+  //   this.socket.emit('disconnect', data);
+  // }
 
   public getGame = () => {
     return this.game$.asObservable();
@@ -134,8 +142,16 @@ export class GameService {
     return this.gameDisconnected$.asObservable();
   };
 
-  isConnected(): boolean {
+  // public getGameDisconnect = () => {
+  //   return this.gameDisconnect$.asObservable();
+  // };
+
+
+  public isConnected(): boolean {
     return this.socket.connected;
   }
 
+  public disconnectSocket(): void {
+    this.socket.disconnect();
+  }
 }

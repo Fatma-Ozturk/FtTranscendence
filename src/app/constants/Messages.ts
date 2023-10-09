@@ -19,5 +19,7 @@ export class Messages{
     static requestError:string="İstek iptal edildi"
     public static readonly passwordError: string = 'Şifre Hatalı';
     public static readonly gameMessageHeader:string = "Oyun Bilgi";
-
+    public static readonly gameWinnerHost:string = "Oyunu kazandın";
+    public static readonly gameWinnerGuest:string = "Oyunu kaybettin";
+    public static readonly gameTie:string = "Oyun berabere";
 }   

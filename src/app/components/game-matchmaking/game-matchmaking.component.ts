@@ -28,7 +28,6 @@ export class GameMatchmakingComponent {
   ngDoCheck(){
     this.gameService.getNewMatchmakingResponse().subscribe(
       (response: any) => {
-        console.log("response" + JSON.stringify(response));
         if (response.message === "Matchmaking Search"){
           this.progressBarDivVisible = true;
           this.gameText = "Oyuncu Aranıyor..."
