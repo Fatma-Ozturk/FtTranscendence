@@ -1,11 +1,22 @@
-<div class="d-flex justify-content-center align-items-center">
+  <div class="d-flex justify-content-center align-items-center">
+    <!-- Canvas için div -->
     <div style="position: relative;">
-        <canvas #myCanvas width="800" height="600"></canvas>
-        <form>
-            <input type="text" placeholder="Enter your message">
-            <button class="send">Send</button>
-            <button class="view-chat">View Chat</button>
-          </form>
+      <canvas #myCanvas width="800" height="600"></canvas>
+  
+      <!-- Mesaj gönderme formu -->
+      <form class="message-form">
+        <input type="text" placeholder="Enter your message" class="message-input">
+        <button class="send">Send</button>
+        <button class="view-chat" (click)="toggleChatLog()">View Chat</button>
+      </form>      
     </div>
-    <div class="chat-log"></div>
+  
+    <!-- Sohbet gösterimi için div -->
+    <div class="chat-log" [ngClass]="{'active': isChatLogActive}">
+      <div *ngFor="let message of messages" class="message">
+        <strong>{{ message.sender }}:</strong> {{ message.text }}
+      </div>
+    </div>
+    
   </div>
+  

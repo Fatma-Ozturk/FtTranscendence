@@ -52,17 +52,29 @@ export class avatarObj {
 		this.msgFadeTime = 150;
 	}
 
-	sendMsg(msg: string) {
-
+	updateLastMessage(msg: string) {
 		if (msg.length > 0) {
 			let isCmd = false;
 			// update last message if not a command
-			if (msg[0] != "/") {
-				this.lastMsg = msg;
-			} else {
-				isCmd = true;
-			}
+			this.lastMsg = msg;
 			this.msgTimer = this.msgMaxTime;
 		}
 	};
+
+/* 
+	sendMessage(msg: string) {
+		if (msg.length > 0) {
+		  if (msg[0] !== '/') {
+			// Bu bir komut değilse, mesajı gönder
+			const newMessage = { text: msg, sender: 'Kullanıcı' };
+			this.messages.push(newMessage); // Mesajları görüntülemek için bir dizi kullanabilirsiniz
+		  } else {
+			// Bu bir komutsa, komut işleme kodunu burada ekleyebilirsiniz
+			this.processCommand(msg);
+		  }
+		  this.lastMsg = msg;
+		  this.msgTimer = this.msgMaxTime;
+		}
+	  } */
+	  
 }

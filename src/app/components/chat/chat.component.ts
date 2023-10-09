@@ -14,6 +14,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   isArrowUpPressed: boolean = false;
   isArrowDownPressed: boolean = false;
+  isChatLogActive: boolean = false;
 
 
   @ViewChild('myCanvas')
@@ -28,7 +29,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
   npcs: any[] = [];//içinde sadece npcler var
   worldObjs: any[] = [];//içinde npc, player ve çeşme var
 
-  player = new avatarObj("Fatma", 1, 0, 30, 60, 3, 28, 2, 568 / 2 - 15, 480 * 0.8 - 54, 0);
+  player = new avatarObj("Fatma", 1, 0, 30, 60, 3, 28, 2, 800 / 2 - 15, 600 * 0.8 - 54, 0);
+
+  messages: { text: string, sender: string }[] = []; // Mesajları depolayacak dizi
+  newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
 
   constructor(private avatarService: AvatarService,
     private renderer: Renderer2, private el: ElementRef) { }
@@ -40,14 +44,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
 
     this.context = this.canvas.nativeElement.getContext('2d');
-    this.w = 568;
-    this.h = 480;
+    this.w = 800;
+    this.h = 600;
     this.s = 2;
 
 
     this.img = new Image();
     this.img.src = "https://i.ibb.co/GTsDmJF/fountain.png";
-    this.fountainStructure = new structureObj(300, 200, 130, 100, 70, this.img, true, 12);
+    this.fountainStructure = new structureObj(300, 200, 245, 150, 70, this.img, true, 12);
 
 
     this.createNPCs();
@@ -66,6 +70,17 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.runDisplay();
   }
 
+  sendMessage() {
+    
+      // Kullanıcının girdiği metni mesajlar dizisine ekleyin
+      const newMessage = { text: this.newMessage, sender: this.player.name };
+      this.messages.push(newMessage);
+
+      // Kullanıcının girdiği metni temizleyin
+      this.newMessage = '';
+    
+  }
+
 
   createNPCs() {
 
@@ -80,7 +95,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
         NameObj("Jill", "female")
       ],
 
-
       avatarW = 30,
       avatarH = 60;
 
@@ -89,19 +103,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
         placeX = randNum(0, this.w - avatarW),
         placeY = randNum(avatarH, this.h - 54 - avatarH);
 
-      this.npcs[npcn] = new avatarObj(
-        npcNames[npcn].name,
-        npcNames[npcn].gender,
-        chooseSkin,
-        avatarW,
-        avatarH,
-        3,
-        28,
-        2,
-        placeX,
-        placeY,
-        8
-      );
+      this.npcs[npcn] = new avatarObj( npcNames[npcn].name, npcNames[npcn].gender, chooseSkin,
+        avatarW, avatarH, 3, 28, 2, placeX, placeY, 8 );
 
       if (findCllsn(this.npcs[npcn], this.fountainStructure)) {
         this.npcs[npcn].x = this.player.x;
@@ -157,7 +160,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.context.fillRect(0, 0, this.w, this.h);
 
     this.context.fillStyle = path;
-    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 260);
+    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 380);
 
     // sort avatars and structures ascending by Y position so that they each arent standing on top of another
     this.worldObjs.sort(function (a, b) {
@@ -177,6 +180,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.runDisplay();
     }, 1000 / 60);
+  }
+  
+  toggleChatLog() {
+    this.isChatLogActive = !this.isChatLogActive;
   }
 
 
@@ -208,7 +215,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
     if (target.classList.contains('send')) {
       event.preventDefault();
       const field = this.el.nativeElement.querySelector('input');
-      this.player.sendMsg(field.value);
+      this.player.updateLastMessage(field.value);
+      this.newMessage = field.value;
+      this.sendMessage();
+      field.value = '';
     }
   }
 
