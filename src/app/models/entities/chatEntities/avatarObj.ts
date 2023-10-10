@@ -31,8 +31,7 @@ export class avatarObj {
 		y: number,
 		lvl: number,
 	) {
-		const nameLenLimit = 16;
-		this.name = name.length > nameLenLimit ? name.substr(0, nameLenLimit) : name || "Anonymous";
+		this.name = name || "Anonymous";
 		this.gender = gender || 0;
 		this.skinTone = skinTone || 0;
 		this.w = w || 0;
@@ -61,20 +60,6 @@ export class avatarObj {
 		}
 	};
 
-/* 
-	sendMessage(msg: string) {
-		if (msg.length > 0) {
-		  if (msg[0] !== '/') {
-			// Bu bir komut değilse, mesajı gönder
-			const newMessage = { text: msg, sender: 'Kullanıcı' };
-			this.messages.push(newMessage); // Mesajları görüntülemek için bir dizi kullanabilirsiniz
-		  } else {
-			// Bu bir komutsa, komut işleme kodunu burada ekleyebilirsiniz
-			this.processCommand(msg);
-		  }
-		  this.lastMsg = msg;
-		  this.msgTimer = this.msgMaxTime;
-		}
-	  } */
+
 	  
 }

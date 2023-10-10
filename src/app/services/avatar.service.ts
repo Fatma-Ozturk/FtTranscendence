@@ -3,16 +3,13 @@ import { BubbleObj } from '../models/entities/chatEntities/BubbleObj';
 import { avatarObj } from '../models/entities/chatEntities/avatarObj';
 import { randNum } from '../models/entities/chatEntities/randNum';
 import { findCllsn } from '../models/entities/chatEntities/findCllsn';
-import { ChatBarObj } from '../models/entities/chatEntities/chatBarObj';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AvatarService {
-	private chatBarObj: ChatBarObj;
 
 	constructor() {
-		this.chatBarObj = new ChatBarObj();
 		this.imgF = new Image();
 		this.imgM = new Image();
 
@@ -30,7 +27,7 @@ export class AvatarService {
 
 	control = (avatar: avatarObj, e: KeyboardEvent): void => {
 		// avatar.dir values: 0 = up, 1 = right, 2 = down, 3 = left
-		if (e && !this.chatBarObj.active) {
+		if (e) {
 			avatar.isMoving = true;
 			avatar.canMove = true;
 			switch (e.keyCode) {
@@ -61,7 +58,7 @@ export class AvatarService {
 		}
 	};
 
-	moveAvatar(avatar: avatarObj, player: avatarObj, w: number, h: number, worldObjs: any[]) {
+	moveAvatar(avatar: avatarObj, w: number, h: number, worldObjs: any[]) {
 
 		if (avatar.isMoving && avatar.canMove) {
 
@@ -115,7 +112,7 @@ export class AvatarService {
 		}
 	}
 
-	drawAvatar(avatar: avatarObj, player: avatarObj, ctx: CanvasRenderingContext2D) {
+	drawAvatar(avatar: avatarObj, ctx: CanvasRenderingContext2D) {
 		let lastMsg = avatar.lastMsg;
 		// chat bubble
 		if (lastMsg.length > 0 && avatar.msgTimer > 0) {
@@ -224,7 +221,7 @@ export class AvatarService {
 		ctx.textBaseline = "top";
 		ctx.font = "14px Arial";
 		ctx.fillText(avatar.name, avatar.x + avatar.w / 2, avatar.y + 4);
-		ctx.fillStyle = avatar.name == player.name ? "#ff4" : "#fff";
+		ctx.fillStyle = "#fff";
 		ctx.fillText(avatar.name, avatar.x + avatar.w / 2, avatar.y + 3);
 	}
 

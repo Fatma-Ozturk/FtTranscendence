@@ -22,7 +22,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
   context: CanvasRenderingContext2D;
   w: number;
   h: number;
-  s: number;
 
   img: HTMLImageElement;
   fountainStructure: structureObj;
@@ -37,8 +36,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
   constructor(private avatarService: AvatarService,
     private renderer: Renderer2, private el: ElementRef) { }
 
-
-
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
@@ -46,15 +43,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.context = this.canvas.nativeElement.getContext('2d');
     this.w = 800;
     this.h = 600;
-    this.s = 2;
 
-
+    //çeşme için nesne oluşturuyoruz.
     this.img = new Image();
     this.img.src = "https://i.ibb.co/GTsDmJF/fountain.png";
     this.fountainStructure = new structureObj(300, 200, 245, 150, 70, this.img, true, 12);
 
 
     this.createNPCs();
+    //ortamdaki objeleri worldObjs içinde topluyoruz.
     this.worldObjs[0] = this.player;
 
     for (var sn in this.npcs) {
@@ -71,28 +68,26 @@ export class ChatComponent implements OnInit, AfterViewInit {
   }
 
   sendMessage() {
-    
       // Kullanıcının girdiği metni mesajlar dizisine ekleyin
       const newMessage = { text: this.newMessage, sender: this.player.name };
       this.messages.push(newMessage);
 
       // Kullanıcının girdiği metni temizleyin
       this.newMessage = '';
-    
   }
 
 
   createNPCs() {
-
-    const NameObj = (name: string, gender: string) => ({
+//1->female 0->male
+    const NameObj = (name: string, gender: number) => ({
       name: name,
       gender: gender
     }),
 
       npcNames = [
-        NameObj("Alice", "female"),
-        NameObj("Jack", "male"),
-        NameObj("Jill", "female")
+        NameObj("Alice", 1),
+        NameObj("Jack", 0),
+        NameObj("Jill", 1)
       ],
 
       avatarW = 30,
@@ -106,7 +101,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
       this.npcs[npcn] = new avatarObj( npcNames[npcn].name, npcNames[npcn].gender, chooseSkin,
         avatarW, avatarH, 3, 28, 2, placeX, placeY, 8 );
 
-      if (findCllsn(this.npcs[npcn], this.fountainStructure)) {
+      if (findCllsn(this.npcs[npcn], this.worldObjs)) {
         this.npcs[npcn].x = this.player.x;
         this.npcs[npcn].y = this.player.y;
       }
@@ -129,7 +124,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
       this.context.fillStyle = "#aaa";
       this.context.fillRect(strctr.x, strctr.y, strctr.w, strctr.h);
     } else if (strctr.isAnim) {
-
+      //buraya giriyor
       this.context.drawImage(strctr.img, strctr.w * (strctr.curFrame - 1), 0, strctr.w, strctr.h, strctr.x, strctr.y - strctr.backArea, strctr.w, strctr.h);
       ++strctr.curFrame;
       if (strctr.curFrame > strctr.frames) {
@@ -171,8 +166,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
     for (var wo in this.worldObjs) {
       // to determine if avatar, test for name
       if (this.worldObjs[wo].name) {
-        this.avatarService.moveAvatar(this.worldObjs[wo], this.worldObjs[0], this.w, this.h, this.worldObjs);
-        this.avatarService.drawAvatar(this.worldObjs[wo], this.worldObjs[0], this.context);
+        this.avatarService.moveAvatar(this.worldObjs[wo], this.w, this.h, this.worldObjs);
+        this.avatarService.drawAvatar(this.worldObjs[wo], this.context);
       } else {
         this.drawStructure(this.worldObjs[wo]);
       }
