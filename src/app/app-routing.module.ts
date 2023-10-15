@@ -16,6 +16,8 @@ import { ChatComponent } from './components/chat/chat.component';
 import { GameComponent } from './components/game/game.component';
 import { RedirectionAuthGoogleComponent } from './components/redirection-auth-google/redirection-auth-google.component';
 import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
+import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -27,12 +29,14 @@ const routes: Routes = [
 	{ path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component },
 	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
-	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
 	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
 	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
 	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard] },
-	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },
+	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },,
+	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
+	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard] },
+	{ path: 'chat-room/:roomId', component: ChatRoomComponent, canActivate: [loginGuard] },
 	{ path: '**', component: NotFoundComponent },
 ];
 

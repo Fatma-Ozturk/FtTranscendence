@@ -1,0 +1,88 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+  }
+  
+  body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+  }
+  
+  .d-flex {
+	display: flex;
+  }
+  
+  .justify-content-center {
+	justify-content: center;
+  }
+  
+  .align-items-center {
+	align-items: center;
+  }
+  
+  .container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  canvas, form {
+	margin: auto;
+  }
+  
+  canvas {
+	display: block;
+  }
+  
+  form {
+	background-color: rgb(147, 197, 248);
+	padding: 10px; /* Forma biraz boşluk ekledim */
+  }
+  
+  .message-input {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 75%;
+	padding: 5px; /* Inputa biraz boşluk ekledim */
+	margin-right: 5px; /* Inputlar arasında boşluk bıraktım */
+  }
+  
+  button {
+	border: 0;
+	vertical-align: middle;
+	cursor: pointer; /* Düğmelere fare üzerine geldiğinde işaretçiyi değiştir */
+  }
+  
+  .send, .view-chat {
+	display: inline-block; /* Düğmeleri yan yana sıralamak için kullanılacak */
+	background-color: #5b5;
+	width: 11%;
+	padding: 5px;
+	color: #fff;
+	border-radius: 3px;
+	margin-right: 5px; /* Düğmeler arasında boşluk eklemek için kullanılacak */
+  }
+  
+  
+  .chat-log {
+	background-color: rgba(188, 186, 186, 0.5); /* Arka plan rengi */
+	color: #040303; /* Metin rengi */
+	display: none; /* Başlangıçta gizli olacak */
+	flex-direction: column; /* Yeni mesajları en üstte görüntülemek için */
+	overflow-y: scroll; /* Taşma durumunda kaydırma çubuğunu göstermek için */
+	width: 300px;
+	height: 660px;
+	padding: 10px; /* İç içe geçmiş boşluk */
+  }
+  
+  
+  .message {
+	margin-bottom: 5px; /* Mesajlar arasında boşluk bıraktım */
+  }
+  
+
+  /* .active sınıfı */
+.active {
+	display: flex !important;
+  }
