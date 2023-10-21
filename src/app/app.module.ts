@@ -75,6 +75,9 @@ import { UserProfileCardComponent } from './components/user-profile-card/user-pr
 import { UserProfileEditComponent } from './components/user-profile-edit/user-profile-edit.component';
 import { GameMatchmakingComponent } from './components/game-matchmaking/game-matchmaking.component';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { ToolbarModule } from 'primeng/toolbar';
+import { BadgeModule } from 'primeng/badge';
+
 
 @NgModule({
   declarations: [
@@ -149,6 +152,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
     ToastModule,
     ChipsModule,
     ProgressBarModule,
+    ToolbarModule,
+    BadgeModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,

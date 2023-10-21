@@ -1,1 +1,31 @@
-<p>chat-rooms works!</p>
+<div>
+    <p-toolbar>
+        <div class="p-toolbar-group-start">
+            <p-button label="Oda Oluştur" icon="pi pi-plus" class="mr-2"></p-button>
+        </div>
+    </p-toolbar>
+</div>
+<div class="mt-3" *ngIf="chatRooms.length <= 0;">
+    <h1>Oda Yok</h1>
+</div>
+<div class="mt-3" *ngIf="chatRooms.length > 0;">
+    <p-card *ngFor="let chatRoom of chatRooms" [header]="chatRoom.name">
+        <ng-template pTemplate="body">
+            <div>
+                <p-badge [value]="chatRoom.status == true ? 'Aktif' : 'Pasif'" [severity]="chatRoom.status == true ? 'success' : 'danger'"></p-badge>
+            </div>
+            <div>
+                Oda Adı: {{chatRoom.name}}
+            </div>
+            <div>
+                Oluşturan Kişi: {{chatRoom.userNickName}}
+            </div>
+            <div>
+                Kişi Sayısı: {{chatRoom.userCount}}
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <p-button label="Katıl" (click)="joinChatRoom(chatRoom)" [style]="{'width': '100%'}"></p-button>
+        </ng-template>
+    </p-card>
+</div>

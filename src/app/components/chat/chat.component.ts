@@ -12,7 +12,7 @@ export class ChatComponent {
   @ViewChild('messageInput') messageInputRef: ElementRef;
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
 
-  messageInput: string = '';
+  messageInput: string = "";
   messages: any[] = [];
   isTyping: boolean = false;
   fakeMessages = [
@@ -26,12 +26,15 @@ export class ChatComponent {
 
   }
 
-  insertMessage(): boolean {
-    const msg: string = this.messageInputRef.nativeElement.value as string;
-    if (msg.trim() === '') {
-      return false;
+  insertMessage(): void {
+    let msg: string = this.messageInputRef.nativeElement.value as string;
+    if (!msg.trim()) {
+      return;
     }
-    return true;
+    this.messageInput = msg;
+    this.messagesContentRef.nativeElement.innerHTML = '<div class="message message-personal">' + msg + '</div>';
+    this.messagesContentRef.nativeElement.querySelector(".mCSB_container");
+    this.renderer.addClass(this.messagesContentRef, "message.new");
   }
 
   setDate() {
@@ -47,30 +50,8 @@ export class ChatComponent {
     this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
   }
 
-  
-  @HostListener('window:keydown', ['$event'])
-	onKeyDown(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
-			this.isArrowUpPressed = true;
-		} else if (
-			event.key === 'ArrowDown' ||
-			event.key === 's' ||
-			event.key === 'S'
-		) {
-			this.isArrowDownPressed = true;
-		}
-	}
-
-	@HostListener('window:keyup', ['$event'])
-	onKeyUp(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
-			this.isArrowUpPressed = false;
-		} else if (
-			event.key === 'ArrowDown' ||
-			event.key === 's' ||
-			event.key === 'S'
-		) {
-			this.isArrowDownPressed = false;
-		}
-	}
+  keyDownEnter(){
+    this.insertMessage();
+    this.updateScrollbar();
+  }
 }
