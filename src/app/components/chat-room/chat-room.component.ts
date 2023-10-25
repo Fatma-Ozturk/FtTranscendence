@@ -19,7 +19,7 @@ export class ChatRoomComponent {
   @ViewChild('myCanvas')
   canvas: ElementRef<HTMLCanvasElement>;
   context: CanvasRenderingContext2D;
-  
+
   w: number;
   h: number;
 
@@ -29,6 +29,7 @@ export class ChatRoomComponent {
   worldObjs: any[] = [];//içinde npc, player ve çeşme var
 
   player: any;
+  playerArray: any[] = [];
 
   messages: { text: string, sender: string }[] = []; // Mesajları depolayacak dizi
   newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
@@ -38,15 +39,18 @@ export class ChatRoomComponent {
 
   constructor(private avatarService: AvatarService,
     private el: ElementRef) {
+
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.getScreenSize();
     this.canvas.nativeElement.height = this.screenHeight - 200;
     this.canvas.nativeElement.width = this.screenWidth - 100;
     this.player = new AvatarObj("Fatma", 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - 15, this.canvas.nativeElement.height * 0.8 - 54, 0);
-  }
-
-  ngOnInit(): void { }
-
-  ngAfterViewInit(): void {
-
+    this.createUsers();
     this.context = this.canvas.nativeElement.getContext('2d');
     this.w = this.canvas.nativeElement.width;
     this.h = this.canvas.nativeElement.height;
@@ -54,12 +58,13 @@ export class ChatRoomComponent {
     //çeşme için nesne oluşturuyoruz.
     this.img = new Image();
     this.img.src = "https://i.ibb.co/GTsDmJF/fountain.png";
-    this.fountainStructure = new StructureObj(300, 200, 245, 150, 70, this.img, true, 12);
+    this.fountainStructure = new StructureObj(300, 200, (this.w / 2) - 150, 100, 70, this.img, true, 12);
 
 
     this.createNPCs();
     //ortamdaki objeleri worldObjs içinde topluyoruz.
     this.worldObjs[0] = this.player;
+    // this.worldObjs[1] = this.player1;
 
     for (var sn in this.npcs) {
       const numericSn = +sn + 1;
@@ -68,6 +73,9 @@ export class ChatRoomComponent {
 
 
     this.worldObjs[this.worldObjs.length] = this.fountainStructure;
+    for (let index = 0; index < this.playerArray.length; index++) {
+      this.worldObjs[this.worldObjs.length + index] = this.playerArray[index];
+    }
 
     this.runAI();
 
@@ -81,6 +89,13 @@ export class ChatRoomComponent {
 
     // Kullanıcının girdiği metni temizleyin
     this.newMessage = '';
+  }
+
+  createUsers() {
+    for (let index = 0; index < 10; index++) {
+
+      this.playerArray[index] = new AvatarObj("Abc", 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - index * 30, this.canvas.nativeElement.height * 0.8 - index * 10, 0);
+    }
   }
 
 
@@ -162,7 +177,7 @@ export class ChatRoomComponent {
     this.context.fillRect(0, 0, this.w, this.h);
 
     this.context.fillStyle = path;
-    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, 380);
+    this.context.fillRect(this.w / 2 - pathW / 2, 220, pathW, this.h - 200);
 
     // sort avatars and structures ascending by Y position so that they each arent standing on top of another
     this.worldObjs.sort(function (a, b) {

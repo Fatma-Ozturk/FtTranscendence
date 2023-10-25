@@ -66,18 +66,20 @@
   
   
   .chat-log {
+	position: absolute;
 	background-color: rgba(188, 186, 186, 0.5); /* Arka plan rengi */
 	color: #040303; /* Metin rengi */
 	display: none; /* Başlangıçta gizli olacak */
 	flex-direction: column; /* Yeni mesajları en üstte görüntülemek için */
 	overflow-y: scroll; /* Taşma durumunda kaydırma çubuğunu göstermek için */
-	width: 300px;
-	height: 660px;
+	width: 50vh;
+	height: 50vh;
 	padding: 10px; /* İç içe geçmiş boşluk */
   }
   
   
   .message {
+	display: flex;
 	margin-bottom: 5px; /* Mesajlar arasında boşluk bıraktım */
   }
   

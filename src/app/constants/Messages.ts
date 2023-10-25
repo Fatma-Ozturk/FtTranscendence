@@ -22,4 +22,6 @@ export class Messages{
     public static readonly gameWinnerHost:string = "Oyunu kazandın";
     public static readonly gameWinnerGuest:string = "Oyunu kaybettin";
     public static readonly gameTie:string = "Oyun berabere";
+    static registredRoom: string = "Bu mesajlaşma odasına daha önce kayıt oldun";
+    static joinedRoom: string = "Mesajlaşma odasına kayıt oldun";
 }   

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ChatRoomByUserDto } from './../../models/dto/chatRoomByUserDto';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChatRoomUserService } from './../../services/chat-room-user.service';
@@ -16,10 +17,13 @@ import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
 })
 export class ChatRoomsComponent implements OnInit {
   chatRooms: ChatRoomByUserDto[] = [];
+  chatRoomCreateDialogVisible: boolean = false;
+
   constructor(private chatRoomService: ChatRoomService,
     private chatRoomUserService: ChatRoomUserService,
     private authService: AuthService,
-    private toastService: ToastrService) {
+    private toastService: ToastrService,
+    private router: Router) {
 
   }
 
@@ -39,22 +43,22 @@ export class ChatRoomsComponent implements OnInit {
   }
 
   joinChatRoom(chatRoom: ChatRoom): void {
-    console.log("chatRoom ", chatRoom.name);
     let currentUserId: number = this.authService.getCurrentUserId();
-    let checkUserInRoom: boolean = this.getUserIsHereByRoomId(chatRoom.id, currentUserId, (result) => {
-      console.log("checkUserInRoom ", checkUserInRoom);
-      if (!checkUserInRoom) {
-        //odada yok, odaya katılabilir
+    console.log("chatRoom.id " + chatRoom.id);
+    
+    this.getUserIsHereByRoomId(chatRoom.id, currentUserId, (result) => {
+      if (result == true) {
         chatRoom.userCount += 1;
         this.updateChatRooms(chatRoom);
         this.addUserToChatRoom(chatRoom);
+        this.toastService.success(Messages.joinedRoom, Messages.success);
+        this.router.navigate(['/', 'chat-room']);
       }
       else {
-        //odada varsa
-        console.log("zaten odadasın, giremezsin");
+        this.router.navigate(['/', 'chat-room']);
+        this.toastService.error(Messages.registredRoom, Messages.error);
       }
     });
-
   }
 
   addUserToChatRoom(chatRoom: ChatRoom) {
@@ -92,13 +96,17 @@ export class ChatRoomsComponent implements OnInit {
           callback(false);
         }
       }
-      else {
-        callback(false);
-      }
+      // else {
+      //   callback(false);
+      // }
     },
       (errroResponse) => {
-        callback(false);
+        // callback(false);
       })
     return (result);
+  }
+
+  chatRoomCreateDialogOnClick() {
+    this.chatRoomCreateDialogVisible = true;
   }
 }

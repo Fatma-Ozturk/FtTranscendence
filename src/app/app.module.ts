@@ -77,6 +77,8 @@ import { GameMatchmakingComponent } from './components/game-matchmaking/game-mat
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ToolbarModule } from 'primeng/toolbar';
 import { BadgeModule } from 'primeng/badge';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room-create.component';
 
 
 @NgModule({
@@ -105,7 +107,8 @@ import { BadgeModule } from 'primeng/badge';
     UserProfileCardComponent,
     UserProfileEditComponent,
     CreateUserProfileComponent,
-    GameMatchmakingComponent
+    GameMatchmakingComponent,
+    ChatRoomCreateComponent
   ],
   imports: [
     BrowserModule,
@@ -154,6 +157,7 @@ import { BadgeModule } from 'primeng/badge';
     ProgressBarModule,
     ToolbarModule,
     BadgeModule,
+    CheckboxModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
