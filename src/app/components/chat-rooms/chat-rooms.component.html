@@ -32,6 +32,6 @@
 
 <p-dialog header="Mesajlaşma odası oluştur" [(visible)]="chatRoomCreateDialogVisible" [style]="{width: '50vw'}">
     <p>
-      <app-chat-room-create *ngIf="chatRoomCreateDialogVisible"></app-chat-room-create>
+      <app-chat-room-create (dialogVisible)="dialogVisibleChange($event)" *ngIf="chatRoomCreateDialogVisible"></app-chat-room-create>
     </p>
 </p-dialog>

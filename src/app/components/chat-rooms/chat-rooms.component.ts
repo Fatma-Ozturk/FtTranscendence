@@ -45,7 +45,7 @@ export class ChatRoomsComponent implements OnInit {
   joinChatRoom(chatRoom: ChatRoom): void {
     let currentUserId: number = this.authService.getCurrentUserId();
     console.log("chatRoom.id " + chatRoom.id);
-    
+
     this.getUserIsHereByRoomId(chatRoom.id, currentUserId, (result) => {
       if (result == true) {
         chatRoom.userCount += 1;
@@ -96,9 +96,6 @@ export class ChatRoomsComponent implements OnInit {
           callback(false);
         }
       }
-      // else {
-      //   callback(false);
-      // }
     },
       (errroResponse) => {
         // callback(false);
@@ -108,5 +105,12 @@ export class ChatRoomsComponent implements OnInit {
 
   chatRoomCreateDialogOnClick() {
     this.chatRoomCreateDialogVisible = true;
+  }
+
+  dialogVisibleChange(event: boolean) {
+    this.chatRoomCreateDialogVisible = Boolean(event);
+    if (event == false) {
+      this.getChatRooms();
+    }
   }
 }

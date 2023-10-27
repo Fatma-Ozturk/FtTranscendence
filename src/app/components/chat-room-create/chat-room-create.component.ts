@@ -4,7 +4,7 @@ import { RandomNumber } from 'src/app/utilities/randomNumber';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmationService, ConfirmEventType } from 'primeng/api';
 import { ChatRoomService } from './../../services/chat-room.service';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatRoom } from 'src/app/models/entities/chatRoom';
 import { Messages } from 'src/app/constants/Messages';
@@ -20,6 +20,7 @@ import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
 })
 export class ChatRoomCreateComponent implements OnInit {
 
+  @Output() dialogVisible = new EventEmitter<boolean>();
   chatRoomForm: FormGroup;
   chatRoomTypes: ChatRoomType[] = [];
 
@@ -47,6 +48,7 @@ export class ChatRoomCreateComponent implements OnInit {
     this.chatRoomForm = this.formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.nullValidator])],
       hasPassword: [false, Validators.compose([Validators.required, Validators.nullValidator])],
+      roomTypeId: ['', Validators.compose([Validators.required, Validators.nullValidator])],
     })
   }
 
@@ -55,21 +57,8 @@ export class ChatRoomCreateComponent implements OnInit {
       if (response.data) {
         this.chatRoomTypes = response.data;
       }
-    })
+    });
   }
-
-  // addUserToChatRoom(chatRoom: ChatRoom) {
-  //   let currentUserId: number = this.authService.getCurrentUserId();
-  //   let chatRoomUser: ChatRoomUser = {
-  //     id: 0,
-  //     chatRoomId: chatRoom.id,
-  //     userId: currentUserId,
-  //     updateTime: new Date(),
-  //     status: true
-  //   };
-  //   this.chatRoomUserService.add(chatRoomUser).subscribe((response) => {
-  //   })
-  // }
 
   add() {
     if (this.chatRoomForm.valid) {
@@ -127,6 +116,7 @@ export class ChatRoomCreateComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         callback();
+        this.dialogVisible.emit(false);
       },
       reject: (type: any) => {
         switch (type) {
