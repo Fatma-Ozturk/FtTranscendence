@@ -1,0 +1,152 @@
+* {
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+}
+body {
+    background-color: #6c5b7b;
+}
+p,h1,body {
+    margin: 0;
+}
+.image-container,.card-title {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.profile {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.separator.vertical {
+    width: 1px;
+    background-color: #fff;
+    height:20px;
+    margin: 0 8px;
+}
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .user-name {
+        margin-bottom: 4px;
+        font-size: 32px;
+        text-transform: uppercase;  
+    }
+    .user-subinfo {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 240px;
+    }
+}
+
+.image-container {
+    margin: 24px 0;
+    .avatar {
+        background-color: black;
+        height: 96px;
+        width: 96px;
+        border-radius: 50%;
+        border-width: 4px;
+        border-color: #000;
+    }
+}
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    margin: 24px 0;
+    width: 50%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
+    background-color: #423051;
+}
+
+.history-container {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    margin: 24px 0;
+    width: 50%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
+    /* background-color: #562260; */
+    background-color: #323268; 
+}
+
+/* Aynı stil özellikleri .info-container ve .history-container içinde olduğu için aynı stil özellikleri burada kullanılmıştır */
+.info {
+    padding: 8px 0;
+    margin: 0 auto;
+    width: 240px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    .title {
+        text-transform: uppercase;
+    }
+}
+
+
+
+.verify-button {
+    background-color: #000; /* Hesap doğrulama butonunun arka plan rengi */
+    color: #fff; /* Hesap doğrulama butonunun metin rengi */
+    padding: 12px 24px; /* Hesap doğrulama butonunun iç dolgusu */
+    border: none; /* Hesap doğrulama butonu kenarlık yok */
+    border-radius: 4px; /* Hesap doğrulama butonunun köşeleri yuvarlatılmış */
+    cursor: pointer; /* Hesap doğrulama butonuna tıklanabilir imleç */
+    font-size: 16px; /* Hesap doğrulama butonunun metin boyutu */
+    text-transform: uppercase; /* Hesap doğrulama butonu metinini büyük harfe dönüştür */
+}
+
+/* Seçili olmayan durum için stil */
+.verify-button:not(:disabled) {
+    background-color: #402E4A; /* Hesap doğrulama butonunun seçili olmayan hali için arka plan rengi */
+}
+
+.verify-button:hover {
+    background-color:  #11a809;; /* Fare ile üstüne gelindiğinde butonun arka plan rengi değişecek */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    color: #f9fdd2; /* Başlık metni rengi */
+    font-size: 20px; /* Başlık metni boyutu */
+    font-family: 'Arial', sans-serif; /* Kullanılacak yazı tipi */
+    text-align: center; /* Metin hizalama (orta) */
+    text-transform: uppercase; /* Metin büyük harf yapma */
+}
+
+@media all and (min-width: 555px) {
+	
+    .profile {
+        height: 100vh;
+        max-width: 700px;
+    }
+    .profile-container {
+        align-items: center;
+        flex-direction: row;    
+        height: 100%;
+        .user {
+            padding: 32px 0 32px 0;
+            margin: 16px;
+            align-items: center;
+        }
+        .info-container {
+            margin: 16px 48px 48px 16px;
+            padding: 32px 0 32px 0;
+            position: relative;
+            max-height: 450px;
+        }
+    }
+}
