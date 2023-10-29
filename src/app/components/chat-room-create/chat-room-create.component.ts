@@ -66,7 +66,7 @@ export class ChatRoomCreateComponent implements OnInit {
       let chatRoomModel: ChatRoom = {
         id: 0,
         name: chatRoomForm.name,
-        accessId: 0,
+        accessId: "",
         roomTypeId: 0,
         roomUserId: this.authService.getCurrentUserId(),
         hasPassword: chatRoomForm.hasPassword,

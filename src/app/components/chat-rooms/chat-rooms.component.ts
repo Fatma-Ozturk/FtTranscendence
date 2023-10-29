@@ -43,22 +43,7 @@ export class ChatRoomsComponent implements OnInit {
   }
 
   joinChatRoom(chatRoom: ChatRoom): void {
-    let currentUserId: number = this.authService.getCurrentUserId();
-    console.log("chatRoom.id " + chatRoom.id);
-
-    this.getUserIsHereByRoomId(chatRoom.id, currentUserId, (result) => {
-      if (result == true) {
-        chatRoom.userCount += 1;
-        this.updateChatRooms(chatRoom);
-        this.addUserToChatRoom(chatRoom);
-        this.toastService.success(Messages.joinedRoom, Messages.success);
-        this.router.navigate(['/', 'chat-room']);
-      }
-      else {
-        this.router.navigate(['/', 'chat-room']);
-        this.toastService.error(Messages.registredRoom, Messages.error);
-      }
-    });
+    this.addUserToChatRoom(chatRoom);
   }
 
   addUserToChatRoom(chatRoom: ChatRoom) {
@@ -71,13 +56,25 @@ export class ChatRoomsComponent implements OnInit {
       status: true
     };
     this.chatRoomUserService.add(chatRoomUser).subscribe((response) => {
+      if (response.success == true){
+        chatRoom.userCount += 1;
+        this.updateChatRooms(chatRoom);
+        this.toastService.success(Messages.joinedRoom, Messages.success);
+        this.router.navigate(['/chat-room' , chatRoom.accessId]);
+      }
+    },
+    errorResponse => {
+      if (errorResponse.error && errorResponse.error.message === "ChatRoomUser Found"){
+        this.router.navigate(['/chat-room', chatRoom.accessId]);
+        // this.toastService.error(Messages.registredRoom, Messages.error);
+      }
     })
   }
 
   updateChatRooms(chatRoom: ChatRoom): void {
     this.chatRoomService.update(chatRoom).subscribe((response) => {
       if (response.success) {
-        this.toastService.success("success", Messages.success);
+        // this.toastService.success("success", Messages.success);
       }
     },
       (errorResponse) => {

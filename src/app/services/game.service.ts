@@ -29,7 +29,7 @@ export class GameService {
 
   public connectSocket(){
     this.token = localStorage.getItem('token');
-    this.socket = io(environment.appurlSocket, {
+    this.socket = io(environment.appurlSocketGame, {
       auth: { token: this.token }
     });
     this.setupSocketListeners();

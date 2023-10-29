@@ -1,4 +1,7 @@
+import { ChatRoomUserService } from 'src/app/services/chat-room-user.service';
+import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
 import { Component, ElementRef, HostListener, Renderer2, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AvatarObj } from 'src/app/models/entities/avatarObj';
 import { StructureObj } from 'src/app/models/entities/structureObj';
 import { AvatarService } from 'src/app/services/avatar.service';
@@ -11,10 +14,10 @@ import { RandomNumber } from 'src/app/utilities/randomNumber';
   styleUrls: ['./chat-room.component.css']
 })
 export class ChatRoomComponent {
+  chatRoomAccessId: string = "";
   isArrowUpPressed: boolean = false;
   isArrowDownPressed: boolean = false;
   isChatLogActive: boolean = false;
-
 
   @ViewChild('myCanvas')
   canvas: ElementRef<HTMLCanvasElement>;
@@ -30,6 +33,7 @@ export class ChatRoomComponent {
 
   player: any;
   playerArray: any[] = [];
+  chatRoomUsers: ChatRoomUser[] = [];
 
   messages: { text: string, sender: string }[] = []; // Mesajları depolayacak dizi
   newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
@@ -37,12 +41,27 @@ export class ChatRoomComponent {
   screenHeight: number;
   screenWidth: number;
 
-  constructor(private avatarService: AvatarService,
-    private el: ElementRef) {
+  constructor(
+    private avatarService: AvatarService,
+    private chatRoomUserService: ChatRoomUserService,
+    private el: ElementRef,
+    private route: ActivatedRoute,
+    private router: Router) {
 
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const accessId = params.get('accessId');
+      this.chatRoomAccessId = accessId;
+      console.log('accessId:', accessId); // id control'ü yap
+    });
+
+    this.chatRoomUserService.getByAccessId(this.chatRoomAccessId).subscribe(response=>{
+      if (response.success){
+        this.chatRoomUsers = response.data;
+      }
+    })
   }
 
   ngAfterViewInit(): void {

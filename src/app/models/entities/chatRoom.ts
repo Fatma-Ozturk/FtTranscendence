@@ -1,7 +1,7 @@
 export interface ChatRoom {
   id: number;
   name: string;
-  accessId: number;
+  accessId: string;
   roomTypeId: number;
   roomUserId: number;
   hasPassword: boolean;
