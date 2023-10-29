@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { ChatRoomUser } from '../models/entities/chatRoomUser';
 import { SingleResponseModel } from '../models/singleResponseModel';
 import { environment } from 'src/environments/environment';
+import { ChatRoomUserByUserDto } from '../models/dto/chatRoomUserByUserDto';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,6 @@ export class ChatRoomUserService extends BaseService<ChatRoomUser> {
   }
 
   public getByAccessId(accessId: string) {
-    return this.httpClient.get<ListResponseModel<ChatRoomUser>>(environment.appurl + "chat-room-users/getbyaccessid?accessId=" + accessId);
+    return this.httpClient.get<ListResponseModel<ChatRoomUserByUserDto>>(environment.appurl + "chat-room-users/getbyaccessid?accessId=" + accessId);
   }
 }

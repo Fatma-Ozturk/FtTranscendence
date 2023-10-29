@@ -32,7 +32,7 @@ export class ChatRoomService extends BaseService<ChatRoom> {
   //socket
   public connectSocket() {
     this.token = localStorage.getItem('token');
-    this.socket = io(environment.appurlSocketGame, {
+    this.socket = io(environment.appurlSocketChatRoom, {
       auth: { token: this.token }
     });
     this.setupSocketListeners();

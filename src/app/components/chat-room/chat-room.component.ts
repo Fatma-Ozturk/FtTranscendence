@@ -1,3 +1,5 @@
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
 import { ChatRoomUserService } from 'src/app/services/chat-room-user.service';
 import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
 import { Component, ElementRef, HostListener, Renderer2, ViewChild } from '@angular/core';
@@ -7,6 +9,8 @@ import { StructureObj } from 'src/app/models/entities/structureObj';
 import { AvatarService } from 'src/app/services/avatar.service';
 import { findCllsn } from 'src/app/utilities/chat/findCllsn';
 import { RandomNumber } from 'src/app/utilities/randomNumber';
+import { ChatRoomUserByUserDto } from 'src/app/models/dto/chatRoomUserByUserDto';
+import { ChatRoomService } from 'src/app/services/chat-room.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -14,6 +18,7 @@ import { RandomNumber } from 'src/app/utilities/randomNumber';
   styleUrls: ['./chat-room.component.css']
 })
 export class ChatRoomComponent {
+  chatMessageForm: FormGroup;
   chatRoomAccessId: string = "";
   isArrowUpPressed: boolean = false;
   isArrowDownPressed: boolean = false;
@@ -33,7 +38,7 @@ export class ChatRoomComponent {
 
   player: any;
   playerArray: any[] = [];
-  chatRoomUsers: ChatRoomUser[] = [];
+  chatRoomUsersByUserDto: ChatRoomUserByUserDto[] = [];
 
   messages: { text: string, sender: string }[] = []; // Mesajları depolayacak dizi
   newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
@@ -44,6 +49,9 @@ export class ChatRoomComponent {
   constructor(
     private avatarService: AvatarService,
     private chatRoomUserService: ChatRoomUserService,
+    private formBuilder: FormBuilder,
+    private chatRoomService: ChatRoomService,
+    private authService: AuthService,
     private el: ElementRef,
     private route: ActivatedRoute,
     private router: Router) {
@@ -53,14 +61,16 @@ export class ChatRoomComponent {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const accessId = params.get('accessId');
-      this.chatRoomAccessId = accessId;
-      console.log('accessId:', accessId); // id control'ü yap
+      this.chatRoomAccessId = accessId; //accesIdControlü yap
     });
 
-    this.chatRoomUserService.getByAccessId(this.chatRoomAccessId).subscribe(response=>{
-      if (response.success){
-        this.chatRoomUsers = response.data;
-      }
+    this.createChatMessageForm();
+  }
+
+
+  createChatMessageForm() {
+    this.chatMessageForm = this.formBuilder.group({
+      message: ["", Validators.compose([Validators.required, Validators.nullValidator, Validators.minLength(0), Validators.maxLength(50)])],
     })
   }
 
@@ -68,8 +78,6 @@ export class ChatRoomComponent {
     this.getScreenSize();
     this.canvas.nativeElement.height = this.screenHeight - 200;
     this.canvas.nativeElement.width = this.screenWidth - 100;
-    this.player = new AvatarObj("Fatma", 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - 15, this.canvas.nativeElement.height * 0.8 - 54, 0);
-    this.createUsers();
     this.context = this.canvas.nativeElement.getContext('2d');
     this.w = this.canvas.nativeElement.width;
     this.h = this.canvas.nativeElement.height;
@@ -78,27 +86,43 @@ export class ChatRoomComponent {
     this.img = new Image();
     this.img.src = "https://i.ibb.co/GTsDmJF/fountain.png";
     this.fountainStructure = new StructureObj(300, 200, (this.w / 2) - 150, 100, 70, this.img, true, 12);
+    this.getChatRoomUserByUserDto(() => {
+      this.createUsers();
+      this.createChatObject()
+      this.runAI();
+      this.runDisplay();
+      this.chatRoomService.connectSocket();
+    });
+  }
 
-
+  createChatObject() {
     this.createNPCs();
     //ortamdaki objeleri worldObjs içinde topluyoruz.
     this.worldObjs[0] = this.player;
-    // this.worldObjs[1] = this.player1;
-
     for (var sn in this.npcs) {
       const numericSn = +sn + 1;
       this.worldObjs[numericSn] = this.npcs[numericSn - 1];
     }
-
-
     this.worldObjs[this.worldObjs.length] = this.fountainStructure;
     for (let index = 0; index < this.playerArray.length; index++) {
       this.worldObjs[this.worldObjs.length + index] = this.playerArray[index];
     }
+  }
 
-    this.runAI();
+  createUsers() {
+    let currentUserId: number = this.authService.getCurrentUserId();
+    let counter: number;
 
-    this.runDisplay();
+    counter = 0;
+    for (let index = 0; index < this.chatRoomUsersByUserDto.length; index++) {
+      if (currentUserId != this.chatRoomUsersByUserDto[index].userId) {
+        this.playerArray[counter] = new AvatarObj(this.chatRoomUsersByUserDto[index].nickName, 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - index * 30, this.canvas.nativeElement.height * 0.8 - index * 10, 0);
+        counter++;
+      }
+      else {
+        this.player = new AvatarObj(this.chatRoomUsersByUserDto[index].nickName, 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - 15, this.canvas.nativeElement.height * 0.8 - 54, 0);
+      }
+    }
   }
 
   sendMessage() {
@@ -110,13 +134,14 @@ export class ChatRoomComponent {
     this.newMessage = '';
   }
 
-  createUsers() {
-    for (let index = 0; index < 10; index++) {
-
-      this.playerArray[index] = new AvatarObj("Abc", 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - index * 30, this.canvas.nativeElement.height * 0.8 - index * 10, 0);
-    }
+  getChatRoomUserByUserDto(callback: () => void) {
+    this.chatRoomUserService.getByAccessId(this.chatRoomAccessId).subscribe(response => {
+      if (response.success) {
+        this.chatRoomUsersByUserDto = response.data;
+        callback();
+      }
+    })
   }
-
 
   createNPCs() {
     //1->female 0->male
@@ -218,13 +243,27 @@ export class ChatRoomComponent {
     }, 1000 / 60);
   }
 
+  //message
+
+  sendMessageClick(){
+    if (this.chatMessageForm.valid) {
+      let chatMessageForm: any = Object.assign({}, this.chatMessageForm.value)
+      let messageText = chatMessageForm.message;
+      this.player.updateLastMessage(messageText);
+      this.newMessage = messageText;
+      this.sendMessage();
+      this.chatMessageForm.setValue({"message": ""});
+      this.chatRoomService.sendChatRoomConnected("aaaa");
+    }
+  }
+
   toggleChatLog() {
     this.isChatLogActive = !this.isChatLogActive;
   }
 
 
   @HostListener('window:keydown', ['$event'])
-  onkeydown(event: KeyboardEvent) {
+  onKeyDown(event: KeyboardEvent) {
     if (event.key === 'ArrowUp') {
       this.isArrowUpPressed = true;
       console.log("arrow up");
@@ -243,19 +282,6 @@ export class ChatRoomComponent {
       this.isArrowDownPressed = false;
     }
     this.avatarService.stopControl(this.player);
-  }
-
-  @HostListener('document:click', ['$event'])
-  onClick(event: Event) {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains('send')) {
-      event.preventDefault();
-      const field = this.el.nativeElement.querySelector('input');
-      this.player.updateLastMessage(field.value);
-      this.newMessage = field.value;
-      this.sendMessage();
-      field.value = '';
-    }
   }
 
   @HostListener('window:resize', ['$event'])

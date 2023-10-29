@@ -43,7 +43,7 @@
   .message-input {
 	appearance: none;
 	-webkit-appearance: none;
-	width: 75%;
+	width: 95%;
 	padding: 5px; /* Inputa biraz boşluk ekledim */
 	margin-right: 5px; /* Inputlar arasında boşluk bıraktım */
   }
