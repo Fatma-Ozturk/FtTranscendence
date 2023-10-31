@@ -92,6 +92,8 @@ export class ChatRoomComponent {
       this.runAI();
       this.runDisplay();
       this.chatRoomService.connectSocket();
+      let response: any = { "data": this.chatRoomAccessId, "messages": "accessId", "success": true };
+      this.chatRoomService.sendChatRoomConnected(response);
     });
   }
 
@@ -245,15 +247,23 @@ export class ChatRoomComponent {
 
   //message
 
-  sendMessageClick(){
+  sendMessageClick() {
     if (this.chatMessageForm.valid) {
       let chatMessageForm: any = Object.assign({}, this.chatMessageForm.value)
       let messageText = chatMessageForm.message;
       this.player.updateLastMessage(messageText);
       this.newMessage = messageText;
       this.sendMessage();
-      this.chatMessageForm.setValue({"message": ""});
-      this.chatRoomService.sendChatRoomConnected("aaaa");
+      this.chatMessageForm.setValue({ "message": "" });
+      let data = { "messages": this.messages, "accessId": this.chatRoomAccessId }
+      let response = { message: 'Message Text', data: data };
+      this.chatRoomService.sendChatRoomHandleMessage(response);
+
+      this.chatRoomService.getMessageResponse().subscribe((response: any) => {
+        console.log("messageResponse ", response.messages);
+        this.newMessage = response.messages;
+        this.sendMessage();
+      })
     }
   }
 

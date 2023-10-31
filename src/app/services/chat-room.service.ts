@@ -19,6 +19,7 @@ export class ChatRoomService extends BaseService<ChatRoom> {
   public chatRoomConnected$: BehaviorSubject<string> = new BehaviorSubject('');
   public chatRoomSendMessage$: BehaviorSubject<string> = new BehaviorSubject('');
   public chatRoomHandleMessage$: BehaviorSubject<string> = new BehaviorSubject('');
+  public messageResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   constructor(private httpClient: HttpClient) {
     super(httpClient);
     this.name = "chat-rooms";
@@ -47,29 +48,40 @@ export class ChatRoomService extends BaseService<ChatRoom> {
     this.socket.on('chatRoomHandleMessage', (message: any): any => {
       this.chatRoomHandleMessage$.next(message);
     });
+    this.socket.on('messageResponse', (message: any): any => {
+      this.messageResponse$.next(message);
+    });
   }
 
-  public sendChatRoomConnected(keydown: any) {
-    this.socket.emit('chatRoomConnected', keydown);
+  public sendChatRoomConnected(arg: any) {
+    this.socket.emit('chatRoomConnected', arg);
   }
 
   public getChatRoomConnected = () => {
     return this.chatRoomConnected$.asObservable();
   };
 
-  public sendChatRoomSendMessage(keydown: any) {
-    this.socket.emit('chatRoomSendMessage', keydown);
+  public sendChatRoomSendMessage(arg: any) {
+    this.socket.emit('chatRoomSendMessage', arg);
   }
 
   public getChatRoomSendMessage = () => {
-    return this.chatRoomConnected$.asObservable();
+    return this.chatRoomSendMessage$.asObservable();
   };
 
-  public sendChatRoomHandleMessage(keydown: any) {
-    this.socket.emit('chatRoomHandleMessage', keydown);
+  public sendChatRoomHandleMessage(arg: any) {
+    this.socket.emit('chatRoomHandleMessage', arg);
   }
 
   public getChatRoomHandleMessage = () => {
     return this.chatRoomHandleMessage$.asObservable();
+  };
+
+  public sendMessageResponse(arg: any) {
+    this.socket.emit('messageResponse', arg);
+  }
+
+  public getMessageResponse = () => {
+    return this.messageResponse$.asObservable();
   };
 }
