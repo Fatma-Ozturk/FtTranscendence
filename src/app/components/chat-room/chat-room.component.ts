@@ -1,3 +1,4 @@
+import { ChatRoomMessageModel } from './../../models/model/chatRoomMessageModel';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChatRoomUserService } from 'src/app/services/chat-room-user.service';
@@ -11,6 +12,7 @@ import { findCllsn } from 'src/app/utilities/chat/findCllsn';
 import { RandomNumber } from 'src/app/utilities/randomNumber';
 import { ChatRoomUserByUserDto } from 'src/app/models/dto/chatRoomUserByUserDto';
 import { ChatRoomService } from 'src/app/services/chat-room.service';
+import { ChatRoomPlayerModel } from 'src/app/models/model/chatRoomPlayerModel';
 
 @Component({
   selector: 'app-chat-room',
@@ -38,9 +40,10 @@ export class ChatRoomComponent {
 
   player: any;
   playerArray: any[] = [];
+  playerTotalArray: ChatRoomPlayerModel[] = [];
   chatRoomUsersByUserDto: ChatRoomUserByUserDto[] = [];
 
-  messages: { text: string, sender: string }[] = []; // Mesajları depolayacak dizi
+  messages: ChatRoomMessageModel[] = []; // Mesajları depolayacak dizi
   newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
 
   screenHeight: number;
@@ -65,6 +68,9 @@ export class ChatRoomComponent {
     });
 
     this.createChatMessageForm();
+    this.chatRoomService.connectSocket();
+    let response: any = { "data": this.chatRoomAccessId, "messages": "accessId", "success": true };
+    this.chatRoomService.sendChatRoomConnected(response);
   }
 
 
@@ -91,10 +97,8 @@ export class ChatRoomComponent {
       this.createChatObject()
       this.runAI();
       this.runDisplay();
-      this.chatRoomService.connectSocket();
-      let response: any = { "data": this.chatRoomAccessId, "messages": "accessId", "success": true };
-      this.chatRoomService.sendChatRoomConnected(response);
     });
+    this.getMessageResponse();
   }
 
   createChatObject() {
@@ -125,15 +129,6 @@ export class ChatRoomComponent {
         this.player = new AvatarObj(this.chatRoomUsersByUserDto[index].nickName, 1, 0, 30, 60, 3, 28, 2, this.canvas.nativeElement.width / 2 - 15, this.canvas.nativeElement.height * 0.8 - 54, 0);
       }
     }
-  }
-
-  sendMessage() {
-    // Kullanıcının girdiği metni mesajlar dizisine ekleyin
-    const newMessage = { text: this.newMessage, sender: this.player.name };
-    this.messages.push(newMessage);
-
-    // Kullanıcının girdiği metni temizleyin
-    this.newMessage = '';
   }
 
   getChatRoomUserByUserDto(callback: () => void) {
@@ -247,6 +242,15 @@ export class ChatRoomComponent {
 
   //message
 
+  sendMessage() {
+    // Kullanıcının girdiği metni mesajlar dizisine ekleyin
+    let newMessage: ChatRoomMessageModel = { text: this.newMessage, sender: this.player.name, date: new Date() };
+    this.messages.push(newMessage);
+
+    // Kullanıcının girdiği metni temizleyin
+    this.newMessage = '';
+  }
+
   sendMessageClick() {
     if (this.chatMessageForm.valid) {
       let chatMessageForm: any = Object.assign({}, this.chatMessageForm.value)
@@ -258,12 +262,6 @@ export class ChatRoomComponent {
       let data = { "messages": this.messages, "accessId": this.chatRoomAccessId }
       let response = { message: 'Message Text', data: data };
       this.chatRoomService.sendChatRoomHandleMessage(response);
-
-      this.chatRoomService.getMessageResponse().subscribe((response: any) => {
-        console.log("messageResponse ", response.messages);
-        this.newMessage = response.messages;
-        this.sendMessage();
-      })
     }
   }
 
@@ -271,6 +269,34 @@ export class ChatRoomComponent {
     this.isChatLogActive = !this.isChatLogActive;
   }
 
+  getMessageResponse() {
+    this.chatRoomService.getMessageResponse().subscribe((response: any) => {
+      let nowDate: Date = new Date();
+      const millisecondsToSubtract = 500;
+      if (response.data !== undefined || response.data != null) {
+        this.messages = response.data;
+        response.data.forEach((element: any) => {
+          let result = this.playerArray.find(x => x.name === element.sender);
+          let date: Date = new Date(element.date);
+          let timeOk = ((nowDate.getTime() - date.getTime()) < millisecondsToSubtract);
+
+          if ((result !== undefined || result != null) && timeOk) {
+            result.updateLastMessage(element.text);
+          }
+        });
+
+        if (this.messages.length > 100) {
+          this.messages = [];
+        }
+      }
+    })
+  }
+
+  //playerMove
+
+  sendPlayerMove(chatRoomPlayerMove: ChatRoomPlayerModel) {
+    this.playerTotalArray.push(chatRoomPlayerMove);
+  }
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
@@ -280,6 +306,10 @@ export class ChatRoomComponent {
     } else if (event.key === 'ArrowDown') {
       this.isArrowDownPressed = true;
       console.log("arrow down");
+      this.sendPlayerMove(this.player.map((player: any) => ({ name: player.name, x: player.x, y: player.y, dir: player.dir })));
+      this.playerArray[0].x += 1;
+      this.playerArray[0].y += 1;
+
     }
     this.avatarService.control(this.player, event);
   }
