@@ -109,13 +109,13 @@ export class GameComponent {
 	}
 
 	ngAfterViewInit(): void {
-		if (this.whoIs > -1) {
+		if (this.whoIs != -1) {
 			this.gameLoop();
 		}
 	}
 
 	ngOnInit(): void {
-		if (this.whoIs > -1) {
+		if (this.whoIs != -1) {
 			this.getTimeNow();
 			this.getScreenSize();
 			this.setCanvasSize();
@@ -136,8 +136,8 @@ export class GameComponent {
 		// 	}, 1000);
 		// }
 	}
-
 	//* ^^ eventloophooks and constructor^^
+
 	gameLoop = (): void => {
 		if (!this.gameRunning) return;
 		this.gameUpdate();
@@ -165,7 +165,6 @@ export class GameComponent {
 				let serializeData: PaddleGameModel[] = JSON.parse(
 					response.data
 				);
-
 				if (response.data[0]) {
 					this.paddleHost.x =
 						serializeData[0].leftFixed * this.fixedScreenRatio;
@@ -214,7 +213,6 @@ export class GameComponent {
 		this.ball.x =
 			this.canvasRef.nativeElement.width / 2 - this.ball.width / 2;
 		this.ball.y = 50;
-		//TODO below parts changed after gamestart call, just random start position for the start
 		this.ball.xVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 		this.ball.yVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 	}
@@ -225,9 +223,6 @@ export class GameComponent {
 	}
 
 	paddleUpdateHost(): void {
-		// if (this.isArrowUpPressed || this.isArrowDownPressed) {
-		// 	this.gameService.getNewMatchmaking
-		// }
 		if (this.whoIs == 0) {
 			if (this.isArrowUpPressed) {
 				this.paddleHost.y = this.paddleHost.y - this.speedmultiplier;
@@ -274,11 +269,11 @@ export class GameComponent {
 		}
 	}
 
-	paddleUpdateGuest(): void {} //TODO: COMES FROM BACKEND :>
+	paddleUpdateGuest(): void {}
 
 	updateBall = (): void => {
 		if (this.ball.y - this.fixedScreenRatio < 0)
-			//* UP Border
+			//* Up border
 			this.ball.yVel = 1;
 		if (
 			this.ball.y + this.fixedScreenRatio + this.ball.height >
@@ -294,11 +289,10 @@ export class GameComponent {
 			)
 				this.ball.xVel = 1;
 			else {
-				//todo: API CALL with reset game objects!
-				// this.rightPaddle.score++;
 				this.paddleGuest.score += 1;
 				this.gameService.sendKeydown(this.paddleGuest);
 				this.ballInit();
+				return;
 			}
 		}
 		if (
@@ -312,17 +306,17 @@ export class GameComponent {
 			)
 				this.ball.xVel = -1;
 			else {
-				//todo: API CALL with reset game objects!
-				// this.leftPaddle.score++;
 				this.paddleHost.score += 1;
 				this.gameService.sendKeydown(this.paddleHost);
 				this.ballInit();
+				return;
 			}
 		}
-
 		this.ball.x += this.fixedScreenRatio * this.ball.xVel;
 		this.ball.y += this.fixedScreenRatio * this.ball.yVel;
 	};
+
+	//* Draw Functions
 
 	gameDraw(): void {
 		this.context.font = '30px Arial';
@@ -336,40 +330,34 @@ export class GameComponent {
 		this.ballDraw();
 		this.playerHostDraw();
 		this.playerGuestDraw();
-		this.context.fillText(
-			'-',
-			this.canvasRef.nativeElement.width / 2,
-			60,
-			this.fixedScreenRatio * 5
-		);
-		this.context.fillText(
-			String(this.leftPaddle.score),
-			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
-			60,
-			this.fixedScreenRatio * 5
-		);
-		this.context.fillText(
-			String(this.rightPaddle.score),
-			this.canvasRef.nativeElement.width / 2 +
-				this.fixedScreenRatio * 10 -
-				10,
-			60,
-			this.fixedScreenRatio * 5
-		);
+		this.scoreDraw();
+		this.timerDraw();
+	}
 
+	scoreDraw(): void {
+		let canvasW = this.canvasRef.nativeElement.width;
+		let canvasH = this.canvasRef.nativeElement.height;
+		this.context.font = '60px Arial';
+		this.context.fillText(
+			`${this.leftPaddle.score} - ${this.rightPaddle.score}`,
+			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 20,
+			this.fixedScreenRatio * 20,
+			this.fixedScreenRatio * 50
+		);
+	}
+
+	timerDraw(): void {
 		let minute = Math.floor(this.gameRemainingTime / 60000); // Bir dakika 60,000 milisaniyeye eşittir
 		let second = ((this.gameRemainingTime % 60000) / 1000).toFixed(0);
 		if (this.gameRemainingTime < 0) {
 			minute = 0;
 			second = '0';
 		}
+		this.context.font = '30px Arial';
 		this.context.fillText(
 			`${minute} : ${second}`,
-			this.canvasRef.nativeElement.width / 2 -
-				this.fixedScreenRatio * 10 +
-				this.fixedScreenRatio * 10 -
-				30,
-			80,
+			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 10,
+			this.fixedScreenRatio * 30,
 			this.fixedScreenRatio * 50
 		);
 	}
@@ -404,6 +392,8 @@ export class GameComponent {
 		);
 	}
 
+	//* Event Listeners
+
 	@HostListener('window:keydown', ['$event'])
 	onKeyDown(event: KeyboardEvent) {
 		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
@@ -436,6 +426,7 @@ export class GameComponent {
 		this.getScreenSize();
 	}
 
+	//util
 	getScreenSize() {
 		this.screenWidth = window.innerWidth;
 		this.screenHeight = window.innerHeight;
@@ -474,7 +465,6 @@ export class GameComponent {
 		this.speedmultiplier = this.speedmultiplier * this.fixedScreenRatio;
 	}
 
-	//util
 	whoIsHostOrGuest(gameRoomSocket: GameRoomSocket): number {
 		const userId = this.authService.getCurrentUserId();
 
