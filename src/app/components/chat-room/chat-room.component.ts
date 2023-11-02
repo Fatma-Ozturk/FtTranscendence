@@ -306,7 +306,7 @@ export class ChatRoomComponent {
     } else if (event.key === 'ArrowDown') {
       this.isArrowDownPressed = true;
       console.log("arrow down");
-      this.sendPlayerMove(this.player.map((player: any) => ({ name: player.name, x: player.x, y: player.y, dir: player.dir })));
+      // this.sendPlayerMove(this.player.map((player: any) => ({ name: player.name, x: player.x, y: player.y, dir: player.dir })));
       this.playerArray[0].x += 1;
       this.playerArray[0].y += 1;
 
