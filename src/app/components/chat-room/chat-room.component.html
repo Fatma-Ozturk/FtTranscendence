@@ -8,16 +8,12 @@
       <div class="row">
         <div class="d-flex justify-content-center align-items-center">
           <div class="col-8">
-            <input type="text" class="w-100 pl-2 pr-2" placeholder="Enter your message" (keydown.enter)="sendMessageClick()" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" pInputText class="message-input"
-              formControlName="message" />
+            <input type="text" class="w-100 pl-2 pr-2" placeholder="Enter your message"
+              (keydown.enter)="sendMessageClick()" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" pInputText
+              class="message-input" formControlName="message" />
           </div>
-          <div class="col-2">
-            <p-button type="button" label="View Chat" (onClick)="toggleChatLog()" styleClass="p-button-outlined w-100"
-              severity="success"></p-button>
-          </div>
-          <div class="col-1 d-flex justify-content-center">
-            <p-button type="button" icon="pi pi-check" (onClick)="sendMessageClick()" styleClass="p-button-rounded">
-            </p-button>
+          <div class="col-4">
+            <p-button type="button" label="View Chat" (onClick)="toggleChatLog()" styleClass="p-button-outlined w-100" severity="success"></p-button>
           </div>
         </div>
       </div>
@@ -25,10 +21,9 @@
   </div>
 
   <!-- Sohbet gösterimi için div -->
-  <div class="chat-log" [ngClass]="{'active': isChatLogActive}">
-    <div *ngFor="let message of messages" class="message">
-      <strong>{{ message.sender }}:</strong> {{ message.text }}
-    </div>
+  <div *ngIf="isChatLogActive">
+    <app-chat [messages]="messages" (messageInput)="chatRoomMessageInput($event)"
+      (sendMessageClickOutput)="sendMessageClick()"></app-chat>
   </div>
 
 </div>

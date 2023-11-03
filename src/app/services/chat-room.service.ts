@@ -17,9 +17,10 @@ export class ChatRoomService extends BaseService<ChatRoom> {
   private token: string;
   private socket: Socket;
   public chatRoomConnected$: BehaviorSubject<string> = new BehaviorSubject('');
-  public chatRoomHangleMove$: BehaviorSubject<string> = new BehaviorSubject('');
+  public chatRoomHandlePlayer$: BehaviorSubject<string> = new BehaviorSubject('');
   public chatRoomHandleMessage$: BehaviorSubject<string> = new BehaviorSubject('');
   public messageResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+  public playerResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   constructor(private httpClient: HttpClient) {
     super(httpClient);
     this.name = "chat-rooms";
@@ -42,14 +43,17 @@ export class ChatRoomService extends BaseService<ChatRoom> {
     this.socket.on('chatRoomConnected', (message: any): any => {
       this.chatRoomConnected$.next(message);
     });
-    this.socket.on('chatRoomHangleMove', (message: any): any => {
-      this.chatRoomHangleMove$.next(message);
+    this.socket.on('chatRoomHandlePlayer', (message: any): any => {
+      this.chatRoomHandlePlayer$.next(message);
     });
     this.socket.on('chatRoomHandleMessage', (message: any): any => {
       this.chatRoomHandleMessage$.next(message);
     });
     this.socket.on('messageResponse', (message: any): any => {
       this.messageResponse$.next(message);
+    });
+    this.socket.on('playerResponse', (message: any): any => {
+      this.playerResponse$.next(message);
     });
   }
 
@@ -61,12 +65,12 @@ export class ChatRoomService extends BaseService<ChatRoom> {
     return this.chatRoomConnected$.asObservable();
   };
 
-  public sendChatRoomHangleMove(arg: any) {
-    this.socket.emit('chatRoomHangleMove', arg);
+  public sendChatRoomHandlePlayer(arg: any) {
+    this.socket.emit('chatRoomHandlePlayer', arg);
   }
 
-  public getChatRoomHangleMove = () => {
-    return this.chatRoomHangleMove$.asObservable();
+  public getChatRoomHandlePlayer = () => {
+    return this.chatRoomHandlePlayer$.asObservable();
   };
 
   public sendChatRoomHandleMessage(arg: any) {
@@ -83,5 +87,13 @@ export class ChatRoomService extends BaseService<ChatRoom> {
 
   public getMessageResponse = () => {
     return this.messageResponse$.asObservable();
+  };
+
+  public sendPlayerResponse(arg: any) {
+    this.socket.emit('playerResponse', arg);
+  }
+
+  public getPlayerResponse = () => {
+    return this.playerResponse$.asObservable();
   };
 }

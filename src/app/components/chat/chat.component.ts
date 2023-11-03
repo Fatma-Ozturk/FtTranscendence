@@ -1,4 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, Renderer2 } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/services/auth.service';
+import { ChatRoomMessageModel } from './../../models/model/chatRoomMessageModel';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, Renderer2, Input, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-chat',
@@ -9,40 +12,19 @@ export class ChatComponent {
   isArrowUpPressed: boolean;
   isArrowDownPressed: boolean;
 
-  @ViewChild('messageInput') messageInputRef: ElementRef;
+  message: string = "";
+
+  @Input() messages: ChatRoomMessageModel[];
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
+  @Output() messageInput = new EventEmitter<string>();
+  @Output() sendMessageClickOutput = new EventEmitter<any>();
 
-  messageInput: string = "";
-  messages: any[] = [];
-  isTyping: boolean = false;
-  fakeMessages = [
-    'Hi there, I\'m Fabio and you?',
-    'Nice to meet you',
-    'How are you?',
-  ];
-  i: number = 0;
 
-  constructor(private renderer: Renderer2) {
+  constructor(
+    private renderer: Renderer2,
+    private authService: AuthService,
+    private toastrService: ToastrService) {
 
-  }
-
-  insertMessage(): void {
-    let msg: string = this.messageInputRef.nativeElement.value as string;
-    if (!msg.trim()) {
-      return;
-    }
-    this.messageInput = msg;
-    this.messagesContentRef.nativeElement.innerHTML = '<div class="message message-personal">' + msg + '</div>';
-    this.messagesContentRef.nativeElement.querySelector(".mCSB_container");
-    this.renderer.addClass(this.messagesContentRef, "message.new");
-  }
-
-  setDate() {
-    const d = new Date();
-    const timestamp = `${d.getHours()}:${d.getMinutes()}`;
-    if (!this.messages.length || timestamp !== this.messages[this.messages.length - 1].timestamp) {
-      this.messages.push({ text: timestamp, timestamp: timestamp });
-    }
   }
 
   updateScrollbar() {
@@ -50,8 +32,9 @@ export class ChatComponent {
     this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
   }
 
-  keyDownEnter(){
-    this.insertMessage();
+  sendMessage() {
+    this.messageInput.emit(this.message);
+    this.sendMessageClickOutput.emit();
     this.updateScrollbar();
   }
 }

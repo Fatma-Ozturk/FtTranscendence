@@ -79,7 +79,6 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { BadgeModule } from 'primeng/badge';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room-create.component';
-
 @NgModule({
   declarations: [
     AppComponent,

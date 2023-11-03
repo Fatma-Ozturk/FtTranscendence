@@ -35,16 +35,16 @@ export class ChatRoomComponent {
 
   img: HTMLImageElement;
   fountainStructure: StructureObj;
-  npcs: any[] = [];//içinde sadece npcler var
-  worldObjs: any[] = [];//içinde npc, player ve çeşme var
+  npcs: any[] = [];
+  worldObjs: any[] = [];
 
   player: any;
   playerArray: any[] = [];
   playerTotalArray: ChatRoomPlayerModel[] = [];
   chatRoomUsersByUserDto: ChatRoomUserByUserDto[] = [];
 
-  messages: ChatRoomMessageModel[] = []; // Mesajları depolayacak dizi
-  newMessage: string = ''; // Kullanıcının girdiği yeni mesaj
+  messages: ChatRoomMessageModel[] = [];
+  newMessage: string = '';
 
   screenHeight: number;
   screenWidth: number;
@@ -99,6 +99,7 @@ export class ChatRoomComponent {
       this.runDisplay();
     });
     this.getMessageResponse();
+    this.getPlayerResponse();
   }
 
   createChatObject() {
@@ -252,17 +253,17 @@ export class ChatRoomComponent {
   }
 
   sendMessageClick() {
-    if (this.chatMessageForm.valid) {
-      let chatMessageForm: any = Object.assign({}, this.chatMessageForm.value)
-      let messageText = chatMessageForm.message;
-      this.player.updateLastMessage(messageText);
-      this.newMessage = messageText;
-      this.sendMessage();
-      this.chatMessageForm.setValue({ "message": "" });
-      let data = { "messages": this.messages, "accessId": this.chatRoomAccessId }
-      let response = { message: 'Message Text', data: data };
-      this.chatRoomService.sendChatRoomHandleMessage(response);
+    let chatMessageForm: any = Object.assign({}, this.chatMessageForm.value)
+    let messageTextDown = chatMessageForm.message;
+    if (messageTextDown) {
+      this.newMessage = messageTextDown;
     }
+    this.player.updateLastMessage(this.newMessage);
+    this.sendMessage();
+    this.chatMessageForm.setValue({ "message": "" });
+    let data = { "messages": this.messages, "accessId": this.chatRoomAccessId }
+    let response = { message: 'Message Text', data: data };
+    this.chatRoomService.sendChatRoomHandleMessage(response);
   }
 
   toggleChatLog() {
@@ -292,25 +293,71 @@ export class ChatRoomComponent {
     })
   }
 
+  chatRoomMessageInput(event: any) {
+    this.newMessage = event;
+    console.log("event ", event);
+    return event;
+  }
+
   //playerMove
 
   sendPlayerMove(chatRoomPlayerMove: ChatRoomPlayerModel) {
     this.playerTotalArray.push(chatRoomPlayerMove);
   }
 
+  getPlayerResponse() {
+    this.chatRoomService.getPlayerResponse().subscribe((response: any) => {
+      if (response.data) {
+        for (let index = 0; index < response.data.length; index++) {
+          const element = response.data[index];
+          if (element) {
+            const result = this.playerArray.find((player: any) => player.name === element.name);
+            if (result) {
+              result.x = element.x;
+              result.y = element.y;
+              result.dir = element.dir;
+            }
+          }
+        }
+
+        if (this.playerTotalArray.length > 100) {
+          this.playerTotalArray = [];
+        }
+      }
+    });
+  }
+
+  sendHandlePlayer() {
+    let chatRoomPlayerModels: ChatRoomPlayerModel[] = this.playerArray.map((player: any) => ({ name: player.name, x: player.x, y: player.y, dir: player.dir }));
+    let chatRoomPlayerModel: ChatRoomPlayerModel = {
+      name: this.player.name,
+      x: this.player.x,
+      y: this.player.y,
+      dir: this.player.dir
+    };
+
+    chatRoomPlayerModels.push(chatRoomPlayerModel);
+    for (const iterator of chatRoomPlayerModels) {
+      const playerFinded = this.playerTotalArray.find((player: any) => player.name === iterator.name);
+      if (!playerFinded) {
+        this.sendPlayerMove(iterator);
+      } else {
+        this.playerTotalArray.pop();
+      }
+    }
+    const data = { "playerTotalArray": this.playerTotalArray, "accessId": this.chatRoomAccessId };
+    const response = { message: 'Player', data: data };
+    this.chatRoomService.sendChatRoomHandlePlayer(response);
+  }
+
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 'ArrowUp') {
       this.isArrowUpPressed = true;
-      console.log("arrow up");
     } else if (event.key === 'ArrowDown') {
       this.isArrowDownPressed = true;
-      console.log("arrow down");
-      // this.sendPlayerMove(this.player.map((player: any) => ({ name: player.name, x: player.x, y: player.y, dir: player.dir })));
-      this.playerArray[0].x += 1;
-      this.playerArray[0].y += 1;
-
     }
+    this.sendHandlePlayer();
     this.avatarService.control(this.player, event);
   }
 
