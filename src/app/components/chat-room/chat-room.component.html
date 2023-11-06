@@ -22,7 +22,7 @@
 
   <!-- Sohbet gösterimi için div -->
   <div *ngIf="isChatLogActive">
-    <app-chat [messages]="messages" (messageInput)="chatRoomMessageInput($event)"
+    <app-chat [chatRoomAccessId]="chatRoomAccessId" [messages]="messages" (messageInput)="chatRoomMessageInput($event)"
       (sendMessageClickOutput)="sendMessageClick()"></app-chat>
   </div>
 

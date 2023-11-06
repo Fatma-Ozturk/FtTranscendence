@@ -9,11 +9,13 @@ import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, 
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent {
+  currentNickName: string;
   isArrowUpPressed: boolean;
   isArrowDownPressed: boolean;
 
   message: string = "";
 
+  @Input() chatRoomAccessId: string;
   @Input() messages: ChatRoomMessageModel[];
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
   @Output() messageInput = new EventEmitter<string>();
@@ -27,14 +29,23 @@ export class ChatComponent {
 
   }
 
+  ngOnInit(){
+    this.currentNickName = this.authService.getCurrentNickName();
+  }
+
   updateScrollbar() {
-    const messagesContent = this.messagesContentRef.nativeElement;
-    this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
+    try {
+      const messagesContent = this.messagesContentRef.nativeElement;
+      this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight); 
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   sendMessage() {
     this.messageInput.emit(this.message);
     this.sendMessageClickOutput.emit();
     this.updateScrollbar();
+    this.message = "";
   }
 }
