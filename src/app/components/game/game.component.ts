@@ -115,6 +115,9 @@ export class GameComponent {
 	}
 
 	ngOnInit(): void {
+		this.setupScoreListener();
+		this.setupBallListener();
+		this.setupPaddleListener();
 		if (this.whoIs != -1) {
 			this.getTimeNow();
 			this.getScreenSize();
@@ -138,14 +141,49 @@ export class GameComponent {
 	}
 	//* ^^ eventloophooks and constructor^^
 
-	gameLoop = (): void => {
-		if (!this.gameRunning) return;
-		this.gameUpdate();
-		this.gameDraw();
-		window.requestAnimationFrame(this.gameLoop);
-		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
-		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
-		this.gameService.sendBallLocation(this.ball);
+	setupScoreListener() {
+		this.gameService.getScoreRespnse().subscribe((response: any) => {
+			if (response.message === 'score' && response.data) {
+				let serializeData: { host: number; guest: number } = JSON.parse(
+					response.data
+				);
+				console.log('Score : ', serializeData);
+				if (this.whoIs == 1) {
+					this.paddleGuest.score = serializeData.host;
+					this.paddleHost.score = serializeData.guest;
+				} else {
+					this.paddleHost.score = serializeData.host;
+					this.paddleGuest.score = serializeData.guest;
+				}
+			}
+		});
+	}
+
+	setupPaddleListener() {
+		this.gameService.getPaddleResponse().subscribe((response: any) => {
+			if (response.message === 'Paddle' && response.data) {
+				let serializeData: PaddleGameModel[] = JSON.parse(
+					response.data
+				);
+				if (response.data[0]) {
+					this.paddleHost.x =
+						serializeData[0].leftFixed * this.fixedScreenRatio;
+					this.paddleHost.y =
+						serializeData[0].topFixed * this.fixedScreenRatio;
+					// this.paddleHost.score = serializeData[0]?.score;
+				}
+				if (response.data[1]) {
+					this.paddleGuest.x =
+						serializeData[1]?.leftFixed * this.fixedScreenRatio;
+					this.paddleGuest.y =
+						serializeData[1]?.topFixed * this.fixedScreenRatio;
+					// this.paddleGuest.score = serializeData[1]?.score;
+				}
+			}
+		});
+	}
+
+	setupBallListener() {
 		this.gameService
 			.getBallLocationResponse()
 			.subscribe((response: any) => {
@@ -160,27 +198,17 @@ export class GameComponent {
 					}
 				}
 			});
-		this.gameService.getPaddleResponse().subscribe((response: any) => {
-			if (response.message === 'Paddle' && response.data) {
-				let serializeData: PaddleGameModel[] = JSON.parse(
-					response.data
-				);
-				if (response.data[0]) {
-					this.paddleHost.x =
-						serializeData[0].leftFixed * this.fixedScreenRatio;
-					this.paddleHost.y =
-						serializeData[0].topFixed * this.fixedScreenRatio;
-					this.paddleHost.score = serializeData[0]?.score;
-				}
-				if (response.data[1]) {
-					this.paddleGuest.x =
-						serializeData[1]?.leftFixed * this.fixedScreenRatio;
-					this.paddleGuest.y =
-						serializeData[1]?.topFixed * this.fixedScreenRatio;
-					this.paddleGuest.score = serializeData[1]?.score;
-				}
-			}
-		});
+	}
+
+	gameLoop = (): void => {
+		if (!this.gameRunning) return;
+		this.gameUpdate();
+		this.gameDraw();
+		window.requestAnimationFrame(this.gameLoop);
+		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+		this.gameService.sendBallLocation(this.ball);
+
 		this.gameRemainingTime =
 			new Date(this.gameRoomSocket.startTime).getTime() +
 			this.gameRoomSocket.timer * 1000 -
@@ -289,8 +317,11 @@ export class GameComponent {
 			)
 				this.ball.xVel = 1;
 			else {
-				this.paddleGuest.score += 1;
-				this.gameService.sendKeydown(this.paddleGuest);
+				if (this.whoIs == 0)
+					this.gameService.sendScore({
+						host: this.paddleHost.score,
+						guest: this.paddleGuest.score + 1,
+					});
 				this.ballInit();
 				return;
 			}
@@ -306,8 +337,11 @@ export class GameComponent {
 			)
 				this.ball.xVel = -1;
 			else {
-				this.paddleHost.score += 1;
-				this.gameService.sendKeydown(this.paddleHost);
+				if (this.whoIs == 0)
+					this.gameService.sendScore({
+						host: this.paddleHost.score + 1,
+						guest: this.paddleGuest.score,
+					});
 				this.ballInit();
 				return;
 			}
