@@ -59,9 +59,30 @@ p,h1,body {
         border-color: #000;
     }
 }
+
+.achievements {
+    display: flex;
+    flex-wrap: wrap; /* Satırlar dolu olduğunda bir sonraki satıra geçmesi için */
+    gap: 10px; /* Resimler arasındaki boşluk */
+    justify-content: center; /* Resimleri yatayda merkezle */
+    align-items: center; /* Resimleri dikeyde merkezle */
+}
+
+.ach {
+    background-color: black;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border-width: 4px;
+    border-color: #000;
+}
+
 .container {
     display: flex;
     width: 100%;
+    width: 800px;
+    justify-content: center;
+
 }
 
 .info-container {
@@ -69,7 +90,7 @@ p,h1,body {
     flex-direction: column;
     padding: 32px 0;
     margin: 24px 0;
-    width: 50%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
+   width: 100%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
     background-color: #423051;
 }
 
@@ -78,10 +99,11 @@ p,h1,body {
     flex-direction: column;
     padding: 32px 0;
     margin: 24px 0;
-    width: 50%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
+    width: 100%; /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
     /* background-color: #562260; */
     background-color: #323268; 
 }
+
 
 /* Aynı stil özellikleri .info-container ve .history-container içinde olduğu için aynı stil özellikleri burada kullanılmıştır */
 .info {
@@ -96,6 +118,33 @@ p,h1,body {
     }
 }
 
+.win{
+    background-color: #0c4709;
+    padding: 8px 0;
+    margin: 0 auto;
+    width: 240px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    .title {
+        text-transform: uppercase;
+    }
+
+}
+
+.lose{
+    background-color: #6f1111;
+    padding: 8px 0;
+    margin: 0 auto;
+    width: 240px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    .title {
+        text-transform: uppercase;
+    }
+
+}
 
 
 .verify-button {
