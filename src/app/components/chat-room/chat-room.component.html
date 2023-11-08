@@ -7,13 +7,13 @@
     <form [formGroup]="chatMessageForm" class="message-form">
       <div class="row">
         <div class="d-flex justify-content-center align-items-center">
-          <div class="col-8">
+          <div class="col-10">
             <input type="text" class="w-100 pl-2 pr-2" placeholder="Enter your message"
               (keydown.enter)="sendMessageClick()" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" pInputText
               class="message-input" formControlName="message" />
           </div>
-          <div class="col-4">
-            <p-button type="button" label="View Chat" (onClick)="toggleChatLog()" styleClass="p-button-outlined w-100" severity="success"></p-button>
+          <div class="col-2">
+            <p-button type="button" label="View Chat" (onClick)="toggleChatLog()" [style]="{'width':'auto'}" styleClass="p-button-outlined" severity="success"></p-button>
           </div>
         </div>
       </div>

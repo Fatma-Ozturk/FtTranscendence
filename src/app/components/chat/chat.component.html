@@ -8,7 +8,7 @@
 	</div>
 	<div class="messages">
 		<div class="messages-content" #messagesContent>
-			<div class="messages" *ngFor="let message of messages">
+			<div class="messages" *ngFor="let message of messages;let isLast=last">
 				<div class="mCSB_container" *ngIf="currentNickName === message.sender">
 					<div *ngIf="currentNickName === message.sender" class="message message-personal">
 						<strong>{{ message.sender }}:</strong> {{ message.text}}
@@ -16,8 +16,13 @@
 				</div>
 				<div class="mCSB_container" *ngIf="currentNickName !== message.sender">
 					<div class="message new">
-						<figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>
+						<figure class="avatar" (click)="navigateProfile(message)"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>
 						<strong>{{ message.sender }}:</strong> {{ message.text}}
+					</div>
+				</div>
+				<div class="mCSB_container" *ngIf="isLast && changeMessages">
+					<div class="message loading">
+						<figure class="avatar"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/156381/profile/profile-80.jpg" /></figure>
 					</div>
 				</div>
 			</div>

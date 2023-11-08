@@ -3,18 +3,23 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
     <main class="profile">
         <div class="user">
             <div class="image-container">
-                <img class="avatar" alt="" src="https://image.freepik.com/free-vector/coloured-knight-design_1152-54.jpg">
+                <img class="avatar" alt=""
+                    src="https://image.freepik.com/free-vector/coloured-knight-design_1152-54.jpg">
             </div>
-            <div class="user-info">
-                <p class="user-name">Alex M.</p>
+            <div class="user-info" *ngIf="(user$ | async) as User">
+                <p class="user-name" *ngIf="user$.getValue().firstName && user$.getValue().lastName">
+                    {{user$.getValue().firstName}} {{user$.getValue().lastName}}</p>
+                <p class="user-name" *ngIf="user$.getValue().nickName">{{user$.getValue().nickName}}</p>
                 <div class="user-subinfo">
                     <p class="user-class">Master</p>
                     <div class="separator vertical"></div>
@@ -23,68 +28,53 @@
             </div>
         </div>
         <div class="container">
-        <div class="info-container">
-            <div class="info">
-                <div class="title">Current place:</div>
-                <div class="description">1st</div>
+            <div class="info-container">
+                <div class="info">
+                    <div class="title">Current place:</div>
+                    <div class="description">1st</div>
+                </div>
+                <div class="info">
+                    <div class="title">Achievements:</div>
+                    <div class="description">42/50</div>
+                </div>
+                <div class="info">
+                    <div class="title">Losses:</div>
+                    <div class="description">3</div>
+                </div>
+                <div class="info">
+                    <div class="title">Wins:</div>
+                    <div class="description">5</div>
+                </div>
             </div>
-			<div class="info">
-                <div class="title">Achievements:</div>
-                <div class="description">42/50</div>
-            </div>
-			<div class="info">
-                <div class="title">Losses:</div>
-                <div class="description">3</div>
-            </div>
-            <div class="info">
-                <div class="title">Wins:</div>
-                <div class="description">5</div>
+            <div class="info-container">
+                <div class="achievements">
+                    <img class="ach" alt=""
+                        src="https://cdn.intra.42.fr/achievement/image/169/BADGE_SCOLARITY_billgates.svg">
+                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/38/SOC004.svg">
+                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/82/PED011.svg">
+                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/114/PRO014.svg">
+                </div>
             </div>
         </div>
-        <div class="history-container">
+        <div class="history-container" *ngIf="userGameHistories$ | async as histories">
             <h1>Match History</h1>
-            <div class="info">
-                <div class="win">
-                <div class="title">1.</div>
-                <div class="description">user1</div>
-                <div class="description">1-0</div>
-                <div class="description">user2</div>
-                <div class="description">10 dk önce</div>
-            </div>
-            </div>
-            <div class="info">
-                <div class="lose">
-                <div class="title">2.</div>
-                <div class="description">user1</div>
-                <div class="description">1-3</div>
-                <div class="description">user3</div>
-                <div class="description">1 gün önce</div>
-            </div>
-            </div>
-            <div class="info">
-                <div class="win">
-                <div class="title">2.</div>
-                <div class="description">user1</div>
-                <div class="description">5-2</div>
-                <div class="description">user4</div>
-                <div class="description">3 gün önce</div>
-            </div>
+            <div class="info" *ngFor="let history of histories">
+                <div [class]="'win'">
+                    <div class="title">1.</div>
+                    <div class="description">{{history.}}</div>
+                    <div class="description">1-0</div>
+                    <div class="description">user2</div>
+                    <div class="description">10 dk önce</div>
+                </div>
             </div>
         </div>
-        <div class="info-container">
-            <div class="achievements">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/169/BADGE_SCOLARITY_billgates.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/38/SOC004.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/82/PED011.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/114/PRO014.svg">
-            </div>
-        </div>
-
-    </div>
-    
         <div class="verification-button">
-            <button class="verify-button">Kimlik Doğrulama</button>
-       </div>
+            <p-button styleClass="p-button-outlined">
+                <img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
+                <span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>
+            </p-button>
+        </div>
     </main>
 </body>
+
 </html>
