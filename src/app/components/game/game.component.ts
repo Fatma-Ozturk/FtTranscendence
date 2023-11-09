@@ -132,12 +132,6 @@ export class GameComponent {
 	ngDoCheck() {}
 
 	ngOnDestroy() {
-		// console.log("isConneed destory");
-		// if (this.gameService.isConnected()){
-		// 	setTimeout(() => {
-		// 		this.router.navigate(['/view']);
-		// 	}, 1000);
-		// }
 	}
 	//* ^^ eventloophooks and constructor^^
 
@@ -170,14 +164,12 @@ export class GameComponent {
 						serializeData[0].leftFixed * this.fixedScreenRatio;
 					this.paddleHost.y =
 						serializeData[0].topFixed * this.fixedScreenRatio;
-					// this.paddleHost.score = serializeData[0]?.score;
 				}
 				if (response.data[1]) {
 					this.paddleGuest.x =
 						serializeData[1]?.leftFixed * this.fixedScreenRatio;
 					this.paddleGuest.y =
 						serializeData[1]?.topFixed * this.fixedScreenRatio;
-					// this.paddleGuest.score = serializeData[1]?.score;
 				}
 			}
 		});
@@ -213,9 +205,8 @@ export class GameComponent {
 			new Date(this.gameRoomSocket.startTime).getTime() +
 			this.gameRoomSocket.timer * 1000 -
 			this.gameNowDate.getTime();
-		if (this.gameRemainingTime <= 0) {
+		if (this.gameRemainingTime <= 0)
 			this.gameFinish();
-		}
 	};
 
 	initGameModels(): void {
@@ -302,20 +293,20 @@ export class GameComponent {
 	updateBall = (): void => {
 		if (this.ball.y - this.fixedScreenRatio < 0)
 			//* Up border
-			this.ball.yVel = 1;
+			this.ball.yVel = this.ball.yVel * -1;
 		if (
 			this.ball.y + this.fixedScreenRatio + this.ball.height >
 			this.canvasRef.nativeElement.height
 		)
 			//* DOWN Border
-			this.ball.yVel = -1;
+			this.ball.yVel =  this.ball.yVel * -1;
 		if (this.ball.x < this.leftPaddle.width) {
 			//* LEFT Border
 			if (
 				this.leftPaddle.y < this.ball.y &&
 				this.leftPaddle.y + this.leftPaddle.height > this.ball.y
 			)
-				this.ball.xVel = 1;
+				this.newBallDirection(this.leftPaddle);
 			else {
 				if (this.whoIs == 0)
 					this.gameService.sendScore({
@@ -335,7 +326,7 @@ export class GameComponent {
 				this.ball.y > this.rightPaddle.y &&
 				this.ball.y < this.rightPaddle.y + this.rightPaddle.height
 			)
-				this.ball.xVel = -1;
+				this.newBallDirection(this.rightPaddle);
 			else {
 				if (this.whoIs == 0)
 					this.gameService.sendScore({
@@ -349,6 +340,27 @@ export class GameComponent {
 		this.ball.x += this.fixedScreenRatio * this.ball.xVel;
 		this.ball.y += this.fixedScreenRatio * this.ball.yVel;
 	};
+
+	newBallDirection(paddle: PaddleGameModel): void {
+		let newVel: number;
+		let paddleMid = paddle.y + (paddle.height / 2);
+		let ballMid = this.ball.y + (this.ball.height / 2);
+
+		let totalDistance = (paddle.height / 2) - paddle.y;
+		let ballDistance = ballMid - paddle.y;
+		if (ballMid < paddleMid) {
+			newVel = Math.min(1, Math.max(0, ballDistance / totalDistance))
+			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
+			this.ball.yVel = -newVel - 1;
+		} else if (ballMid > paddleMid) {
+			newVel = Math.min(1, Math.max(0, ((paddle.height / 2) - ballDistance) / totalDistance))
+			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
+			this.ball.yVel = newVel + 1;
+		} else {
+			this.ball.xVel = paddle.x == this.paddleHost.x ? 1: -1;
+			this.ball.yVel = 0;
+		}
+	}
 
 	//* Draw Functions
 
