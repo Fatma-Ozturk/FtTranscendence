@@ -1,5 +1,4 @@
 * {
-    color: #fff;
     font-family: 'Roboto', sans-serif;
 }
 
@@ -92,14 +91,6 @@ body {
     border-color: #000;
 }
 
-.container {
-    display: flex;
-    width: 100%;
-    width: 800px;
-    justify-content: center;
-
-}
-
 .info-container {
     display: flex;
     flex-direction: column;
@@ -115,7 +106,7 @@ body {
     flex-direction: column;
     padding: 32px 0;
     margin: 24px 0;
-    width: 100%;
+    width: auto;
     /* İki container'ı eşit genişlikte yapmak için yarı yarıya ayarlayabilirsiniz */
     /* background-color: #562260; */
     background-color: #323236a9;
@@ -126,7 +117,7 @@ body {
 .info {
     padding: 8px 0;
     margin: 0 auto;
-    width: 240px;
+    width: 500px;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
@@ -140,7 +131,7 @@ body {
     background-color: #0c4709;
     padding: 8px 0;
     margin: 0 auto;
-    width: 240px;
+    width: 500px;
     display: flex;
     justify-content: space-between;
     flex-direction: row;

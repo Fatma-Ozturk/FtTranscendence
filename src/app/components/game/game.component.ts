@@ -65,6 +65,8 @@ export class GameComponent {
 	intervalMs = 1000;
 	intervalId: any;
 
+	gameScoreResult: GameScore;
+
 	constructor(
 		private gameService: GameService,
 		private gameScoreService: GameScoreService,
@@ -568,7 +570,8 @@ export class GameComponent {
 			status: true,
 		};
 		this.gameScoreService.add(gameScore).subscribe(
-			(response) => {},
+			(response) => {
+			},
 			(responseError) => {
 				if (responseError.error) {
 					this.toastrService.info(Messages.error);

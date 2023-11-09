@@ -8,6 +8,7 @@ import { Messages } from 'src/app/constants/Messages';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { GameHistoryDto } from 'src/app/models/dto/gameHistoryDto';
 
 @Component({
   selector: 'app-user-profile',
@@ -18,7 +19,9 @@ export class UserProfileComponent {
 
 
   user$ = new BehaviorSubject<User | null>(null);
-  userGameHistories$ = new BehaviorSubject<GameHistory[]>([]);
+  userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
+
+  userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
 
   constructor(
     private userService: UserService,
@@ -44,7 +47,7 @@ export class UserProfileComponent {
         next: (response: any) => {
           if (response.success) {
             this.user$.next(response.data);
-            this.getUserGameHistories(response.data.id);
+            this.getUserGameHistoryDtos(response.data.id);
           } else {
             throw new Error('User not found');
           }
@@ -55,12 +58,12 @@ export class UserProfileComponent {
       });
   }
 
-  getUserGameHistories(userId: number) {
-    this.gameHistoryService.getByUserId(userId)
+  getUserGameHistoryDtos(userId: number) {
+    this.gameHistoryService.getByUserIdGameHistoryDto(userId)
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.userGameHistories$.next(response.data);
+            this.userGameHistoryDtosSubject.next(response.data);
           }
         },
         error: (responseError) => {

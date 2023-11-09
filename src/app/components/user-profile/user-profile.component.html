@@ -27,46 +27,52 @@
                 </div>
             </div>
         </div>
-        <div class="container">
-            <div class="info-container">
-                <div class="info">
-                    <div class="title">Current place:</div>
-                    <div class="description">1st</div>
-                </div>
-                <div class="info">
-                    <div class="title">Achievements:</div>
-                    <div class="description">42/50</div>
-                </div>
-                <div class="info">
-                    <div class="title">Losses:</div>
-                    <div class="description">3</div>
-                </div>
-                <div class="info">
-                    <div class="title">Wins:</div>
-                    <div class="description">5</div>
-                </div>
+        <div class="info-container">
+            <div class="info">
+                <div class="title">Current place:</div>
+                <div class="description">1st</div>
             </div>
-            <div class="info-container">
-                <div class="achievements">
-                    <img class="ach" alt=""
-                        src="https://cdn.intra.42.fr/achievement/image/169/BADGE_SCOLARITY_billgates.svg">
-                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/38/SOC004.svg">
-                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/82/PED011.svg">
-                    <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/114/PRO014.svg">
-                </div>
+            <div class="info">
+                <div class="title">Achievements:</div>
+                <div class="description">42/50</div>
+            </div>
+            <div class="info">
+                <div class="title">Losses:</div>
+                <div class="description">3</div>
+            </div>
+            <div class="info">
+                <div class="title">Wins:</div>
+                <div class="description">5</div>
             </div>
         </div>
-        <div class="history-container" *ngIf="userGameHistories$ | async as histories">
-            <h1>Match History</h1>
-            <div class="info" *ngFor="let history of histories">
-                <div [class]="'win'">
-                    <div class="title">1.</div>
-                    <div class="description">{{history}}</div>
-                    <div class="description">1-0</div>
-                    <div class="description">user2</div>
-                    <div class="description">10 dk önce</div>
-                </div>
+        <div class="info-container">
+            <div class="achievements">
+                <img class="ach" alt=""
+                    src="https://cdn.intra.42.fr/achievement/image/169/BADGE_SCOLARITY_billgates.svg">
+                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/38/SOC004.svg">
+                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/82/PED011.svg">
+                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/114/PRO014.svg">
             </div>
+        </div>
+        <div class="history-container" >
+            <p-table *ngIf="userGameHistoryDtosSubject | async" [value]="userGameHistoryDtosSubject | async" [itemSize]="50" scrollHeight="200px" styleClass="border-1 surface-border" [style]="{'min-width': '50rem', 'height': '200px'}">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Ev Sahibi</th>
+                        <th>Konuk</th>
+                        <th>Bitiş Tarihi</th>
+                        <th>Başlangıç Zamanı</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-history>
+                    <tr>
+                        <td>{{history.userHostNickName}}</td>
+                        <td>{{history.userGuestNickName}}</td>
+                        <td>{{history.finishDate}}</td>
+                        <td>{{history.updateTime}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
         </div>
         <div class="verification-button">
             <p-button styleClass="p-button-outlined">
