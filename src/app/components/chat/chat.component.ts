@@ -9,7 +9,7 @@ import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, 
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, OnChanges {
+export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   currentNickName: string;
   isArrowUpPressed: boolean;
   isArrowDownPressed: boolean;
@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit, OnChanges {
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
   @Output() messageInput = new EventEmitter<string>();
   @Output() sendMessageClickOutput = new EventEmitter<any>();
+  @Output() updateScrollbarOutput = new EventEmitter<any>();
 
 
   constructor(
@@ -35,10 +36,14 @@ export class ChatComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.currentNickName = this.authService.getCurrentNickName();
   }
+  
+  ngAfterViewInit(): void {
+    this.updateScrollbar();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['messages']) {
-      console.log("message change ");
+      // console.log("message change ");
 
       const prevValue = changes['messages'].previousValue;
       const currentValue = changes['messages'].currentValue;
@@ -49,14 +54,28 @@ export class ChatComponent implements OnInit, OnChanges {
           this.changeMessages = false;
         }, 100);
       }
-      console.log(`Previous Value: ${prevValue}, Current Value: ${currentValue}`);
+      // console.log(`Previous Value: ${prevValue}, Current Value: ${currentValue}`);
     }
   }
 
   updateScrollbar() {
     try {
+      this.updateScrollbarOutput.emit(this.messagesContentRef);
+  
       const messagesContent = this.messagesContentRef.nativeElement;
+      const scrollToOptions: ScrollToOptions = {
+        top: messagesContent.scrollHeight,
+        left: 0,
+        behavior: "smooth",
+      };
+  
       this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
+      messagesContent.scrollTo(scrollToOptions);
+  
+      console.log("messagesContent.scrollHeight ", messagesContent.scrollHeight);
+      console.log("messagesContent.scrollTop ", messagesContent.scrollTop);
+      
+      console.log("ok ok ok scrollTop");
     } catch (error) {
       console.log(error);
     }

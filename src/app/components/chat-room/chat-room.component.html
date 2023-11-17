@@ -4,7 +4,7 @@
     <canvas #myCanvas width="800" height="600"></canvas>
 
     <!-- Mesaj gönderme formu -->
-    <form [formGroup]="chatMessageForm" class="message-form">
+    <form [formGroup]="chatMessageForm" class="message-form" *ngIf="isMuteVisible">
       <div class="row">
         <div class="d-flex justify-content-center align-items-center">
           <div class="col-10">
@@ -23,7 +23,7 @@
   <!-- Sohbet gösterimi için div -->
   <div *ngIf="isChatLogActive">
     <app-chat [chatRoomAccessId]="chatRoomAccessId" [messages]="messages" (messageInput)="chatRoomMessageInput($event)"
-      (sendMessageClickOutput)="sendMessageClick()"></app-chat>
+      (sendMessageClickOutput)="sendMessageClick()" (updateScrollbarOutput)="updateScrollBar($event)"></app-chat>
   </div>
 
 </div>

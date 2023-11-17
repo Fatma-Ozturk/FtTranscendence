@@ -19,7 +19,9 @@ export class ChatRoomService extends BaseService<ChatRoom> {
   public chatRoomConnected$: BehaviorSubject<string> = new BehaviorSubject('');
   public chatRoomHandlePlayer$: BehaviorSubject<string> = new BehaviorSubject('');
   public chatRoomHandleMessage$: BehaviorSubject<string> = new BehaviorSubject('');
+  public chatRoomHandleOperations$: BehaviorSubject<string> = new BehaviorSubject('');
   public messageResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+  public operationResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   public playerResponse$: BehaviorSubject<string> = new BehaviorSubject('');
   constructor(private httpClient: HttpClient) {
     super(httpClient);
@@ -49,11 +51,17 @@ export class ChatRoomService extends BaseService<ChatRoom> {
     this.socket.on('chatRoomHandleMessage', (message: any): any => {
       this.chatRoomHandleMessage$.next(message);
     });
+    this.socket.on('chatRoomHandleOperations', (message: any): any => {
+      this.chatRoomHandleOperations$.next(message);
+    });
     this.socket.on('messageResponse', (message: any): any => {
       this.messageResponse$.next(message);
     });
     this.socket.on('playerResponse', (message: any): any => {
       this.playerResponse$.next(message);
+    });
+    this.socket.on('operationResponse', (message: any): any => {
+      this.operationResponse$.next(message);
     });
   }
 
@@ -81,6 +89,14 @@ export class ChatRoomService extends BaseService<ChatRoom> {
     return this.chatRoomHandleMessage$.asObservable();
   };
 
+  public sendChatRoomHandleOperations(arg: any) {
+    this.socket.emit('chatRoomHandleOperations', arg);
+  }
+
+  public getChatRoomHandleOperations = () => {
+    return this.chatRoomHandleOperations$.asObservable();
+  };
+
   public sendMessageResponse(arg: any) {
     this.socket.emit('messageResponse', arg);
   }
@@ -91,9 +107,17 @@ export class ChatRoomService extends BaseService<ChatRoom> {
 
   public sendPlayerResponse(arg: any) {
     this.socket.emit('playerResponse', arg);
-  }
+  };
 
   public getPlayerResponse = () => {
     return this.playerResponse$.asObservable();
+  };
+
+  public sendOperationResponse(arg: any) {
+    this.socket.emit('operationResponse', arg);
+  }
+
+  public getOperationResponse = () => {
+    return this.operationResponse$.asObservable();
   };
 }

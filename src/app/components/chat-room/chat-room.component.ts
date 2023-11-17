@@ -1,3 +1,5 @@
+import { ChatRoomProperty } from './../../models/entities/chatRoomProperty';
+import { UserService } from 'src/app/services/user.service';
 import { ChatRoomMessageModel } from './../../models/model/chatRoomMessageModel';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
@@ -13,6 +15,8 @@ import { RandomNumber } from 'src/app/utilities/randomNumber';
 import { ChatRoomUserByUserDto } from 'src/app/models/dto/chatRoomUserByUserDto';
 import { ChatRoomService } from 'src/app/services/chat-room.service';
 import { ChatRoomPlayerModel } from 'src/app/models/model/chatRoomPlayerModel';
+import { User } from 'src/app/models/entities/user';
+import { ChatRoomOperationModel } from 'src/app/models/model/chatRoomOperationModel';
 
 @Component({
   selector: 'app-chat-room',
@@ -49,16 +53,23 @@ export class ChatRoomComponent {
   screenHeight: number;
   screenWidth: number;
 
+  //chat speech
+  isMuteVisible: boolean = true;
+  operations: ChatRoomOperationModel[] = [];
+
+
   constructor(
     private avatarService: AvatarService,
     private chatRoomUserService: ChatRoomUserService,
     private formBuilder: FormBuilder,
     private chatRoomService: ChatRoomService,
     private authService: AuthService,
+    private userService: UserService,
     private el: ElementRef,
     private route: ActivatedRoute,
-    private router: Router) {
-
+    private router: Router,
+    private renderer: Renderer2) {
+    // chatRoomPropertyService
   }
 
   ngOnInit(): void {
@@ -100,6 +111,7 @@ export class ChatRoomComponent {
     });
     this.getMessageResponse();
     this.getPlayerResponse();
+    this.getOperationResponse();
   }
 
   createChatObject() {
@@ -247,7 +259,7 @@ export class ChatRoomComponent {
     // Kullanıcının girdiği metni mesajlar dizisine ekleyin
     let newMessage: ChatRoomMessageModel = { text: this.newMessage, sender: this.player.name, date: new Date() };
     this.messages.push(newMessage);
-
+    this.messageInterpreter(newMessage);
     // Kullanıcının girdiği metni temizleyin
     this.newMessage = '';
   }
@@ -261,9 +273,13 @@ export class ChatRoomComponent {
     this.player.updateLastMessage(this.newMessage);
     this.sendMessage();
     this.chatMessageForm.setValue({ "message": "" });
-    let data = { "messages": this.messages, "accessId": this.chatRoomAccessId }
-    let response = { message: 'Message Text', data: data };
-    this.chatRoomService.sendChatRoomHandleMessage(response);
+    let data = {
+      "messages": this.messages, "accessId": this.chatRoomAccessId, "operations": this.operations
+    }
+    let responseMessage = { message: 'Message Text', data: data };
+    let responseOperation = { message: 'Message Text', data: data };
+    this.chatRoomService.sendChatRoomHandleMessage(responseMessage);
+    this.chatRoomService.sendChatRoomHandleOperations(responseOperation)
   }
 
   toggleChatLog() {
@@ -297,6 +313,87 @@ export class ChatRoomComponent {
     this.newMessage = event;
     console.log("event ", event);
     return event;
+  }
+
+  chatRoomOperationMute(key: string, value: any) {
+    console.log("ok mute");
+    
+    let operation: ChatRoomOperationModel;
+    let nowDate: Date = new Date();
+    let afterNextDate: Date;
+
+    afterNextDate = new Date(nowDate.getMinutes() + 1);
+    operation = {
+      propertyName: key,
+      nickName: value,
+      endOfTime: afterNextDate
+    }
+    this.sendChatRoomOperation(operation);
+    if (this.authService.getCurrentNickName() === value) {
+      console.log("isMuteVisibleFalse");
+      this.isMuteVisible = false;
+    }
+  }
+
+  chatRoomOperationAdmin(key: string, value: any) {
+    console.log("ok adm");
+
+    let operation: ChatRoomOperationModel;
+
+    operation = {
+      propertyName: key,
+      nickName: value,
+      endOfTime: null
+    }
+    this.sendChatRoomOperation(operation);
+  }
+
+  messageInterpreter(newMessage: any) {
+    let message = newMessage.text;
+    let keyValueArray = message.split(":");
+    let key = keyValueArray[0];
+    let value = keyValueArray[1];
+
+    console.log("key ", key);
+    console.log("msg ", message);
+    
+    if (key === "mute") {
+      this.chatRoomOperationMute(key, value);
+    } else if (key === "admin") {
+      this.chatRoomOperationAdmin(key, value);
+    }
+  }
+
+  sendChatRoomOperation(operation: ChatRoomOperationModel) {
+    let finededOperation = this.operations.find(x => x.nickName === operation.nickName && x.propertyName === operation.propertyName)
+    if (!finededOperation) {
+      this.operations.push(operation);
+    }
+  }
+
+  getOperationResponse() {
+    this.chatRoomService.getOperationResponse().subscribe((response: any) => {
+      console.log("response", response);
+
+      console.log("response.data ", response.data);
+      if (response.data !== undefined || response.data != null) {
+        
+        response.data.forEach((element: ChatRoomOperationModel) => {
+          if (element.propertyName === "mute") {
+            this.chatRoomOperationMute(element.propertyName, element.nickName);
+          } else if (element.propertyName === "admin") {
+            this.chatRoomOperationAdmin(element.propertyName, element.nickName);
+          }
+        });
+      }
+    })
+  }
+
+  updateScrollBar(messagesContentRef: ElementRef) {
+    const messagesContent = messagesContentRef.nativeElement;
+    this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
+    console.log("ok ok ok fucn");
+
   }
 
   //playerMove
