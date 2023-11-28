@@ -16,10 +16,10 @@
                 <img class="avatar" alt=""
                     src="https://image.freepik.com/free-vector/coloured-knight-design_1152-54.jpg">
             </div>
-            <div class="user-info" *ngIf="(user$ | async) as User">
-                <p class="user-name" *ngIf="user$.getValue().firstName && user$.getValue().lastName">
-                    {{user$.getValue().firstName}} {{user$.getValue().lastName}}</p>
-                <p class="user-name" *ngIf="user$.getValue().nickName">{{user$.getValue().nickName}}</p>
+            <div class="user-info" *ngIf="(userSubject | async) as User">
+                <p class="user-name" *ngIf="userSubject.getValue().firstName && userSubject.getValue().lastName">
+                    {{userSubject.getValue().firstName}} {{userSubject.getValue().lastName}}</p>
+                <p class="user-name" *ngIf="userSubject.getValue().nickName">{{userSubject.getValue().nickName}}</p>
                 <div class="user-subinfo">
                     <p class="user-class">Master</p>
                     <div class="separator vertical"></div>
@@ -74,7 +74,7 @@
                 </ng-template>
             </p-table>
         </div>
-        <div class="verification-button">
+        <div class="verification-button" *ngIf="isVerif2FAVisible">
             <p-button styleClass="p-button-outlined">
                 <img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
                 <span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>

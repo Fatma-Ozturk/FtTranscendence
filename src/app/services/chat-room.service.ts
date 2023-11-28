@@ -1,3 +1,4 @@
+import { SingleResponseModel } from './../models/singleResponseModel';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -31,6 +32,11 @@ export class ChatRoomService extends BaseService<ChatRoom> {
   getRoomsByUserDto(): Observable<ListResponseModel<ChatRoomByUserDto>> {
     let newPath = environment.appurl + "chat-rooms/getroomsbyuserdto"
     return this.httpClient.get<ListResponseModel<ChatRoomByUserDto>>(newPath);
+  }
+
+  getByAccessId(accessId: string): Observable<SingleResponseModel<ChatRoom>> {
+    let newPath = environment.appurl + "chat-rooms/getbyaccessid?accessId=" + accessId;
+    return this.httpClient.get<SingleResponseModel<ChatRoom>>(newPath);
   }
 
   //socket

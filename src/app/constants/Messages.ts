@@ -24,4 +24,6 @@ export class Messages{
     public static readonly gameTie:string = "Oyun berabere";
     static registredRoom: string = "Bu mesajlaşma odasına daha önce kayıt oldun";
     static joinedRoom: string = "Mesajlaşma odasına kayıt oldun";
+    public static readonly info:string = "Bilgilendirme";
+    public static readonly notChatRoomAdmin:string = "Odanın sahibi değilsin";
 }   

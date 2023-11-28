@@ -1,8 +1,9 @@
+import { AuthService } from './../../services/auth.service';
 import { GameHistoryService } from './../../services/game-history.service';
 import { GameHistory } from './../../models/entities/gameHistory';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from 'src/app/services/user.service';
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { User } from 'src/app/models/entities/user';
 import { Messages } from 'src/app/constants/Messages';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,21 +16,28 @@ import { GameHistoryDto } from 'src/app/models/dto/gameHistoryDto';
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })
-export class UserProfileComponent {
-
-
-  user$ = new BehaviorSubject<User | null>(null);
+export class UserProfileComponent implements OnInit, AfterViewInit {
+  userSubject = new BehaviorSubject<User | null>(null);
   userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
 
   userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
-
+  user$ = this.userSubject.asObservable();
+  isVerif2FAVisible: boolean = false;
   constructor(
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
     private toastrService: ToastrService,
     private route: ActivatedRoute,
-    private router: Router) {
+    private router: Router,
+    private authService: AuthService) {
 
+  }
+  ngAfterViewInit(): void {
+    this.user$.subscribe(response => {
+      if (response){
+        this.isVerif2FAVisible = (this.authService.getCurrentUserId() == response.id);
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -46,7 +54,7 @@ export class UserProfileComponent {
       .subscribe({
         next: (response: any) => {
           if (response.success) {
-            this.user$.next(response.data);
+            this.userSubject.next(response.data);
             this.getUserGameHistoryDtos(response.data.id);
           } else {
             throw new Error('User not found');
@@ -70,5 +78,9 @@ export class UserProfileComponent {
           this.toastrService.error(Messages.error);
         }
       });
+  }
+
+  twoFA(){
+    
   }
 }

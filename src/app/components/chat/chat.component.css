@@ -1,3 +1,5 @@
+/*-------------------- Mixins --------------------*/
+/*-------------------- Body --------------------*/
 *, *::before, *::after {
     box-sizing: border-box;
 }
@@ -22,7 +24,7 @@ body {
     filter: blur(80px);
     transform: scale(1.2);
 }
-
+/*-------------------- Chat --------------------*/
 .chat {
     position: absolute;
     top: 50%;
@@ -105,7 +107,6 @@ body {
     line-height: 1.4;
     margin-left: 35px;
     position: relative;
-    overflow: hidden !important;
     text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
 }
 .messages .message .timestamp {

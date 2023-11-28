@@ -1,3 +1,4 @@
+import { ToastrService } from 'ngx-toastr';
 import { ChatRoomProperty } from './../../models/entities/chatRoomProperty';
 import { UserService } from 'src/app/services/user.service';
 import { ChatRoomMessageModel } from './../../models/model/chatRoomMessageModel';
@@ -17,6 +18,10 @@ import { ChatRoomService } from 'src/app/services/chat-room.service';
 import { ChatRoomPlayerModel } from 'src/app/models/model/chatRoomPlayerModel';
 import { User } from 'src/app/models/entities/user';
 import { ChatRoomOperationModel } from 'src/app/models/model/chatRoomOperationModel';
+import { ChatRoom } from 'src/app/models/entities/chatRoom';
+import { Messages } from 'src/app/constants/Messages';
+import { switchMap, take } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-chat-room',
@@ -68,7 +73,8 @@ export class ChatRoomComponent {
     private el: ElementRef,
     private route: ActivatedRoute,
     private router: Router,
-    private renderer: Renderer2) {
+    private renderer: Renderer2,
+    private toastrService: ToastrService) {
     // chatRoomPropertyService
   }
 
@@ -271,7 +277,7 @@ export class ChatRoomComponent {
       this.newMessage = messageTextDown;
     }
     this.player.updateLastMessage(this.newMessage);
-    this.sendMessage();
+    let result = this.sendMessage();
     this.chatMessageForm.setValue({ "message": "" });
     let data = {
       "messages": this.messages, "accessId": this.chatRoomAccessId, "operations": this.operations
@@ -279,7 +285,7 @@ export class ChatRoomComponent {
     let responseMessage = { message: 'Message Text', data: data };
     let responseOperation = { message: 'Message Text', data: data };
     this.chatRoomService.sendChatRoomHandleMessage(responseMessage);
-    this.chatRoomService.sendChatRoomHandleOperations(responseOperation)
+    this.chatRoomService.sendChatRoomHandleOperations(responseOperation);
   }
 
   toggleChatLog() {
@@ -316,13 +322,11 @@ export class ChatRoomComponent {
   }
 
   chatRoomOperationMute(key: string, value: any) {
-    console.log("ok mute");
-    
     let operation: ChatRoomOperationModel;
     let nowDate: Date = new Date();
     let afterNextDate: Date;
 
-    afterNextDate = new Date(nowDate.getMinutes() + 1);
+    afterNextDate = new Date(nowDate.getTime() + nowDate.getMilliseconds() + 100000);
     operation = {
       propertyName: key,
       nickName: value,
@@ -330,22 +334,67 @@ export class ChatRoomComponent {
     }
     this.sendChatRoomOperation(operation);
     if (this.authService.getCurrentNickName() === value) {
-      console.log("isMuteVisibleFalse");
       this.isMuteVisible = false;
     }
+    console.log("nowDate.getTime() ", nowDate.getMilliseconds());
+    console.log("operation.endOfTime.getTime() ", operation.endOfTime.getMilliseconds());
+
+    setTimeout(() => {
+      if (this.authService.getCurrentNickName() === value) {
+        this.isMuteVisible = true;
+      }
+    }, operation.endOfTime.getMilliseconds() * 9);
   }
 
   chatRoomOperationAdmin(key: string, value: any) {
-    console.log("ok adm");
-
     let operation: ChatRoomOperationModel;
-
+    let chatRoom: ChatRoom;
     operation = {
       propertyName: key,
       nickName: value,
       endOfTime: null
     }
     this.sendChatRoomOperation(operation);
+    this.chatRoomService.getByAccessId(this.chatRoomAccessId).subscribe(response => {
+      if (response.success) {
+        chatRoom = response.data;
+        if (this.authService.getCurrentUserId() != chatRoom.roomUserId) {
+          this.toastrService.info(Messages.notChatRoomAdmin, Messages.info)
+          return;
+        }
+        this.getUserByNickName(chatRoom, value);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error, Messages.error);
+      }
+    });
+  }
+
+  chatRoomUpdate(chatRoom: ChatRoom, nickName: string) {
+    this.chatRoomService.update(chatRoom).pipe(take(1)).subscribe(response => {
+      if (response.success) {
+        this.newMessage = "Yeni Oda Sahibi: " + nickName
+        this.sendMessage();
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error, Messages.error);
+      }
+    });
+  }
+
+  getUserByNickName(chatRoom: ChatRoom, nickName: string) {
+    this.userService.getByNickName(nickName).subscribe(response => {
+      if (response.success) {
+        chatRoom.roomUserId = response.data.id
+        this.chatRoomUpdate(chatRoom, nickName);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error, Messages.error);
+      }
+    });
   }
 
   messageInterpreter(newMessage: any) {
@@ -354,9 +403,6 @@ export class ChatRoomComponent {
     let key = keyValueArray[0];
     let value = keyValueArray[1];
 
-    console.log("key ", key);
-    console.log("msg ", message);
-    
     if (key === "mute") {
       this.chatRoomOperationMute(key, value);
     } else if (key === "admin") {
@@ -377,12 +423,12 @@ export class ChatRoomComponent {
 
       console.log("response.data ", response.data);
       if (response.data !== undefined || response.data != null) {
-        
+
         response.data.forEach((element: ChatRoomOperationModel) => {
           if (element.propertyName === "mute") {
             this.chatRoomOperationMute(element.propertyName, element.nickName);
           } else if (element.propertyName === "admin") {
-            this.chatRoomOperationAdmin(element.propertyName, element.nickName);
+            // this.chatRoomOperationAdmin(element.propertyName, element.nickName);
           }
         });
       }
