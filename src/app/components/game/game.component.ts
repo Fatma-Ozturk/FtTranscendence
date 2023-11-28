@@ -115,7 +115,6 @@ export class GameComponent {
 			this.gameLoop();
 		}
 	}
-
 	ngOnInit(): void {
 		this.setupScoreListener();
 		this.setupBallListener();
@@ -130,13 +129,11 @@ export class GameComponent {
 			});
 		}
 	}
-
 	ngDoCheck() {}
-
 	ngOnDestroy() {
 	}
-	//* ^^ eventloophooks and constructor^^
 
+	//* ^^ eventloophooks and constructor^^
 	setupScoreListener() {
 		this.gameService.getScoreRespnse().subscribe((response: any) => {
 			if (response.message === 'score' && response.data) {
@@ -154,7 +151,6 @@ export class GameComponent {
 			}
 		});
 	}
-
 	setupPaddleListener() {
 		this.gameService.getPaddleResponse().subscribe((response: any) => {
 			if (response.message === 'Paddle' && response.data) {
@@ -176,7 +172,6 @@ export class GameComponent {
 			}
 		});
 	}
-
 	setupBallListener() {
 		this.gameService
 			.getBallLocationResponse()
@@ -193,7 +188,6 @@ export class GameComponent {
 				}
 			});
 	}
-
 	gameLoop = (): void => {
 		if (!this.gameRunning) return;
 		this.gameUpdate();
@@ -210,7 +204,6 @@ export class GameComponent {
 		if (this.gameRemainingTime <= 0)
 			this.gameFinish();
 	};
-
 	initGameModels(): void {
 		this.leftPaddle.width = this.fixedScreenRatio * 5;
 		this.leftPaddle.height = this.fixedScreenRatio * 50;
@@ -227,7 +220,6 @@ export class GameComponent {
 			this.rightPaddle.height / 2;
 		this.ballInit();
 	}
-
 	ballInit(): void {
 		this.ball.width = this.fixedScreenRatio * 5;
 		this.ball.height = this.fixedScreenRatio * 5;
@@ -237,12 +229,10 @@ export class GameComponent {
 		this.ball.xVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 		this.ball.yVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 	}
-
 	gameUpdate(): void {
 		this.paddleUpdateHost();
 		this.updateBall();
 	}
-
 	paddleUpdateHost(): void {
 		if (this.whoIs == 0) {
 			if (this.isArrowUpPressed) {
@@ -289,9 +279,7 @@ export class GameComponent {
 			this.gameService.sendKeydown(this.paddleGuest);
 		}
 	}
-
 	paddleUpdateGuest(): void {}
-
 	updateBall = (): void => {
 		if (this.ball.y - this.fixedScreenRatio < 0)
 			//* Up border
@@ -342,7 +330,6 @@ export class GameComponent {
 		this.ball.x += this.fixedScreenRatio * this.ball.xVel;
 		this.ball.y += this.fixedScreenRatio * this.ball.yVel;
 	};
-
 	newBallDirection(paddle: PaddleGameModel): void {
 		let newVel: number;
 		let paddleMid = paddle.y + (paddle.height / 2);
@@ -353,11 +340,9 @@ export class GameComponent {
 		if (ballMid < paddleMid) {
 			newVel = Math.min(1, Math.max(0, ballDistance / totalDistance))
 			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
-			this.ball.yVel = -newVel - 1;
 		} else if (ballMid > paddleMid) {
 			newVel = Math.min(1, Math.max(0, ((paddle.height / 2) - ballDistance) / totalDistance))
 			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
-			this.ball.yVel = newVel + 1;
 		} else {
 			this.ball.xVel = paddle.x == this.paddleHost.x ? 1: -1;
 			this.ball.yVel = 0;
@@ -365,7 +350,6 @@ export class GameComponent {
 	}
 
 	//* Draw Functions
-
 	gameDraw(): void {
 		this.context.font = '30px Arial';
 		this.context.fillStyle = '#000';
@@ -381,19 +365,19 @@ export class GameComponent {
 		this.scoreDraw();
 		this.timerDraw();
 	}
-
 	scoreDraw(): void {
 		let canvasW = this.canvasRef.nativeElement.width;
 		let canvasH = this.canvasRef.nativeElement.height;
 		this.context.font = '60px Arial';
 		this.context.fillText(
-			`${this.leftPaddle.score} - ${this.rightPaddle.score}`,
+			this.whoIs == 0 ?
+				`${this.paddleHost.score} - ${this.paddleGuest.score}` :
+				`${this.paddleGuest.score} - ${this.paddleHost.score}`,
 			this.canvasRef.nativeElement.width / 2 - this.fixedScreenRatio * 20,
 			this.fixedScreenRatio * 20,
 			this.fixedScreenRatio * 50
 		);
 	}
-
 	timerDraw(): void {
 		let minute = Math.floor(this.gameRemainingTime / 60000); // Bir dakika 60,000 milisaniyeye eşittir
 		let second = ((this.gameRemainingTime % 60000) / 1000).toFixed(0);
@@ -409,7 +393,6 @@ export class GameComponent {
 			this.fixedScreenRatio * 50
 		);
 	}
-
 	playerHostDraw(): void {
 		this.context.fillStyle = '#fff';
 		this.context.fillRect(
@@ -419,7 +402,6 @@ export class GameComponent {
 			this.paddleHost.height
 		);
 	}
-
 	playerGuestDraw(): void {
 		this.context.fillStyle = '#fff';
 		this.context.fillRect(
@@ -429,7 +411,6 @@ export class GameComponent {
 			this.paddleGuest.height
 		);
 	}
-
 	ballDraw(): void {
 		this.context.fillStyle = '#fff';
 		this.context.fillRect(
@@ -441,7 +422,6 @@ export class GameComponent {
 	}
 
 	//* Event Listeners
-
 	@HostListener('window:keydown', ['$event'])
 	onKeyDown(event: KeyboardEvent) {
 		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
@@ -454,8 +434,6 @@ export class GameComponent {
 			this.isArrowDownPressed = true;
 		}
 	}
-
-	// Listen for keyup event on the window
 	@HostListener('window:keyup', ['$event'])
 	onKeyUp(event: KeyboardEvent) {
 		if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
@@ -468,7 +446,6 @@ export class GameComponent {
 			this.isArrowDownPressed = false;
 		}
 	}
-
 	@HostListener('window:resize', ['$event'])
 	onResize(event: Event) {
 		this.getScreenSize();
@@ -479,7 +456,6 @@ export class GameComponent {
 		this.screenWidth = window.innerWidth;
 		this.screenHeight = window.innerHeight;
 	}
-
 	adjustCanvasSizeToAspectRatio(
 		width: number,
 		height: number,
@@ -494,7 +470,6 @@ export class GameComponent {
 			return { width, height: newHeight };
 		}
 	}
-
 	setCanvasSize() {
 		let canvasSize = this.adjustCanvasSizeToAspectRatio(
 			this.screenWidth - this.screenWidth / 20,
@@ -512,7 +487,6 @@ export class GameComponent {
 				: fixedHeightRatio;
 		this.speedmultiplier = this.speedmultiplier * this.fixedScreenRatio;
 	}
-
 	whoIsHostOrGuest(gameRoomSocket: GameRoomSocket): number {
 		const userId = this.authService.getCurrentUserId();
 
@@ -522,7 +496,6 @@ export class GameComponent {
 		}
 		return 1;
 	}
-
 	gameFinish() {
 		// this.gameMessage = "Oyun bağlantınız koptu lütfen siktir olup gidin!";
 		clearInterval(this.intervalId);
@@ -544,34 +517,28 @@ export class GameComponent {
 			this.router.navigate(['/view']);
 		}, 10000);
 	}
-
 	gameFinishTie(): void {
 		this.gameScoreAdd(1);
 		this.gameMessage = Messages.gameTie;
 	}
-
 	gameFinishWinnerHost(): void {
 		this.gameScoreAdd(2);
 		this.gameMessage = Messages.gameWinnerHost;
 	}
-
 	gameFinishWinnerGuest(): void {
 		this.gameScoreAdd(3);
 		this.gameMessage = Messages.gameWinnerGuest;
 	}
-
 	printDateTime = () => {
 		const date = new Date();
 		this.gameNowDate = date;
-	};
-
+	}
 	getTimeNow() {
 		this.gameNowDate = new Date();
 		this.intervalId = setInterval(this.printDateTime, this.intervalMs);
 	}
 
 	//servies
-
 	gameScoreAdd(resultNameId: number) {
 		let gameScore: GameScore = {
 			id: 0,
