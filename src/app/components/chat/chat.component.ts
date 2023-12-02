@@ -11,6 +11,7 @@ import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, 
 })
 export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   currentNickName: string;
+  currentFullName: string;
   isArrowUpPressed: boolean;
   isArrowDownPressed: boolean;
 
@@ -35,6 +36,7 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngOnInit() {
     this.currentNickName = this.authService.getCurrentNickName();
+    this.currentFullName = this.authService.getCurrentFullName();
   }
   
   ngAfterViewInit(): void {
@@ -61,34 +63,33 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   updateScrollbar() {
     try {
       this.updateScrollbarOutput.emit(this.messagesContentRef);
-  
       const messagesContent = this.messagesContentRef.nativeElement;
       const scrollToOptions: ScrollToOptions = {
         top: messagesContent.scrollHeight,
         left: 0,
         behavior: "smooth",
       };
-  
       this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
       messagesContent.scrollTo(scrollToOptions);
-  
-      console.log("messagesContent.scrollHeight ", messagesContent.scrollHeight);
-      console.log("messagesContent.scrollTop ", messagesContent.scrollTop);
-      
-      console.log("ok ok ok scrollTop");
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
   sendMessage() {
     this.messageInput.emit(this.message);
     this.sendMessageClickOutput.emit();
-    this.updateScrollbar();
     this.message = "";
+    setTimeout(() => {
+      this.updateScrollbar();
+    }, 100);
   }
 
   navigateProfile(message: ChatRoomMessageModel){
     this.router.navigate(['/user-profile', message.sender]);
+  }
+
+  navigateMyProfile(){
+    this.router.navigate(['/user-profile', this.currentNickName]);
   }
 }

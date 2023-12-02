@@ -23,6 +23,9 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
   user$ = this.userSubject.asObservable();
   isVerif2FAVisible: boolean = false;
+
+  gameHistoryDialogVisible: boolean = false;
+  profileSettingsDialogVisible: boolean = false;
   constructor(
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
@@ -34,7 +37,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.user$.subscribe(response => {
-      if (response){
+      if (response) {
         this.isVerif2FAVisible = (this.authService.getCurrentUserId() == response.id);
       }
     })
@@ -80,7 +83,15 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       });
   }
 
-  twoFA(){
-    
+  showGameHistoryDialog() {
+    this.gameHistoryDialogVisible = true;
+  }
+
+  showProfileSettingDialog(){
+    this.profileSettingsDialogVisible = true;
+  }
+
+  twoFA() {
+
   }
 }

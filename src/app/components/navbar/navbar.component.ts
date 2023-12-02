@@ -134,4 +134,7 @@ export class NavbarComponent implements OnInit {
       this.router.navigate(['main']);
     }
   }
+  navigateMyProfile(){
+    this.router.navigate(['/user-profile', this.getNickName()]);
+  }
 }

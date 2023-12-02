@@ -1,7 +1,8 @@
 <div>
     <p-toolbar>
         <div class="p-toolbar-group-start">
-            <p-button label="Oda Oluştur" (onClick)="chatRoomCreateDialogOnClick()" icon="pi pi-plus" class="mr-2"></p-button>
+            <p-button label="Oda Oluştur" (onClick)="chatRoomCreateDialogOnClick()" icon="pi pi-plus" class="mr-2">
+            </p-button>
         </div>
     </p-toolbar>
 </div>
@@ -9,29 +10,64 @@
     <h1>Oda Yok</h1>
 </div>
 <div class="mt-3" *ngIf="chatRooms.length > 0;">
-    <p-card *ngFor="let chatRoom of chatRooms" [header]="chatRoom.name">
-        <ng-template pTemplate="body">
-            <div>
-                <p-badge [value]="chatRoom.status == true ? 'Aktif' : 'Pasif'" [severity]="chatRoom.status == true ? 'success' : 'danger'"></p-badge>
-            </div>
-            <div>
-                Oda Adı: {{chatRoom.name}}
-            </div>
-            <div>
-                Oluşturan Kişi: {{chatRoom.userNickName}}
-            </div>
-            <div>
-                Kişi Sayısı: {{chatRoom.userCount}}
-            </div>
-        </ng-template>
-        <ng-template pTemplate="footer">
-            <p-button label="Katıl" (click)="joinChatRoom(chatRoom)" [style]="{'width': '100%'}"></p-button>
-        </ng-template>
-    </p-card>
+    <div *ngFor="let chatRoom of chatRooms">
+        <p-card [header]="chatRoom.name" *ngIf="chatRoom.roomTypeId == 1">
+            <ng-template pTemplate="body">
+                <div class="row">
+                    <div class="col-6">
+                        <p-badge [value]="chatRoom.status == true ? 'Aktif' : 'Pasif'"
+                        [severity]="chatRoom.status == true ? 'success' : 'danger'"></p-badge>
+                    </div>
+                    <div class="col-6">
+                        <div class="float-end">
+                            <i class="pi pi-copy" (click)="inviteCopyToClipboardChatRoom(chatRoom)"></i>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    Oda Adı: {{chatRoom.name}}
+                </div>
+                <div>
+                    Oluşturan Kişi: {{chatRoom.userNickName}}
+                </div>
+                <div>
+                    Kişi Sayısı: {{chatRoom.userCount}}
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <p-button label="Katıl" (click)="joinChatRoom(chatRoom)" [style]="{'width': '100%'}"></p-button>
+            </ng-template>
+        </p-card>
+        <p-card [header]="chatRoom.name" *ngIf="chatRoom.roomTypeId == 2 && chatRoom.roomUserId == currentUserId">
+            <ng-template pTemplate="body">
+                <div>
+                    <p-badge [value]="chatRoom.status == true ? 'Aktif' : 'Pasif'"
+                        [severity]="chatRoom.status == true ? 'success' : 'danger'"></p-badge>
+                </div>
+                <div>
+                    Bunu sadece sen görüyorsun
+                </div>
+                <div>
+                    Oda Adı: {{chatRoom.name}}
+                </div>
+                <div>
+                    Oluşturan Kişi: {{chatRoom.userNickName}}
+                </div>
+                <div>
+                    Kişi Sayısı: {{chatRoom.userCount}}
+                </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <p-button label="Katıl" (click)="joinChatRoom(chatRoom)" [style]="{'width': '100%'}"></p-button>
+                <i class="bi bi-copy"></i>
+            </ng-template>
+        </p-card>
+    </div>
 </div>
 
 <p-dialog header="Mesajlaşma odası oluştur" [(visible)]="chatRoomCreateDialogVisible" [style]="{width: '50vw'}">
     <p>
-      <app-chat-room-create (dialogVisible)="dialogVisibleChange($event)" *ngIf="chatRoomCreateDialogVisible"></app-chat-room-create>
+        <app-chat-room-create (dialogVisible)="dialogVisibleChange($event)" *ngIf="chatRoomCreateDialogVisible">
+        </app-chat-room-create>
     </p>
 </p-dialog>

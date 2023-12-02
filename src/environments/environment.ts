@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+    frontUrl: "http://localhost:4200/",
     appurl:"http://localhost:3000/api/",
     appurlSocketGame:"http://localhost:3000/socket/game",
     appurlSocketChatRoom:"http://localhost:3000/socket/chat-room",

@@ -9,7 +9,7 @@
           </p-avatar>
         </button>
       </div>
-      <div *ngIf="isAuthBool==true" class="mt-2">
+      <div *ngIf="isAuthBool==true" class="mt-2" (click)="navigateMyProfile()">
         <p-chip [label]="getNickName()"
         image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"></p-chip>
       </div>

@@ -62,6 +62,7 @@ export class ChatRoomComponent {
   isMuteVisible: boolean = true;
   operations: ChatRoomOperationModel[] = [];
 
+  messagesContentRef:ElementRef;
 
   constructor(
     private avatarService: AvatarService,
@@ -276,8 +277,10 @@ export class ChatRoomComponent {
     if (messageTextDown) {
       this.newMessage = messageTextDown;
     }
+    if (this.newMessage == "")
+      return;
     this.player.updateLastMessage(this.newMessage);
-    let result = this.sendMessage();
+    this.sendMessage();
     this.chatMessageForm.setValue({ "message": "" });
     let data = {
       "messages": this.messages, "accessId": this.chatRoomAccessId, "operations": this.operations
@@ -286,6 +289,9 @@ export class ChatRoomComponent {
     let responseOperation = { message: 'Message Text', data: data };
     this.chatRoomService.sendChatRoomHandleMessage(responseMessage);
     this.chatRoomService.sendChatRoomHandleOperations(responseOperation);
+    setTimeout(() => {
+      this.updateScrollBarChat();
+    }, 100);
   }
 
   toggleChatLog() {
@@ -305,6 +311,9 @@ export class ChatRoomComponent {
 
           if ((result !== undefined || result != null) && timeOk) {
             result.updateLastMessage(element.text);
+            setTimeout(() => {
+              this.updateScrollBarChat();
+            }, 100);
           }
         });
 
@@ -436,10 +445,12 @@ export class ChatRoomComponent {
   }
 
   updateScrollBar(messagesContentRef: ElementRef) {
-    const messagesContent = messagesContentRef.nativeElement;
-    this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
-    console.log("ok ok ok fucn");
+    this.messagesContentRef = messagesContentRef;
+  }
 
+  updateScrollBarChat(){
+    const messagesContent = this.messagesContentRef.nativeElement;
+    this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
   }
 
   //playerMove

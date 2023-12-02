@@ -26,4 +26,5 @@ export class Messages{
     static joinedRoom: string = "Mesajlaşma odasına kayıt oldun";
     public static readonly info:string = "Bilgilendirme";
     public static readonly notChatRoomAdmin:string = "Odanın sahibi değilsin";
+    public static readonly copyToClipboard:string = "Kopyalandı";
 }   

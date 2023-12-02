@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChatRoomByUserDto } from './../../models/dto/chatRoomByUserDto';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChatRoomUserService } from './../../services/chat-room-user.service';
@@ -9,6 +9,7 @@ import { BaseService } from 'src/app/utilities/baseService';
 import { Component, OnInit } from '@angular/core';
 import { Messages } from 'src/app/constants/Messages';
 import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-chat-rooms',
@@ -19,16 +20,24 @@ export class ChatRoomsComponent implements OnInit {
   chatRooms: ChatRoomByUserDto[] = [];
   chatRoomCreateDialogVisible: boolean = false;
 
+  currentUserId: number;
+
   constructor(private chatRoomService: ChatRoomService,
     private chatRoomUserService: ChatRoomUserService,
     private authService: AuthService,
     private toastService: ToastrService,
-    private router: Router) {
+    private router: Router,
+    private route: ActivatedRoute,) {
 
   }
 
   ngOnInit(): void {
+    if (this.router.url.indexOf("/invite/")) {
+      let chatRoomId: number = parseInt(this.route.snapshot.paramMap.get('chatRoomId'));
+      this.inviteChatRoom(chatRoomId);
+    }
     this.getChatRooms();
+    this.currentUserId = this.authService.getCurrentUserId();
   }
 
   getChatRooms(): void {
@@ -43,7 +52,47 @@ export class ChatRoomsComponent implements OnInit {
   }
 
   joinChatRoom(chatRoom: ChatRoom): void {
+    if (chatRoom.hasPassword) {
+      this.toastService.error("Şifre");
+      return;
+    }
     this.addUserToChatRoom(chatRoom);
+  }
+
+  inviteCopyToClipboardChatRoom(chatRoom: ChatRoom): void {
+    let inviteUrl: string;
+
+    inviteUrl = environment.frontUrl + "chat-rooms/invite/" + chatRoom.id;
+    this.copyText(inviteUrl);
+    this.toastService.success(Messages.copyToClipboard);
+  }
+
+  inviteChatRoom(chatRoomId: number) {
+    let chatRoom: ChatRoom;
+    this.chatRoomService.get(chatRoomId).subscribe(response => {
+      if (response.success) {
+        chatRoom = response.data;
+        this.joinChatRoom(chatRoom);
+      }
+    }, errorResponse => {
+      if (errorResponse.error) {
+        this.toastService.error(Messages.error);
+      }
+    })
+  }
+
+  copyText(val: string) {
+    let selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = val;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
   }
 
   addUserToChatRoom(chatRoom: ChatRoom) {
@@ -56,19 +105,19 @@ export class ChatRoomsComponent implements OnInit {
       status: true
     };
     this.chatRoomUserService.add(chatRoomUser).subscribe((response) => {
-      if (response.success == true){
+      if (response.success == true) {
         chatRoom.userCount += 1;
         this.updateChatRooms(chatRoom);
         this.toastService.success(Messages.joinedRoom, Messages.success);
-        this.router.navigate(['/chat-room' , chatRoom.accessId]);
+        this.router.navigate(['/chat-room', chatRoom.accessId]);
       }
     },
-    errorResponse => {
-      if (errorResponse.error && errorResponse.error.message === "ChatRoomUser Found"){
-        this.router.navigate(['/chat-room', chatRoom.accessId]);
-        // this.toastService.error(Messages.registredRoom, Messages.error);
-      }
-    })
+      errorResponse => {
+        if (errorResponse.error && errorResponse.error.message === "ChatRoomUser Found") {
+          this.router.navigate(['/chat-room', chatRoom.accessId]);
+          // this.toastService.error(Messages.registredRoom, Messages.error);
+        }
+      })
   }
 
   updateChatRooms(chatRoom: ChatRoom): void {
