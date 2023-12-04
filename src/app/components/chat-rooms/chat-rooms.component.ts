@@ -32,10 +32,17 @@ export class ChatRoomsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.router.url.indexOf("/invite/")) {
-      let chatRoomId: number = parseInt(this.route.snapshot.paramMap.get('chatRoomId'));
-      this.inviteChatRoom(chatRoomId);
-    }
+    this.route.params.subscribe(params => {
+      if (this.router.url.indexOf("/invite/") > 0) {
+        if (params['accessId']) {
+          let accessId: string = String(params['accessId']);
+          this.inviteChatRoom(accessId);
+        }
+      } else {
+        console.log('Parametre bulunamadı.');
+        this.router.navigate(['/']);
+      }
+    });
     this.getChatRooms();
     this.currentUserId = this.authService.getCurrentUserId();
   }
@@ -62,14 +69,14 @@ export class ChatRoomsComponent implements OnInit {
   inviteCopyToClipboardChatRoom(chatRoom: ChatRoom): void {
     let inviteUrl: string;
 
-    inviteUrl = environment.frontUrl + "chat-rooms/invite/" + chatRoom.id;
+    inviteUrl = environment.frontUrl + "chat-rooms/invite/" + chatRoom.accessId;
     this.copyText(inviteUrl);
     this.toastService.success(Messages.copyToClipboard);
   }
 
-  inviteChatRoom(chatRoomId: number) {
+  inviteChatRoom(accessId: string) {
     let chatRoom: ChatRoom;
-    this.chatRoomService.get(chatRoomId).subscribe(response => {
+    this.chatRoomService.getByAccessId(accessId).subscribe(response => {
       if (response.success) {
         chatRoom = response.data;
         this.joinChatRoom(chatRoom);

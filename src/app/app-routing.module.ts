@@ -36,7 +36,7 @@ const routes: Routes = [
 	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },,
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
 	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard] },
-	{ path: 'chat-rooms/invite/:chatRoomId', component: ChatRoomsComponent, canActivate: [loginGuard] },
+	{ path: 'chat-rooms/invite/:accessId', component: ChatRoomsComponent, canActivate: [loginGuard] },
 	{ path: 'chat-room/:accessId', component: ChatRoomComponent, canActivate: [loginGuard] },
 	{ path: '**', component: NotFoundComponent },
 ];
