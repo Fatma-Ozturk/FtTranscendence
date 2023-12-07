@@ -1,3 +1,4 @@
+import { ChatRoomRegisterModel } from './../../models/model/chatRoomRegisterModel';
 import { ChatRoomTypeService } from './../../services/chat-room-type.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { RandomNumber } from 'src/app/utilities/randomNumber';
@@ -12,6 +13,8 @@ import { StatusEnum } from 'src/app/models/enums/statusEnum';
 import { ChatRoomType } from 'src/app/models/entities/chatRoomType';
 import { ChatRoomUserService } from 'src/app/services/chat-room-user.service';
 import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
+import { CheckboxChangeEvent } from 'primeng/checkbox';
+import { ChatRoomAuthService } from 'src/app/services/chat-room-auth.service';
 
 @Component({
   selector: 'app-chat-room-create',
@@ -29,11 +32,13 @@ export class ChatRoomCreateComponent implements OnInit {
 
   lockedButtonClass: boolean = false;
   validatorRequired: string = "";
+  hasPassword: boolean;
   constructor(private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
     private toastrService: ToastrService,
     private authService: AuthService,
     private chatRoomService: ChatRoomService,
+    private chatRoomAuthService: ChatRoomAuthService,
     private chatRoomTypeService: ChatRoomTypeService,
     private chatRoomUserService: ChatRoomUserService) {
 
@@ -49,6 +54,7 @@ export class ChatRoomCreateComponent implements OnInit {
       name: ['', Validators.compose([Validators.required, Validators.nullValidator])],
       hasPassword: [false, Validators.compose([Validators.required, Validators.nullValidator])],
       roomTypeId: ['', Validators.compose([Validators.required, Validators.nullValidator])],
+      password: [''],
     })
   }
 
@@ -63,7 +69,7 @@ export class ChatRoomCreateComponent implements OnInit {
   add() {
     if (this.chatRoomForm.valid) {
       let chatRoomForm: any = Object.assign({}, this.chatRoomForm.value)
-      let chatRoomModel: ChatRoom = {
+      let chatRoomRegister: ChatRoomRegisterModel = {
         id: 0,
         name: chatRoomForm.name,
         accessId: "",
@@ -73,13 +79,45 @@ export class ChatRoomCreateComponent implements OnInit {
         userCount: 0,
         status: true,
         updateTime: new Date(),
+        password: chatRoomForm.password
       };
-      this.confirm(() => { this.addChatRoom(chatRoomModel); this.lockedSaveButton(); }, Messages.add, Messages.add);
+      let chatRoom: ChatRoom = {
+        id: 0,
+        name: chatRoomForm.name,
+        accessId: "",
+        roomTypeId: chatRoomForm.roomTypeId,
+        roomUserId: this.authService.getCurrentUserId(),
+        hasPassword: chatRoomForm.hasPassword,
+        userCount: 0,
+        status: true,
+        updateTime: new Date()
+      };
+      this.confirm(() => {
+        if (this.hasPassword)
+          this.registerChatRoom(chatRoomRegister);
+        else
+          this.addChatRoom(chatRoom);
+        this.lockedSaveButton();
+      }, Messages.add, Messages.add);
       this.validatorRequired = " ng-valid"
     } else {
       this.validatorRequired = " ng-invalid ng-dirty"
       this.toastrService.error(Messages.formInvalid, Messages.error);
     }
+  }
+
+  registerChatRoom(chatRoomRegisterModel: ChatRoomRegisterModel) {
+    this.chatRoomAuthService.register(chatRoomRegisterModel).subscribe(response => {
+      if (response.success) {
+        this.toastrService.success(Messages.add, Messages.success);
+        setTimeout(() => {
+          this.unlockedSaveButton();
+        }, 500);
+      }
+    }, responseError => {
+      if (responseError.error)
+        this.toastrService.error(Messages.notAdd, Messages.error);
+    })
   }
 
   addChatRoom(chatRoom: ChatRoom) {
@@ -135,5 +173,8 @@ export class ChatRoomCreateComponent implements OnInit {
   }
   unlockedSaveButton() {
     this.lockedButtonClass = false;
+  }
+  hasPasswordChange(event: CheckboxChangeEvent) {
+    this.hasPassword = event.checked;
   }
 }

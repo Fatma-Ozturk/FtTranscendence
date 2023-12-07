@@ -1,1 +1,23 @@
-<p>user-profile-edit works!</p>
+<div class="profile-pic-wrapper">
+    <div class="pic-holder">
+        <img id="profilePic" class="pic" src="https://source.unsplash.com/random/150x150">
+        <label for="newProfilePhoto" class="upload-file-block">
+            <div class="text-center">
+                <div class="mb-2">
+                    <i class="bi bi-camera"></i>
+                </div>
+                <div class="text-uppercase">
+                    Update <br /> Profile Photo
+                </div>
+            </div>
+        </label>
+        <Input class="uploadProfileInput" type="file" name="profile_pic" id="newProfilePhoto"
+            accept="image/*" style="display: none;" />
+    </div>
+</div>
+<div class="verification-button">
+    <p-button styleClass="p-button-outlined w-100" (onClick)="updateUserProfile()">
+        <img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
+        <span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>
+    </p-button>
+</div>

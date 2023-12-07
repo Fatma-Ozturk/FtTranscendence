@@ -22,10 +22,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
   user$ = this.userSubject.asObservable();
-  isVerif2FAVisible: boolean = false;
+  nickName: string = "";
+  editProfileVisible: boolean = false;
 
   gameHistoryDialogVisible: boolean = false;
-  profileSettingsDialogVisible: boolean = false;
   constructor(
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
@@ -38,7 +38,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.user$.subscribe(response => {
       if (response) {
-        this.isVerif2FAVisible = (this.authService.getCurrentUserId() == response.id);
+        this.editProfileVisible = (this.authService.getCurrentUserId() == response.id);
       }
     })
   }
@@ -47,11 +47,11 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     this.route.paramMap
       .pipe(
         switchMap((params: any) => {
-          const nickName = params.get('nickname');
-          if (!nickName) {
+          this.nickName = params.get('nickname');
+          if (!this.nickName) {
             throw new Error('Nickname is required');
           }
-          return this.userService.getByNickName(nickName);
+          return this.userService.getByNickName(this.nickName);
         })
       )
       .subscribe({
@@ -87,11 +87,8 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     this.gameHistoryDialogVisible = true;
   }
 
-  showProfileSettingDialog(){
-    this.profileSettingsDialogVisible = true;
-  }
-
-  twoFA() {
-
+  showProfileSettingDialog() {
+    // this.profileSettingsDialogVisible = true;
+    this.router.navigate(['/user-edit-profile/', this.nickName ])
   }
 }

@@ -30,6 +30,7 @@ export class AuthService {
   // passwordChange(registerModel: RegisterModel) {
   //   return this.httpClient.post<SingleResponseModel<TokenModel>>(environment.appurl + "auth/passwordchange", registerModel)
   // }
+
   isAuthenticadet() {
     if (localStorage.getItem("token")) {
       this.data.next(true)
@@ -110,5 +111,14 @@ export class AuthService {
     if (token) {
       return this.jwtControllerService.isActive(token);
     }
+  }
+
+  currentUserIsCurrentSameInUrl(nickname: string): boolean{
+    let currentNickName = this.getCurrentNickName();
+
+    if (currentNickName === nickname){
+      return true;
+    }
+    return false;
   }
 }

@@ -1,3 +1,4 @@
+import { ChatRoomAuthService } from './../../services/chat-room-auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatRoomByUserDto } from './../../models/dto/chatRoomByUserDto';
 import { AuthService } from 'src/app/services/auth.service';
@@ -10,6 +11,7 @@ import { Component, OnInit } from '@angular/core';
 import { Messages } from 'src/app/constants/Messages';
 import { ChatRoomUser } from 'src/app/models/entities/chatRoomUser';
 import { environment } from 'src/environments/environment';
+import { ChatRoomLoginModel } from 'src/app/models/model/chatRoomLoginModel';
 
 @Component({
   selector: 'app-chat-rooms',
@@ -17,17 +19,23 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./chat-rooms.component.css']
 })
 export class ChatRoomsComponent implements OnInit {
+  chatRoom: ChatRoom;
   chatRooms: ChatRoomByUserDto[] = [];
   chatRoomCreateDialogVisible: boolean = false;
+
+  chatRooomPassword: string = "";
+  chatRoomPasswordDialogVisible: boolean = false;
 
   currentUserId: number;
 
   constructor(private chatRoomService: ChatRoomService,
     private chatRoomUserService: ChatRoomUserService,
+    private chatRoomAuthService: ChatRoomAuthService,
     private authService: AuthService,
     private toastService: ToastrService,
     private router: Router,
-    private route: ActivatedRoute,) {
+    private route: ActivatedRoute,
+    private toastrService: ToastrService) {
 
   }
 
@@ -60,10 +68,34 @@ export class ChatRoomsComponent implements OnInit {
 
   joinChatRoom(chatRoom: ChatRoom): void {
     if (chatRoom.hasPassword) {
-      this.toastService.error("Şifre");
-      return;
+      this.chatRoom = chatRoom;
+      this.chatRoomPasswordDialogVisible = true;
+    } else {
+      this.addUserToChatRoom(chatRoom);
     }
-    this.addUserToChatRoom(chatRoom);
+  }
+
+  loginToJoinChatRoom() {
+    let chatRoomLoginModel: ChatRoomLoginModel = {
+      accessId: this.chatRoom.accessId,
+      password: this.chatRooomPassword
+    };
+    this.loginChatRoom(this.chatRoom, chatRoomLoginModel);
+  }
+
+  loginChatRoom(chatRoom: ChatRoom, chatRoomLoginModel: ChatRoomLoginModel) {
+    this.chatRoomAuthService.login(chatRoomLoginModel).subscribe(response => {
+      let token: string = String(response.data.token);
+      localStorage.setItem("token", token);
+      if (response.data && token.length > 0 && localStorage.getItem("token")) {
+        this.addUserToChatRoom(chatRoom);
+      }
+    }, responseError => {
+      if (responseError.error.message == "User Not Found")
+        this.toastrService.info(Messages.userNotFound)
+      if (responseError.error.message == "Password Error")
+        this.toastrService.info(Messages.passwordError)
+    });
   }
 
   inviteCopyToClipboardChatRoom(chatRoom: ChatRoom): void {
@@ -165,5 +197,9 @@ export class ChatRoomsComponent implements OnInit {
     if (event == false) {
       this.getChatRooms();
     }
+  }
+
+  chatRoomPassworDialogVisibleChange(event: boolean) {
+
   }
 }

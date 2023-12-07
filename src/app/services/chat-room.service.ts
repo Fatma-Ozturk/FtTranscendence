@@ -8,6 +8,9 @@ import { ChatRoomByUserDto } from '../models/dto/chatRoomByUserDto';
 import { ChatRoom } from '../models/entities/chatRoom';
 import { ListResponseModel } from '../models/listResponseModel';
 import { BaseService } from '../utilities/baseService';
+import { ChatRoomLoginModel } from '../models/model/chatRoomLoginModel';
+import { ChatRoomRegisterModel } from '../models/model/chatRoomRegisterModel';
+import { TokenModel } from '../models/model/tokenModel';
 
 @Injectable({
   providedIn: 'root'

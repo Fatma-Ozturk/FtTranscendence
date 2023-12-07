@@ -78,6 +78,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ToolbarModule } from 'primeng/toolbar';
 import { BadgeModule } from 'primeng/badge';
 import { CheckboxModule } from 'primeng/checkbox';
+import { PasswordModule } from 'primeng/password';
 import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room-create.component';
 @NgModule({
   declarations: [
@@ -156,6 +157,7 @@ import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room
     ToolbarModule,
     BadgeModule,
     CheckboxModule,
+    PasswordModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
