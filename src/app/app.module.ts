@@ -80,6 +80,8 @@ import { BadgeModule } from 'primeng/badge';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PasswordModule } from 'primeng/password';
 import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room-create.component';
+import { TagModule } from 'primeng/tag';
+import { PanelMenuModule } from 'primeng/panelmenu';
 @NgModule({
   declarations: [
     AppComponent,
@@ -158,6 +160,8 @@ import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room
     BadgeModule,
     CheckboxModule,
     PasswordModule,
+    TagModule,
+    PanelMenuModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,
