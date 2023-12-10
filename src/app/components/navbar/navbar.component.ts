@@ -1,3 +1,4 @@
+import { UserInfoService } from './../../services/user-info.service';
 import { ActivePageNameService } from './../../services/active-page-name.service';
 import { AuthService } from './../../services/auth.service';
 import { HostListener, Renderer2, SimpleChanges } from '@angular/core';
@@ -7,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ROUTES } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -17,10 +19,17 @@ export class NavbarComponent implements OnInit {
   items: MenuItem[];
   activePageNameNav: string;
   visibleSidebar1: any;
+
+  userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
+  userInfo$ = this.userInfoSubject.asObservable();
+  
+  profileUrl: string = "https://source.unsplash.com/random/150x150";
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private activePageNameService: ActivePageNameService
+    private activePageNameService: ActivePageNameService,
+    private userInfoService:UserInfoService
   ) {
     this.getActivePageName();
   }
@@ -38,6 +47,15 @@ export class NavbarComponent implements OnInit {
         clearInterval(intervalId);
       }
     }, 100);
+  }
+
+  getUserInfo(){
+    let getCurrentNickName = this.authService.getCurrentNickName();
+    this.userInfoService.getByNickName(getCurrentNickName).subscribe(response=>{
+      if (response.success){
+        // this.userInfo$.next
+      }
+    })
   }
   getActivePageName() {
     this.activePageNameService.loadActivePage();

@@ -56,7 +56,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
   //proifle image file
   selectedFile: File | null = null;
-  profileUrl: string;
+  profileUrl: string = "https://source.unsplash.com/random/150x150";
 
   constructor(private userService: UserService,
     private userInfoService: UserInfoService,
@@ -128,10 +128,11 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
         gender: response?.gender,
         birthdayDate: response?.birthdayDate
       })
-      if (response?.profileImagePath == null && response?.profileImagePath === undefined && response?.profileImagePath == ""){
+      if (response?.profileImagePath == null || response?.profileImagePath === undefined || response?.profileImagePath == ""){
         this.profileUrl = "https://source.unsplash.com/random/150x150";
+      }else{
+        this.profileUrl = environment.profileImageUrl + response.profileImagePath
       }
-      this.profileUrl = environment.profileImageUrl + response?.profileImagePath
     });
   }
 
