@@ -1,3 +1,4 @@
+import { UserInfoService } from './../../services/user-info.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -6,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PrimeNGConfig } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
 import { AuthService } from 'src/app/services/auth.service';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 
 @Component({
   selector: 'app-register',
@@ -23,7 +25,8 @@ export class RegisterComponent {
     private toastrService: ToastrService,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private primengConfig: PrimeNGConfig) { }
+    private primengConfig: PrimeNGConfig,
+    private userInfoService: UserInfoService) { }
 
   ngOnInit(): void {
     // this.primengConfig.ripple = true;
@@ -43,6 +46,7 @@ export class RegisterComponent {
       let token: string = String(response.data.token);
       localStorage.setItem("token", token);
       if (response.data && token.length > 0 && localStorage.getItem("token")) {
+        this.updateUserInfo();
         this.router.navigate(['/view'])
         this.toastrService.info(Messages.success);
       }
@@ -86,17 +90,26 @@ export class RegisterComponent {
     return '';
   }
 
-  // onAvatarSelected(event: any) {
-  //   const file: File | null = event.target.files ? event.target.files[0] : null;
+  updateUserInfo() {
+    let currentUserId = this.authService.getCurrentUserId();
+    let userInfo: UserInfo = {
+      id: 0,
+      userId: currentUserId,
+      loginDate: new Date(),
+      profileCheck: true,
+      profileImagePath: "",
+      profileText: "",
+      gender: false,
+      birthdayDate: new Date()
+    };
+    this.userInfoService.add(userInfo).subscribe(response => {
+      if (response.success) {
 
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => {
-  //       this.avatarUrl = reader.result as string;
-  //     };
-  //   } else {
-  //     this.avatarUrl = null;
-  //   }
-  // }
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
+      }
+    })
+  }
 }

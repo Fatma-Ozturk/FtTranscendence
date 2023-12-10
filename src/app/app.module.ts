@@ -82,6 +82,8 @@ import { PasswordModule } from 'primeng/password';
 import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room-create.component';
 import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
+import { SelectButtonModule } from 'primeng/selectbutton';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -162,6 +164,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
     PasswordModule,
     TagModule,
     PanelMenuModule,
+    SelectButtonModule,
     ToastrModule.forRoot({
       positionClass: "toast-bottom-center",
       timeOut: 10000,

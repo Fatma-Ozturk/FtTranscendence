@@ -1,3 +1,4 @@
+import { ToastrService } from 'ngx-toastr';
 import { UserInfoService } from './../../services/user-info.service';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -8,6 +9,8 @@ import { User } from 'src/app/models/entities/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserInfo } from 'src/app/models/entities/userInfo';
+import { Messages } from 'src/app/constants/Messages';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-user-profile-edit',
@@ -15,19 +18,25 @@ import { UserInfo } from 'src/app/models/entities/userInfo';
   styleUrls: ['./user-profile-edit.component.css']
 })
 export class UserProfileEditComponent implements OnInit, AfterViewInit {
+  date: Date;
+  minDate: Date;
+  maxDate: Date;
+
+  stateGenderOptions: any[];
+
   nickName: string;
+
   userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
-  isVerif2FAVisible: boolean = false;
+  userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
+  userInfo$ = this.userInfoSubject.asObservable();
 
   //user-info form
-  userInfo: UserInfo;
   userInfoForm: FormGroup;
   userInfoFormVisible: boolean = false;
 
   //user form
-  user: User;
   userForm: FormGroup;
   userFormVisible: boolean = false;
 
@@ -40,20 +49,49 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
   //userVerif
   userVerifVisible: boolean = false;
+  isVerif2FAVisible: boolean = false;
 
   //towFa
   twoFAVisible: boolean = false;
+
+  //proifle image file
+  selectedFile: File | null = null;
+  profileUrl: string;
+
   constructor(private userService: UserService,
     private userInfoService: UserInfoService,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private formBuilder: FormBuilder) {
+    private formBuilder: FormBuilder,
+    private toastrService: ToastrService) {
 
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((data: any) => {
+
+    this.stateGenderOptions = [
+      { label: 'Beyfendi', value: true },
+      { label: 'Hanımefendi', value: false }
+    ];
+
+    // let today = new Date();
+    // let month = today.getMonth();
+    // let year = today.getFullYear();
+    // let prevMonth = (month === 0) ? 11 : month - 1;
+    // let prevYear = (prevMonth === 11) ? year - 100 : year;
+    // let nextMonth = (month === 11) ? 0 : month + 1;
+    // let nextYear = (nextMonth === 0) ? year + 20 : year;
+    // this.minDate = new Date();
+    // this.minDate.setMonth(prevMonth);
+    // this.minDate.setFullYear(prevYear);
+    // this.maxDate = new Date();
+    // this.maxDate.setMonth(nextMonth);
+    // this.maxDate.setFullYear(nextYear);
+
+    this.route.params.subscribe((data: any) => {
       this.nickName = String(data['nickname']);
+      this.getUserByNickName(this.nickName);
+      this.getUserInfoByNickName(this.nickName);
     });
 
     this.userForm = this.formBuilder.group({
@@ -64,8 +102,8 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
     this.userInfoForm = this.formBuilder.group({
       profileText: ['', Validators.compose([Validators.required, Validators.nullValidator])],
-      gender: ['', Validators.compose([Validators.required, Validators.nullValidator])],
-      birthdayDate: ['', Validators.compose([Validators.required, Validators.nullValidator])],
+      gender: [true, Validators.compose([Validators.required, Validators.nullValidator])],
+      birthdayDate: [new Date(), Validators.compose([Validators.required, Validators.nullValidator])],
     });
 
     this.getMenuItems();
@@ -76,37 +114,96 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
       if (response) {
         this.isVerif2FAVisible = (this.authService.getCurrentUserId() == response.id);
       }
-    })
+    });
+    this.user$.subscribe(response => {
+      this.userForm.patchValue({
+        firstName: response?.firstName,
+        lastName: response?.lastName,
+        nickName: response?.nickName
+      })
+    });
+    this.userInfo$.subscribe(response => {
+      this.userInfoForm.patchValue({
+        profileText: response?.profileText,
+        gender: response?.gender,
+        birthdayDate: response?.birthdayDate
+      })
+      if (response?.profileImagePath == null && response?.profileImagePath === undefined && response?.profileImagePath == ""){
+        this.profileUrl = "https://source.unsplash.com/random/150x150";
+      }
+      this.profileUrl = environment.profileImageUrl + response?.profileImagePath
+    });
   }
 
-  getUserByNickName(){
-    this.userService.getByNickName(this.nickName).subscribe(response=>{
-      if (response.success){
-        this.user = response.data;
+  getUserByNickName(nickName: string) {
+    this.userService.getByNickName(nickName).subscribe(response => {
+      if (response.success) {
+        this.userSubject.next(response.data);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
       }
     });
   }
 
-  getUserInfo(){
-    this.userInfoService.getByNickName(this.nickName).subscribe(response=>{
-      if (response.success){
-        this.userInfo = response.data;
+  getUserInfoByNickName(nickName: string) {
+    this.userInfoService.getByNickName(nickName).subscribe(response => {
+      if (response.success) {
+        this.userInfoSubject.next(response.data);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
       }
     });
   }
 
-  updateUser(){
-    this.userService.update(this.user).subscribe(response=>{
-      if (response.success){
-
+  updateUser() {
+    let userFormObject: any = Object.assign({}, this.userForm.value);
+    let user: User = this.userSubject.getValue();
+    user.firstName = userFormObject.firstName;
+    user.lastName = userFormObject.lastName;
+    user.nickName = userFormObject.nickName;
+    this.userService.update(user).subscribe(response => {
+      if (response.success) {
+        this.toastrService.success(Messages.success);
       }
-    }, responseError=>{
-
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
+      }
     })
   }
 
-  updateUserInfo(){
+  updateUserInfo() {
+    let userInfoFormObject: any = Object.assign({}, this.userInfoForm.value);
+    let userInfo: UserInfo = this.userInfoSubject.getValue();
 
+    userInfo.profileText = userInfoFormObject.profileText;
+    userInfo.gender = userInfoFormObject.gender;
+    userInfo.birthdayDate = userInfoFormObject.birthdayDate;
+    this.userInfoService.update(userInfo).subscribe(response => {
+      if (response.success) {
+        this.toastrService.success(Messages.success);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
+      }
+    })
+  }
+
+  submitUpdateUser() {
+    if (!this.userForm.valid)
+      return;
+    this.updateUser();
+  }
+
+  submitUpdateUserInfo() {
+    if (!this.userInfoForm.valid)
+      return;
+    this.updateUserInfo();
   }
 
   getMenuItems() {
@@ -143,7 +240,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
         ]
       },
       {
-        label: 'Günenlik',
+        label: 'Güvenlik',
         icon: 'pi pi-fw pi-user',
         items: [
           {
@@ -206,32 +303,55 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     })
   }
 
-  visibleUser(){
+  visibleUser() {
     this.userFormVisible = !this.userFormVisible;
     this.userInfoFormVisible = false;
     this.twoFAVisible = false;
     this.userVerifVisible = false;
+    this.getUserByNickName(this.nickName);
   }
-  
 
-  visibleUserInfo(){
+
+  visibleUserInfo() {
     this.userInfoFormVisible = !this.userInfoFormVisible;
     this.userFormVisible = false;
     this.twoFAVisible = false;
     this.userVerifVisible = false;
+    this.getUserInfoByNickName(this.nickName);
   }
 
-  visibleTwoFA(){
+  visibleTwoFA() {
     this.twoFAVisible = !this.twoFAVisible;
     this.userInfoFormVisible = false;
     this.userFormVisible = false;
     this.userVerifVisible = false;
   }
 
-  visibleUserVerif(){
+  visibleUserVerif() {
     this.userVerifVisible = !this.userVerifVisible;
     this.userInfoFormVisible = false;
     this.userFormVisible = false;
     this.twoFAVisible = false;
+  }
+
+  //profile image
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
+    this.uploadFile();
+  }
+
+  uploadFile(): void {
+    if (this.selectedFile) {
+      this.userInfoService.uploadProfileImage(this.nickName, this.selectedFile).subscribe(
+        (response) => {
+          this.toastrService.success(Messages.updloadFileSuccess, Messages.success);
+        },
+        (error) => {
+          this.toastrService.error(Messages.updloadFileError, Messages.error);
+        }
+      );
+    } else {
+      this.toastrService.warning(Messages.notSelectFile, Messages.warn);
+    }
   }
 }

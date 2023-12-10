@@ -1,3 +1,4 @@
+import { ResponseModel } from 'src/app/models/responseModel/responseModel';
 import { UserInfo } from './../models/entities/userInfo';
 import { BaseService } from './../utilities/baseService';
 import { Injectable } from '@angular/core';
@@ -16,5 +17,13 @@ export class UserInfoService extends BaseService<UserInfo>{
 
   getByNickName(nickName: string) {
     return this.httpClient.get<SingleResponseModel<UserInfo>>(environment.appurl + "user-infos/getbynickname?nickname=" + nickName);
+  }
+
+  uploadProfileImage(nickName: string, file: File) {
+    const formData: FormData = new FormData();
+    formData.append('image', file, file.name);
+    formData.append('nickname', nickName);
+
+    return this.httpClient.post<ResponseModel>(environment.appurl + "user-infos/uploadprofileimage", formData);
   }
 }
