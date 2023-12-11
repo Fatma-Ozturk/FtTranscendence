@@ -583,13 +583,17 @@ export class GameComponent {
 		);
 	}
 	gameTotalScoreUpdate() {
- 
+
 		let gameTotalScore: GameTotalScore = {
 			id: 0,
 			userId: this.authService.getCurrentUserId(),
-			totalScore: 
+			totalScore: this.paddleHost.score,
+			totalWin: 0,
+			totalLose: 0,
+			updateTime: new Date(),
+			status: true
 		};
-		this.gameTotalScoreService.update();
+		this.gameTotalScoreService.update(gameTotalScore);
 	}
 	navigeMainPage() {
 		if (this.gameService.isConnected()) {
