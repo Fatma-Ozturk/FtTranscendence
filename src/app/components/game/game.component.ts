@@ -1,3 +1,5 @@
+import { GameTotalScoreService } from './../../services/game-total-score.service';
+import { GameTotalScore } from './../../models/entities/gameTotalScore';
 import { ToastrService } from 'ngx-toastr';
 import { GameHistoryService } from './../../services/game-history.service';
 import { GameScoreService } from './../../services/game-score.service';
@@ -75,6 +77,7 @@ export class GameComponent {
 		private route: ActivatedRoute,
 		private router: Router,
 		private authService: AuthService,
+		private gameTotalScoreService: GameTotalScoreService,
 		private cdr: ChangeDetectorRef
 	) {
 		this.paddleGuest = new PaddleGameModel();
@@ -129,7 +132,7 @@ export class GameComponent {
 			});
 		}
 	}
-	ngDoCheck() {}
+	ngDoCheck() { }
 	ngOnDestroy() {
 	}
 
@@ -279,7 +282,7 @@ export class GameComponent {
 			this.gameService.sendKeydown(this.paddleGuest);
 		}
 	}
-	paddleUpdateGuest(): void {}
+	paddleUpdateGuest(): void { }
 	updateBall = (): void => {
 		if (this.ball.y - this.fixedScreenRatio < 0)
 			//* Up border
@@ -289,7 +292,7 @@ export class GameComponent {
 			this.canvasRef.nativeElement.height
 		)
 			//* DOWN Border
-			this.ball.yVel =  this.ball.yVel * -1;
+			this.ball.yVel = this.ball.yVel * -1;
 		if (this.ball.x < this.leftPaddle.width) {
 			//* LEFT Border
 			if (
@@ -339,12 +342,12 @@ export class GameComponent {
 		let ballDistance = ballMid - paddle.y;
 		if (ballMid < paddleMid) {
 			newVel = Math.min(1, Math.max(0, ballDistance / totalDistance))
-			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
+			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1 : -newVel - 1;
 		} else if (ballMid > paddleMid) {
 			newVel = Math.min(1, Math.max(0, ((paddle.height / 2) - ballDistance) / totalDistance))
-			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1: -newVel - 1;
+			this.ball.xVel = this.paddleHost.x == paddle.x ? newVel + 1 : -newVel - 1;
 		} else {
-			this.ball.xVel = paddle.x == this.paddleHost.x ? 1: -1;
+			this.ball.xVel = paddle.x == this.paddleHost.x ? 1 : -1;
 			this.ball.yVel = 0;
 		}
 	}
@@ -507,6 +510,7 @@ export class GameComponent {
 			this.gameFinishTie();
 		}
 		this.gameHistoryAdd();
+		this.gameTotalScoreUpdate();
 		this.gameRunning = false;
 		this.visibleGameDisconnectPopup = true;
 		if (this.gameService.isConnected()) {
@@ -569,7 +573,7 @@ export class GameComponent {
 			status: true,
 		};
 		this.gameHistoryService.add(gameHistory).subscribe(
-			(response) => {},
+			(response) => { },
 			(responseError) => {
 				if (responseError.error) {
 					this.toastrService.info(Messages.error);
@@ -577,6 +581,15 @@ export class GameComponent {
 				}
 			}
 		);
+	}
+	gameTotalScoreUpdate() {
+ 
+		let gameTotalScore: GameTotalScore = {
+			id: 0,
+			userId: this.authService.getCurrentUserId(),
+			totalScore: 
+		};
+		this.gameTotalScoreService.update();
 	}
 	navigeMainPage() {
 		if (this.gameService.isConnected()) {
