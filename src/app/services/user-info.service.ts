@@ -26,4 +26,11 @@ export class UserInfoService extends BaseService<UserInfo>{
 
     return this.httpClient.post<ResponseModel>(environment.appurl + "user-infos/uploadprofileimage", formData);
   }
+
+  getProfileImage(profileImagePath: string): string {
+    if (profileImagePath == null || profileImagePath === undefined || profileImagePath == "") {
+      return ("https://source.unsplash.com/random/150x150");
+    }
+    return (environment.profileImageUrl + profileImagePath);
+  }
 }

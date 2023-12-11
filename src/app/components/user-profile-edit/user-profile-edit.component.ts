@@ -128,11 +128,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
         gender: response?.gender,
         birthdayDate: response?.birthdayDate
       })
-      if (response?.profileImagePath == null || response?.profileImagePath === undefined || response?.profileImagePath == ""){
-        this.profileUrl = "https://source.unsplash.com/random/150x150";
-      }else{
-        this.profileUrl = environment.profileImageUrl + response.profileImagePath
-      }
+      this.userInfoService.getProfileImage(response.profileImagePath);
     });
   }
 

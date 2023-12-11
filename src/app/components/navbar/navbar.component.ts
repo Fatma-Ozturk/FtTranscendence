@@ -9,27 +9,28 @@ import { Router, ROUTES } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 import { UserInfo } from 'src/app/models/entities/userInfo';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  isAuthBool:boolean = false;
+  isAuthBool: boolean = false;
   items: MenuItem[];
   activePageNameNav: string;
   visibleSidebar1: any;
 
   userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
   userInfo$ = this.userInfoSubject.asObservable();
-  
+
   profileUrl: string = "https://source.unsplash.com/random/150x150";
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private activePageNameService: ActivePageNameService,
-    private userInfoService:UserInfoService
+    private userInfoService: UserInfoService
   ) {
     this.getActivePageName();
   }
@@ -37,9 +38,9 @@ export class NavbarComponent implements OnInit {
     this.updateAuthBool();
     this.loadMenu();
     this.getActivePageName();
+    this.getUserInfo();
   }
-  ngAfterViewInit():void
-  {
+  ngAfterViewInit(): void {
     let intervalId = setInterval(() => {
       this.updateAuthBool();
       if (this.isAuthBool == true && this.authService.isAuthenticadet()) {
@@ -47,15 +48,25 @@ export class NavbarComponent implements OnInit {
         clearInterval(intervalId);
       }
     }, 100);
-  }
 
-  getUserInfo(){
-    let getCurrentNickName = this.authService.getCurrentNickName();
-    this.userInfoService.getByNickName(getCurrentNickName).subscribe(response=>{
-      if (response.success){
-        // this.userInfo$.next
+    this.userInfo$.subscribe(response => {
+      if (response) {
+        this.userInfoService.getProfileImage(response.profileImagePath);
       }
     })
+  }
+
+  getUserInfo() {
+    let getCurrentNickName = this.authService.getCurrentNickName();
+    this.userInfoService.getByNickName(getCurrentNickName).subscribe(response => {
+      if (response.success) {
+        this.userInfoSubject.next(response.data);
+      }
+    }, responseError => {
+      if (responseError.error) {
+
+      }
+    });
   }
   getActivePageName() {
     this.activePageNameService.loadActivePage();
@@ -118,14 +129,14 @@ export class NavbarComponent implements OnInit {
       },
     ];
   }
-  gameRoute () {
+  gameRoute() {
     this.router.navigate(['/game']);
   }
-  ChatRoute () {
-     this.router.navigate(['/chat']);
+  ChatRoute() {
+    this.router.navigate(['/chat']);
   }
-  leaderboardRoute () {
-      this.router.navigate(['/leaderboard']);
+  leaderboardRoute() {
+    this.router.navigate(['/leaderboard']);
   }
   updateAuthBool() {
     const token = localStorage.getItem('token');
@@ -152,7 +163,7 @@ export class NavbarComponent implements OnInit {
       this.router.navigate(['main']);
     }
   }
-  navigateMyProfile(){
+  navigateMyProfile() {
     this.router.navigate(['/user-profile', this.getNickName()]);
   }
 }
