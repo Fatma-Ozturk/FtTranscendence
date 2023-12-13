@@ -27,8 +27,13 @@
                 </div>
             </div>
         </div>
+        <div class="block-user-container" *ngIf="!editProfileVisible">
+            <p-button label="Kullanıcıyı Engelle" icon="pi pi-external-link"
+                class="btn block-user-btn" styleClass="p-button-outlined p-button-secondary w-100">
+            </p-button>
+        </div>
         <div class="edit-profile-container" *ngIf="editProfileVisible">
-            <p-button label="Edit Profile" (click)="showProfileSettingDialog()" icon="pi pi-external-link"
+            <p-button label="Profili Düzenle" (click)="showProfileSettingDialog()" icon="pi pi-external-link"
                 class="btn profile-edit-btn" styleClass="p-button-outlined p-button-secondary w-100">
             </p-button>
         </div>

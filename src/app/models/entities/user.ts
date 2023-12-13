@@ -9,9 +9,10 @@ export interface User {
   phone: string;
   email: string;
   verificationCode: string;
+  isTwoFA?: boolean;
+  twoFAType?: number;
   isVerified: boolean;
   explanation: string;
   updateTime: Date;
-  is2FA: boolean;
   status: boolean;
 }

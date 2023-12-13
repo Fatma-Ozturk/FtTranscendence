@@ -8,6 +8,8 @@ import { Messages } from 'src/app/constants/Messages';
 import { User } from 'src/app/models/entities/user';
 import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
+import { UserInfoService } from 'src/app/services/user-info.service';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 
 @Component({
   selector: 'app-redirection-auth-google',
@@ -23,7 +25,9 @@ export class RedirectionAuthGoogleComponent {
     private router: Router,
     private jwtControllerService: JwtControllerService,
     private localStorageService: LocalStorageService,
-    private toastrService: ToastrService) {
+    private toastrService: ToastrService,
+    private authService:AuthService,
+    private userInfoService: UserInfoService) {
 
   }
 
@@ -47,5 +51,28 @@ export class RedirectionAuthGoogleComponent {
         this.toastrService.info(Messages.success);
       }
     }
+  }
+
+  updateUserInfo() {
+    let currentUserId = this.authService.getCurrentUserId();
+    let userInfo: UserInfo = {
+      id: 0,
+      userId: currentUserId,
+      loginDate: new Date(),
+      profileCheck: true,
+      profileImagePath: "",
+      profileText: "",
+      gender: false,
+      birthdayDate: new Date()
+    };
+    this.userInfoService.add(userInfo).subscribe(response => {
+      if (response.success) {
+
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
+      }
+    })
   }
 }

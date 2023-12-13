@@ -21,7 +21,7 @@ import {
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Messages } from 'src/app/constants/Messages';
-import { timeInterval } from 'rxjs';
+import { BehaviorSubject, timeInterval } from 'rxjs';
 
 @Component({
 	selector: 'app-game',
@@ -68,6 +68,10 @@ export class GameComponent {
 	intervalId: any;
 
 	gameScoreResult: GameScore;
+
+	gameTotalScoreSubject = new BehaviorSubject<GameTotalScore | null>(null);
+	gameTotalScore$ = this.gameTotalScoreSubject.asObservable();
+	gameTotalScore: GameTotalScore;
 
 	constructor(
 		private gameService: GameService,
@@ -117,8 +121,12 @@ export class GameComponent {
 		if (this.whoIs != -1) {
 			this.gameLoop();
 		}
+		this.gameTotalScore$.subscribe(response => {
+			this.gameTotalScore = response;
+		})
 	}
 	ngOnInit(): void {
+		this.getGameTotalScore();
 		this.setupScoreListener();
 		this.setupBallListener();
 		this.setupPaddleListener();
@@ -583,17 +591,38 @@ export class GameComponent {
 		);
 	}
 	gameTotalScoreUpdate() {
-
 		let gameTotalScore: GameTotalScore = {
-			id: 0,
+			id: this.gameTotalScore.id,
 			userId: this.authService.getCurrentUserId(),
-			totalScore: this.paddleHost.score,
-			totalWin: 0,
-			totalLose: 0,
+			totalScore: this.gameTotalScore.totalScore + this.paddleHost.score,
+			totalWin: this.gameTotalScore.totalWin + this.paddleHost.score,
+			totalLose: this.gameTotalScore.totalLose + this.paddleGuest.score,
 			updateTime: new Date(),
 			status: true
 		};
-		this.gameTotalScoreService.update(gameTotalScore);
+		this.gameTotalScoreService.update(gameTotalScore).subscribe(response => {
+			if (response.success) {
+
+			}
+		}, (responseError) => {
+			if (responseError.error) {
+				this.toastrService.info(Messages.error);
+				this.router.navigate(['/view']);
+			}
+		});
+	}
+	getGameTotalScore() {
+		let currentNickName: string = this.authService.getCurrentNickName();
+		this.gameTotalScoreService.getByNickName(currentNickName).subscribe(response => {
+			if (response.success) {
+				this.gameTotalScoreSubject.next(response.data);
+			}
+		}, (responseError) => {
+			if (responseError.error) {
+				this.toastrService.info(Messages.error);
+				this.router.navigate(['/view']);
+			}
+		});
 	}
 	navigeMainPage() {
 		if (this.gameService.isConnected()) {

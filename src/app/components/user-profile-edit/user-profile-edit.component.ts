@@ -128,7 +128,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
         gender: response?.gender,
         birthdayDate: response?.birthdayDate
       })
-      this.userInfoService.getProfileImage(response.profileImagePath);
+      this.profileUrl = this.userInfoService.getProfileImage(response?.profileImagePath);
     });
   }
 

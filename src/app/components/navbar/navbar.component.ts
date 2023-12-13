@@ -51,7 +51,7 @@ export class NavbarComponent implements OnInit {
 
     this.userInfo$.subscribe(response => {
       if (response) {
-        this.userInfoService.getProfileImage(response.profileImagePath);
+        this.profileUrl = this.userInfoService.getProfileImage(response?.profileImagePath);
       }
     })
   }

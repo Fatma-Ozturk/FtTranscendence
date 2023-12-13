@@ -4,9 +4,11 @@ import { ToastrService } from 'ngx-toastr';
 import { MessageService } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
 import { User } from 'src/app/models/entities/user';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 import { AuthService } from 'src/app/services/auth.service';
 import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
+import { UserInfoService } from 'src/app/services/user-info.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -23,7 +25,9 @@ export class RedirectionAuth42Component {
     private router: Router,
     private jwtControllerService: JwtControllerService,
     private localStorageService: LocalStorageService,
-    private toastrService: ToastrService) {
+    private toastrService: ToastrService,
+    private authService:AuthService,
+    private userInfoService: UserInfoService) {
 
   }
 
@@ -43,9 +47,33 @@ export class RedirectionAuth42Component {
     if (this.success === 'true') {
       if (this.jwtControllerService.isActive(this.token)) {
         this.localStorageService.saveItem("token", this.token);
+        this.updateUserInfo();
         this.router.navigate(['/view'])
         this.toastrService.info(Messages.success);
       }
     }
+  }
+
+  updateUserInfo() {
+    let currentUserId = this.authService.getCurrentUserId();
+    let userInfo: UserInfo = {
+      id: 0,
+      userId: currentUserId,
+      loginDate: new Date(),
+      profileCheck: true,
+      profileImagePath: "",
+      profileText: "",
+      gender: false,
+      birthdayDate: new Date()
+    };
+    this.userInfoService.add(userInfo).subscribe(response => {
+      if (response.success) {
+
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error);
+      }
+    })
   }
 }

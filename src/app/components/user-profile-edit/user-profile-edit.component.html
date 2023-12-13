@@ -187,7 +187,7 @@
                                         Onay</label>
                                 </div>
                                 <div class="col-sm-10">
-                                    <p-tag icon="pi pi-user" value="Primary"></p-tag>
+                                    <p-tag icon="pi pi-user" [severity]="userInfoSubject.getValue().profileCheck == true ? 'success': 'danger'" [value]="userInfoSubject.getValue().profileCheck == true ? 'Onaylandı': 'Onaylanmadı'"></p-tag>
                                 </div>
                             </div>
                         </div>
