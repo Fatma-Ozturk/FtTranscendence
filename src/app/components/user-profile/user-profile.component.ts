@@ -10,6 +10,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GameHistoryDto } from 'src/app/models/dto/gameHistoryDto';
+import { GameTotalScoreByUserDto } from 'src/app/models/dto/gameTotalScoreByUserDto';
+import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
+import { GameTotalScore } from 'src/app/models/entities/gameTotalScore';
 
 @Component({
   selector: 'app-user-profile',
@@ -26,9 +29,13 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   editProfileVisible: boolean = false;
 
   gameHistoryDialogVisible: boolean = false;
+
+  gameTotalScoriesSubject = new BehaviorSubject<GameTotalScore | null>(null);
+  gameTotalScories$ = this.gameTotalScoriesSubject.asObservable();
   constructor(
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
+    private gameTotalScoreService: GameTotalScoreService,
     private toastrService: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
@@ -41,6 +48,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
         this.editProfileVisible = (this.authService.getCurrentUserId() == response.id);
       }
     })
+    this.getGameTotalScories();
   }
 
   ngOnInit(): void {
@@ -89,6 +97,14 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   showProfileSettingDialog() {
     // this.profileSettingsDialogVisible = true;
-    this.router.navigate(['/user-edit-profile/', this.nickName ])
+    this.router.navigate(['/user-edit-profile/', this.nickName])
+  }
+
+  getGameTotalScories() {
+    this.gameTotalScoreService.getByNickName(this.nickName).subscribe(response => {
+      if (response.success) {
+        this.gameTotalScoriesSubject.next(response.data);
+      }
+    });
   }
 }

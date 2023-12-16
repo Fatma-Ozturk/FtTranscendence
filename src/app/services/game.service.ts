@@ -11,14 +11,10 @@ export class GameService {
 	public score$: BehaviorSubject<string> = new BehaviorSubject('');
 	public game$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
-	public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject(
-		''
-	);
+	public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public ballLocation$: BehaviorSubject<string> = new BehaviorSubject('');
 	public scoreRespose$: BehaviorSubject<string> = new BehaviorSubject('');
-	public ballLocationResponse$: BehaviorSubject<string> = new BehaviorSubject(
-		''
-	);
+	public ballLocationResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomId$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomSocket$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomSocketResponse$: BehaviorSubject<string> =

@@ -1,6 +1,12 @@
+import { GameTotalScore } from './../../models/entities/gameTotalScore';
+import { ToastModule } from 'primeng/toast';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/services/auth.service';
 import { GameService } from './../../services/game.service';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
+import { Messages } from 'src/app/constants/Messages';
 
 @Component({
   selector: 'app-game-matchmaking',
@@ -8,14 +14,20 @@ import { Router } from '@angular/router';
   styleUrls: ['./game-matchmaking.component.css']
 })
 export class GameMatchmakingComponent {
-  gameText:string;
+  gameText: string;
 
   @ViewChild('processDiv', { static: true })
   processDivRef: ElementRef<HTMLDivElement>;
 
   progressBarDivVisible: boolean;
-  gameTextDivVisible: boolean
-  constructor(private gameService: GameService, private router:Router) {
+  gameTextDivVisible: boolean;
+  currentNickName: string = "";
+  constructor(
+    private gameService: GameService,
+    private gameTotalScoreService: GameTotalScoreService,
+    private authService: AuthService,
+    private toastrService: ToastrService,
+    private router: Router) {
 
   }
 
@@ -23,30 +35,32 @@ export class GameMatchmakingComponent {
     this.progressBarDivVisible = false;
     this.gameTextDivVisible = true;
     this.gameText = "Oyuna katıl";
+    this.currentNickName = this.authService.getCurrentNickName();
+    this.getGameTotalScoreByNickName();
   }
 
-  ngDoCheck(){
+  ngDoCheck() {
     this.gameService.getNewMatchmakingResponse().subscribe(
       (response: any) => {
-        if (response.message === "Matchmaking Search"){
+        if (response.message === "Matchmaking Search") {
           this.progressBarDivVisible = true;
           this.gameText = "Oyuncu Aranıyor..."
         }
-        else if (response.message === "Matchmaking Join"){
+        else if (response.message === "Matchmaking Join") {
           this.progressBarDivVisible = false;
           this.gameText = "Oyuncu Bulundu..."
         }
-        else if (response.message === "Matchmaking Finish"){
+        else if (response.message === "Matchmaking Finish") {
           this.progressBarDivVisible = false;
           this.gameText = "Yönlendiriliyor..."
-          this.gameService.getGameRoomId().subscribe((response: any)=>{
-            if (response != null && response !== undefined){
+          this.gameService.getGameRoomId().subscribe((response: any) => {
+            if (response != null && response !== undefined) {
               setTimeout(() => {
-                const queryParams = { 'room-id': response.message};
-                this.router.navigate(['/game'], {queryParams});
-            }, 1000);
+                const queryParams = { 'room-id': response.message };
+                this.router.navigate(['/game'], { queryParams });
+              }, 1000);
             }
-        })
+          })
         }
       },
       (error) => {
@@ -55,9 +69,39 @@ export class GameMatchmakingComponent {
     );
   }
 
-  matchGame(){
+  matchGame() {
     this.gameService.connectSocket();
     console.log("this.gameService.getNewMatchmakingResponse() " + JSON.stringify(this.gameService.getNewMatchmakingResponse));
     this.gameService.sendMatchmaking('');
+  }
+
+  getGameTotalScoreByNickName() {
+    this.gameTotalScoreService.getByNickName(this.currentNickName).subscribe(response => {
+      if (response.success && (response.data == null || response.data == undefined)) {
+        this.addGameTotalScore();
+      }
+    }, errorResponse => {
+      if (errorResponse.error) {
+        this.toastrService.error(Messages.error);
+      }
+    })
+  }
+  addGameTotalScore() {
+    let currentUserId = this.authService.getCurrentUserId();
+    let gameTotalGameScore: GameTotalScore = {
+      id: 0,
+      userId: currentUserId,
+      totalScore: 0,
+      totalWin: 0,
+      totalLose: 0,
+      updateTime: new Date(),
+      status: true
+    }
+    this.gameTotalScoreService.add(gameTotalGameScore).subscribe(response => {
+    }, errorResponse => {
+      if (errorResponse.error) {
+        this.toastrService.error(Messages.error);
+      }
+    });
   }
 }

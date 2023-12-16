@@ -594,9 +594,9 @@ export class GameComponent {
 		let gameTotalScore: GameTotalScore = {
 			id: this.gameTotalScore.id,
 			userId: this.authService.getCurrentUserId(),
-			totalScore: this.gameTotalScore.totalScore + this.paddleHost.score,
-			totalWin: this.gameTotalScore.totalWin + this.paddleHost.score,
-			totalLose: this.gameTotalScore.totalLose + this.paddleGuest.score,
+			totalScore: Number(this.gameTotalScore.totalScore) + Number(this.paddleHost.score),
+			totalWin: Number(this.gameTotalScore.totalWin) + Number(this.paddleHost.score),
+			totalLose: Number(this.gameTotalScore.totalLose) + Number(this.paddleGuest.score),
 			updateTime: new Date(),
 			status: true
 		};

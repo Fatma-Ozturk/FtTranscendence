@@ -1,6 +1,6 @@
-export interface GameTotalScore {
+export class GameTotalScoreByUserDto {
     id: number;
-    userId: number;
+    nickName: string;
     totalScore: number;
     totalWin: number;
     totalLose: number;

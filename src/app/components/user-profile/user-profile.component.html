@@ -42,7 +42,7 @@
                 styleClass="p-button-outlined p-button-secondary w-100" (click)="showGameHistoryDialog()"
                 icon="pi pi-external-link"></p-button>
         </div>
-        <div class="info-container">
+        <div class="info-container" *ngIf="gameTotalScories$ | async as gameTotalScore">
             <div class="info">
                 <div class="title">Current place:</div>
                 <div class="description">1st</div>
@@ -53,11 +53,11 @@
             </div>
             <div class="info">
                 <div class="title">Losses:</div>
-                <div class="description">3</div>
+                <div class="description">{{gameTotalScore.totalLose}}</div>
             </div>
             <div class="info">
                 <div class="title">Wins:</div>
-                <div class="description">5</div>
+                <div class="description">{{gameTotalScore.totalWin}}</div>
             </div>
         </div>
         <div class="info-container">
