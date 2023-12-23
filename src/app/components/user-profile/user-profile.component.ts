@@ -1,3 +1,4 @@
+import { AchievementRuleService } from './../../services/achievement-rule.service';
 import { AuthService } from './../../services/auth.service';
 import { GameHistoryService } from './../../services/game-history.service';
 import { GameHistory } from './../../models/entities/gameHistory';
@@ -36,6 +37,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
     private gameTotalScoreService: GameTotalScoreService,
+    private achievementRuleService: AchievementRuleService,
     private toastrService: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
@@ -49,6 +51,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       }
     })
     this.getGameTotalScories();
+    this.checkAchievement();
   }
 
   ngOnInit(): void {
@@ -104,6 +107,15 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     this.gameTotalScoreService.getByNickName(this.nickName).subscribe(response => {
       if (response.success) {
         this.gameTotalScoriesSubject.next(response.data);
+      }
+    });
+  }
+
+  checkAchievement(){
+    let currentUserId: number = this.authService.getCurrentUserId();
+    this.achievementRuleService.checkAchievement(currentUserId, "sign").subscribe(response=>{
+      if (response.success){
+        //add userAch for sign ach
       }
     });
   }
