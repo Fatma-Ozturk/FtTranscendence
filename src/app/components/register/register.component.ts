@@ -1,3 +1,4 @@
+import { AchievementRuleService } from './../../services/achievement-rule.service';
 import { UserInfoService } from './../../services/user-info.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -22,11 +23,12 @@ export class RegisterComponent {
 
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService,
+    private userInfoService: UserInfoService,
+    private achievementRuleService: AchievementRuleService,
     private toastrService: ToastrService,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private primengConfig: PrimeNGConfig,
-    private userInfoService: UserInfoService) { }
+    private primengConfig: PrimeNGConfig) { }
 
   ngOnInit(): void {
     // this.primengConfig.ripple = true;
@@ -47,7 +49,7 @@ export class RegisterComponent {
       localStorage.setItem("token", token);
       if (response.data && token.length > 0 && localStorage.getItem("token")) {
         this.updateUserInfo();
-        this.router.navigate(['/view'])
+        this.router.navigate(['/view']);
         this.toastrService.info(Messages.success);
       }
     }, responseError => {
@@ -103,13 +105,23 @@ export class RegisterComponent {
       birthdayDate: new Date()
     };
     this.userInfoService.add(userInfo).subscribe(response => {
-      if (response.success) {
-
+      if (response.success == true) {
+  
       }
     }, responseError => {
       if (responseError.error) {
         this.toastrService.error(Messages.error);
       }
-    })
+    });
+  }
+
+  checkAchievement(achievementName: string) {
+    let currentUserId = this.authService.getCurrentUserId();
+    this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe(response => { },
+      errorResponse => {
+        if (errorResponse.error) {
+          this.toastrService.error(Messages.error);
+        }
+      });
   }
 }

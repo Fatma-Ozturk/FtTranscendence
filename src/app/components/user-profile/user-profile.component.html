@@ -28,8 +28,8 @@
             </div>
         </div>
         <div class="block-user-container" *ngIf="!editProfileVisible">
-            <p-button label="Kullanıcıyı Engelle" icon="pi pi-external-link"
-                class="btn block-user-btn" styleClass="p-button-outlined p-button-secondary w-100">
+            <p-button label="Kullanıcıyı Engelle" icon="pi pi-external-link" class="btn block-user-btn"
+                styleClass="p-button-outlined p-button-secondary w-100">
             </p-button>
         </div>
         <div class="edit-profile-container" *ngIf="editProfileVisible">
@@ -62,11 +62,17 @@
         </div>
         <div class="info-container">
             <div class="achievements">
-                <img class="ach" alt=""
-                    src="https://cdn.intra.42.fr/achievement/image/169/BADGE_SCOLARITY_billgates.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/38/SOC004.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/82/PED011.svg">
-                <img class="ach" alt="" src="https://cdn.intra.42.fr/achievement/image/114/PRO014.svg">
+                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement;">
+                    <ng-template *ngIf="userAchievementByAchievement.length > 0; else noAchievements">
+                        <ng-template *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
+                            <img [src]="achievement.imagePath" alt="_1">
+                        </ng-template>
+                    </ng-template>
+                </ng-container>
+
+                <ng-template #noAchievements>
+                    Achievement
+                </ng-template>
             </div>
         </div>
         <div>

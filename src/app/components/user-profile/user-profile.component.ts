@@ -1,3 +1,6 @@
+import { UserAchievementService } from './../../services/user-achievement.service';
+import { UserAchievement } from './../../models/entities/userAchievement';
+import { Achievement } from './../../models/entities/achievement';
 import { AchievementRuleService } from './../../services/achievement-rule.service';
 import { AuthService } from './../../services/auth.service';
 import { GameHistoryService } from './../../services/game-history.service';
@@ -14,6 +17,7 @@ import { GameHistoryDto } from 'src/app/models/dto/gameHistoryDto';
 import { GameTotalScoreByUserDto } from 'src/app/models/dto/gameTotalScoreByUserDto';
 import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
 import { GameTotalScore } from 'src/app/models/entities/gameTotalScore';
+import { UserAchievementByAchievementDto } from 'src/app/models/dto/userAchievementByAchievementDto';
 
 @Component({
   selector: 'app-user-profile',
@@ -33,11 +37,15 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   gameTotalScoriesSubject = new BehaviorSubject<GameTotalScore | null>(null);
   gameTotalScories$ = this.gameTotalScoriesSubject.asObservable();
+
+  userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>([]);
+  userAchievementByAchievementDtos$ = this.userAchievementByAchievementDtoSubject.asObservable();
   constructor(
     private userService: UserService,
     private gameHistoryService: GameHistoryService,
     private gameTotalScoreService: GameTotalScoreService,
     private achievementRuleService: AchievementRuleService,
+    private userAchievementService: UserAchievementService,
     private toastrService: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
@@ -51,7 +59,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
       }
     })
     this.getGameTotalScories();
-    this.checkAchievement();
+    this.getAllUserAchievementByAchievementDtoWithUserId(this.authService.getCurrentUserId());
   }
 
   ngOnInit(): void {
@@ -111,12 +119,11 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     });
   }
 
-  checkAchievement(){
-    let currentUserId: number = this.authService.getCurrentUserId();
-    this.achievementRuleService.checkAchievement(currentUserId, "sign").subscribe(response=>{
-      if (response.success){
-        //add userAch for sign ach
+  getAllUserAchievementByAchievementDtoWithUserId(userId: number) {
+    this.userAchievementService.getAllUserAchievementByAchievementDtoWithUserId(userId).subscribe(response => {
+      if (response.success) {
+        this.userAchievementByAchievementDtoSubject.next(response.data);
       }
-    });
+    })
   }
 }

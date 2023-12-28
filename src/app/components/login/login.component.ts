@@ -8,6 +8,7 @@ import { PrimeNGConfig } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
 import { User } from 'src/app/models/entities/user';
 import { AuthService } from 'src/app/services/auth.service';
+import { AchievementRuleService } from 'src/app/services/achievement-rule.service';
 
 @Component({
   selector: 'app-login',
@@ -20,9 +21,10 @@ export class LoginComponent {
 
   constructor(private formBuilder: FormBuilder,
     private authService: AuthService,
-    private userService:UserService,
+    private userService: UserService,
     private toastrService: ToastrService,
     private router: Router,
+    private achievementRuleService: AchievementRuleService,
     private sanitizer: DomSanitizer,
     private primengConfig: PrimeNGConfig) { }
 
@@ -42,8 +44,8 @@ export class LoginComponent {
       let token: string = String(response.data.token);
       localStorage.setItem("token", token);
       if (response.data && token.length > 0 && localStorage.getItem("token")) {
-          this.router.navigate(['/view'])
-          this.toastrService.info(Messages.success);
+        this.router.navigate(['/view'])
+        this.toastrService.info(Messages.success);
       }
     }, responseError => {
       if (responseError.error.message == "User Not Found")
