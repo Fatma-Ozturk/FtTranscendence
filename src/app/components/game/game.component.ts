@@ -1,3 +1,4 @@
+import { AchievementRuleService } from 'src/app/services/achievement-rule.service';
 import { GameTotalScoreService } from './../../services/game-total-score.service';
 import { GameTotalScore } from './../../models/entities/gameTotalScore';
 import { ToastrService } from 'ngx-toastr';
@@ -82,7 +83,8 @@ export class GameComponent {
 		private router: Router,
 		private authService: AuthService,
 		private gameTotalScoreService: GameTotalScoreService,
-		private cdr: ChangeDetectorRef
+		private cdr: ChangeDetectorRef,
+		private achievementRuleService: AchievementRuleService
 	) {
 		this.paddleGuest = new PaddleGameModel();
 		this.paddleHost = new PaddleGameModel();
@@ -123,6 +125,9 @@ export class GameComponent {
 		}
 		this.gameTotalScore$.subscribe(response => {
 			this.gameTotalScore = response;
+			if (response.totalWin > 1){
+				this.checkAchievement("firstPongWin");
+			}
 		})
 	}
 	ngOnInit(): void {
@@ -630,5 +635,15 @@ export class GameComponent {
 			this.gameService.disconnectSocket();
 		}
 		this.router.navigate(['/view']);
+	}
+
+	checkAchievement(achievementName: string) {
+		let currentUserId = this.authService.getCurrentUserId();
+		this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe(response => { },
+			errorResponse => {
+				if (errorResponse.error) {
+					this.toastrService.error(Messages.error);
+				}
+			});
 	}
 }

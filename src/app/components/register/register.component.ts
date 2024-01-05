@@ -1,3 +1,4 @@
+import { switchMap } from 'rxjs/operators';
 import { AchievementRuleService } from './../../services/achievement-rule.service';
 import { UserInfoService } from './../../services/user-info.service';
 import { Component } from '@angular/core';
@@ -43,21 +44,47 @@ export class RegisterComponent {
     })
   }
   register() {
+    // let registerForm = Object.assign({}, this.registerForm.value);
+    // this.authService.register(registerForm).subscribe(response => {
+    //   let token: string = String(response.data.token);
+    //   localStorage.setItem("token", token);
+    //   if (response.data && token.length > 0 && localStorage.getItem("token")) {
+    //     this.updateUserInfo();
+    //     this.router.navigate(['/view']);
+    //     this.toastrService.info(Messages.success);
+    //   }
+    // }, responseError => {
+    //   if (responseError.error) {
+    //     if (responseError.error.message == "User Not Found")
+    //       this.toastrService.info(Messages.userNotFound)
+    //     if (responseError.error.message == "User Already Exists")
+    //       this.toastrService.info(Messages.userAlreadyExists)
+    //   }
+    // });
+
     let registerForm = Object.assign({}, this.registerForm.value);
-    this.authService.register(registerForm).subscribe(response => {
-      let token: string = String(response.data.token);
-      localStorage.setItem("token", token);
-      if (response.data && token.length > 0 && localStorage.getItem("token")) {
-        this.updateUserInfo();
-        this.router.navigate(['/view']);
-        this.toastrService.info(Messages.success);
-      }
-    }, responseError => {
-      if (responseError.error) {
-        if (responseError.error.message == "User Not Found")
-          this.toastrService.info(Messages.userNotFound)
-        if (responseError.error.message == "User Already Exists")
-          this.toastrService.info(Messages.userAlreadyExists)
+    this.authService.register(registerForm).pipe(
+      switchMap((response: any): any => {
+        let token: string = String(response.data.token);
+        localStorage.setItem("token", token);
+        if (response.data && token.length > 0 && localStorage.getItem("token")) {
+          return this.updateUserInfo();
+        }
+      }), switchMap((): any => this.checkAchievement('sign')),
+    ).subscribe({
+      next: (response: any) => {
+        if (this.authService.isActive()){
+          this.router.navigate(['/view']);
+          this.toastrService.info(Messages.success);
+        }
+      },
+      error: (responseError: any) => {
+        if (responseError.error) {
+          if (responseError.error.message == "User Not Found")
+            this.toastrService.info(Messages.userNotFound);
+          if (responseError.error.message == "User Already Exists")
+            this.toastrService.info(Messages.userAlreadyExists);
+        }
       }
     });
   }
@@ -104,24 +131,11 @@ export class RegisterComponent {
       gender: false,
       birthdayDate: new Date()
     };
-    this.userInfoService.add(userInfo).subscribe(response => {
-      if (response.success == true) {
-  
-      }
-    }, responseError => {
-      if (responseError.error) {
-        this.toastrService.error(Messages.error);
-      }
-    });
+    return this.userInfoService.add(userInfo);
   }
 
   checkAchievement(achievementName: string) {
     let currentUserId = this.authService.getCurrentUserId();
-    this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe(response => { },
-      errorResponse => {
-        if (errorResponse.error) {
-          this.toastrService.error(Messages.error);
-        }
-      });
+    return this.achievementRuleService.checkAchievement(currentUserId, achievementName);
   }
 }

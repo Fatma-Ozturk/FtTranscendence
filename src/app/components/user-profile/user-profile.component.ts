@@ -30,6 +30,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
   userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
   user$ = this.userSubject.asObservable();
+  currentUserId: number;
   nickName: string = "";
   editProfileVisible: boolean = false;
 
@@ -38,7 +39,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   gameTotalScoriesSubject = new BehaviorSubject<GameTotalScore | null>(null);
   gameTotalScories$ = this.gameTotalScoriesSubject.asObservable();
 
-  userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>([]);
+  userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>(null);
   userAchievementByAchievementDtos$ = this.userAchievementByAchievementDtoSubject.asObservable();
   constructor(
     private userService: UserService,
@@ -55,14 +56,15 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.user$.subscribe(response => {
       if (response) {
-        this.editProfileVisible = (this.authService.getCurrentUserId() == response.id);
+        this.editProfileVisible = (this.currentUserId == response.id);
       }
     })
     this.getGameTotalScories();
-    this.getAllUserAchievementByAchievementDtoWithUserId(this.authService.getCurrentUserId());
+    this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
   }
 
   ngOnInit(): void {
+    this.currentUserId = this.authService.getCurrentUserId();
     this.route.paramMap
       .pipe(
         switchMap((params: any) => {

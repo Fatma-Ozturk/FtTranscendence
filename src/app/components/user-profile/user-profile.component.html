@@ -42,32 +42,48 @@
                 styleClass="p-button-outlined p-button-secondary w-100" (click)="showGameHistoryDialog()"
                 icon="pi pi-external-link"></p-button>
         </div>
-        <div class="info-container" *ngIf="gameTotalScories$ | async as gameTotalScore">
-            <div class="info">
-                <div class="title">Current place:</div>
-                <div class="description">1st</div>
+        <div>
+            <div class="info-container" *ngIf="gameTotalScories$ | async as gameTotalScore;else noGameTotalScore">
+                <div class="info">
+                    <div class="title">Current place:</div>
+                    <div class="description">1st</div>
+                </div>
+                <div class="info">
+                    <div class="title">Başarı Yüzdesi:</div>
+                    <div class="description">{{gameTotalScore.totalWin}}/{{(+gameTotalScore.totalWin | number) + (+gameTotalScore.totalLose | number)}}</div>
+                </div>
+                <div class="info">
+                    <div class="title">Losses:</div>
+                    <div class="description">{{gameTotalScore.totalLose}}</div>
+                </div>
+                <div class="info">
+                    <div class="title">Wins:</div>
+                    <div class="description">{{gameTotalScore.totalWin}}</div>
+                </div>
             </div>
-            <div class="info">
-                <div class="title">Achievements:</div>
-                <div class="description">4/5</div>
-            </div>
-            <div class="info">
-                <div class="title">Losses:</div>
-                <div class="description">{{gameTotalScore.totalLose}}</div>
-            </div>
-            <div class="info">
-                <div class="title">Wins:</div>
-                <div class="description">{{gameTotalScore.totalWin}}</div>
-            </div>
+            <ng-template #noGameTotalScore>
+                Oyun Skor Yok
+            </ng-template>
         </div>
+
         <div class="info-container">
             <div class="achievements">
-                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement;">
-                    <ng-template *ngIf="userAchievementByAchievement.length > 0; else noAchievements">
-                        <ng-template *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
-                            <img [src]="achievement.imagePath" alt="_1">
-                        </ng-template>
-                    </ng-template>
+                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement">
+                    <div *ngIf="userAchievementByAchievement?.length > 0; else noAchievements">
+                        <div *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
+                            <div style="text-align: center;">
+                                <div>
+                                    <img [src]="achievement.imagePath" style="height: 30px;" alt="_1">
+                                </div>
+                                <div class="mt-2">
+                                    Ad : <label>{{achievement.name}}</label>
+                                </div>
+                                <div>
+                                    <label>{{achievement.reward}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </ng-container>
 
                 <ng-template #noAchievements>
