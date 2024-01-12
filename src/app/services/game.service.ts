@@ -17,15 +17,13 @@ export class GameService {
 	public ballLocationResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomId$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomSocket$: BehaviorSubject<string> = new BehaviorSubject('');
-	public gameRoomSocketResponse$: BehaviorSubject<string> =
-		new BehaviorSubject('');
+	public gameRoomSocketResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public paddleResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameDisconnected$: BehaviorSubject<string> = new BehaviorSubject('');
-	// public gameDisconnect$: BehaviorSubject<string> = new BehaviorSubject('');
 	private token: string;
-	private socket: Socket; // Socket tipinde bir değişken tanımlayın
+	private socket: Socket;
 
-	constructor() {}
+	constructor() { }
 
 	public connectSocket() {
 		this.token = localStorage.getItem('token');
@@ -156,9 +154,37 @@ export class GameService {
 		return this.gameDisconnected$.asObservable();
 	};
 
-	// public getGameDisconnect = () => {
-	//   return this.gameDisconnect$.asObservable();
-	// };
+	public removeKeydown(): void {
+		this.socket.off('keydown');
+	}
+
+	public removeGameRoomId(): void {
+		this.socket.off('gameRoomId');
+	}
+
+	public removeNewMatchmaking(): void {
+		this.socket.off('matchmaking');
+	}
+
+	public removeMatchmakingResponse(): void {
+		this.socket.off('matchmakingResponse');
+	}
+//
+	public removeScoreRespnse(): void {
+		this.socket.off('scoreResponse');
+	}
+
+	public removePaddleResponse(): void {
+		this.socket.off('paddleResponse');
+	}
+
+	public removeScore(): void {
+		this.socket.off('score');
+	}
+
+	public removeBallLocation(): void {
+		this.socket.off('ballLocation')
+	}
 
 	public isConnected(): boolean {
 		return this.socket.connected;

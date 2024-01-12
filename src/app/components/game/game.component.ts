@@ -92,24 +92,26 @@ export class GameComponent {
 		this.bendCall = 0;
 		this.gameService.getGameRoomSocketResponse().subscribe(
 			(response: any) => {
-				if (response.message === 'GameRoomSocketResponse Info') {
-					this.gameRoomSocket = JSON.parse(response.data);
-					this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
-					if (this.whoIs == -1) return;
-					if (this.whoIs == 0) {
-						this.leftPaddle = this.paddleHost;
-						this.rightPaddle = this.paddleGuest;
-						this.paddleHost.whoIs = GamePlayerEnum.host;
-						this.paddleGuest.whoIs = GamePlayerEnum.guest;
-						this.ball.whoIs = this.paddleHost.whoIs;
-						this.ball.remainingTime = this.gameRoomSocket.startTime;
-					} else if (this.whoIs == 1) {
-						this.leftPaddle = this.paddleHost;
-						this.rightPaddle = this.paddleGuest;
-						this.paddleHost.whoIs = GamePlayerEnum.host;
-						this.paddleGuest.whoIs = GamePlayerEnum.guest;
-						this.ball.whoIs = this.paddleGuest.whoIs;
-						this.ball.remainingTime = this.gameRoomSocket.startTime;
+				if (response){
+					if (response.message === 'GameRoomSocketResponse Info') {
+						this.gameRoomSocket = JSON.parse(response.data);
+						this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
+						if (this.whoIs == -1) return;
+						if (this.whoIs == 0) {
+							this.leftPaddle = this.paddleHost;
+							this.rightPaddle = this.paddleGuest;
+							this.paddleHost.whoIs = GamePlayerEnum.host;
+							this.paddleGuest.whoIs = GamePlayerEnum.guest;
+							this.ball.whoIs = this.paddleHost.whoIs;
+							this.ball.remainingTime = this.gameRoomSocket.startTime;
+						} else if (this.whoIs == 1) {
+							this.leftPaddle = this.paddleHost;
+							this.rightPaddle = this.paddleGuest;
+							this.paddleHost.whoIs = GamePlayerEnum.host;
+							this.paddleGuest.whoIs = GamePlayerEnum.guest;
+							this.ball.whoIs = this.paddleGuest.whoIs;
+							this.ball.remainingTime = this.gameRoomSocket.startTime;
+						}
 					}
 				}
 			},
@@ -125,7 +127,7 @@ export class GameComponent {
 		}
 		this.gameTotalScore$.subscribe(response => {
 			this.gameTotalScore = response;
-			if (response.totalWin > 1){
+			if (response?.totalWin > 1){
 				this.checkAchievement("firstPongWin");
 			}
 		})
@@ -147,6 +149,11 @@ export class GameComponent {
 	}
 	ngDoCheck() { }
 	ngOnDestroy() {
+		this.gameService.removeScoreRespnse();
+		this.gameService.removePaddleResponse();
+		this.gameService.removeScore();
+		this.gameService.removeBallLocation();
+		this.gameService.disconnectSocket();
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -642,7 +649,7 @@ export class GameComponent {
 		this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe(response => { },
 			errorResponse => {
 				if (errorResponse.error) {
-					this.toastrService.error(Messages.error);
+					// this.toastrService.error(Messages.error);
 				}
 			});
 	}

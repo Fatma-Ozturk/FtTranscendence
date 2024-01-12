@@ -40,6 +40,10 @@ export class GameMatchmakingComponent {
   }
 
   ngDoCheck() {
+    
+  }
+
+  matchmakingStart(){
     this.gameService.getNewMatchmakingResponse().subscribe(
       (response: any) => {
         if (response.message === "Matchmaking Search") {
@@ -57,6 +61,9 @@ export class GameMatchmakingComponent {
             if (response != null && response !== undefined) {
               setTimeout(() => {
                 const queryParams = { 'room-id': response.message };
+                this.gameService.removeGameRoomId();
+                this.gameService.removeNewMatchmaking();
+                this.gameService.removeMatchmakingResponse();
                 this.router.navigate(['/game'], { queryParams });
               }, 1000);
             }
@@ -73,6 +80,7 @@ export class GameMatchmakingComponent {
     this.gameService.connectSocket();
     console.log("this.gameService.getNewMatchmakingResponse() " + JSON.stringify(this.gameService.getNewMatchmakingResponse));
     this.gameService.sendMatchmaking('');
+    this.matchmakingStart();
   }
 
   getGameTotalScoreByNickName() {

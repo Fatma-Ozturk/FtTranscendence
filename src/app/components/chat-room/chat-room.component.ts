@@ -21,7 +21,7 @@ import { ChatRoomOperationModel } from 'src/app/models/model/chatRoomOperationMo
 import { ChatRoom } from 'src/app/models/entities/chatRoom';
 import { Messages } from 'src/app/constants/Messages';
 import { switchMap, take } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-chat-room',
@@ -62,7 +62,10 @@ export class ChatRoomComponent {
   isMuteVisible: boolean = true;
   operations: ChatRoomOperationModel[] = [];
 
-  messagesContentRef:ElementRef;
+  chatRoomSubject = new BehaviorSubject<ChatRoom | null>(null);
+  chatRoom$ = this.chatRoomSubject.asObservable();
+  chatRoom: ChatRoom;
+  messagesContentRef: ElementRef;
 
   constructor(
     private avatarService: AvatarService,
@@ -83,6 +86,7 @@ export class ChatRoomComponent {
     this.route.paramMap.subscribe(params => {
       const accessId = params.get('accessId');
       this.chatRoomAccessId = accessId; //accesIdControlü yap
+      this.getChatRoomByAccessId();
     });
 
     this.createChatMessageForm();
@@ -119,6 +123,11 @@ export class ChatRoomComponent {
     this.getMessageResponse();
     this.getPlayerResponse();
     this.getOperationResponse();
+    this.chatRoom$.subscribe(response => {
+      if (response) {
+        this.chatRoom = response;
+      }
+    })
   }
 
   createChatObject() {
@@ -335,6 +344,12 @@ export class ChatRoomComponent {
     let nowDate: Date = new Date();
     let afterNextDate: Date;
 
+    // this.toastrService.info(Messages.notChatRoomAdmin, String(this.chatRoom.roomUserId) + " " + String(this.authService.getCurrentUserId()))
+    // if (this.authService.getCurrentUserId() != this.chatRoom.roomUserId) {
+    // this.toastrService.info(Messages.notChatRoomAdmin, "eflkdjs")
+
+    //   return;
+    // }
     afterNextDate = new Date(nowDate.getTime() + nowDate.getMilliseconds() + 100000);
     operation = {
       propertyName: key,
@@ -343,6 +358,8 @@ export class ChatRoomComponent {
     }
     this.sendChatRoomOperation(operation);
     if (this.authService.getCurrentNickName() === value) {
+    this.toastrService.info(Messages.notChatRoomAdmin, String(this.chatRoom.roomUserId) + " " + String(this.authService.getCurrentUserId()))
+
       this.isMuteVisible = false;
     }
     console.log("nowDate.getTime() ", nowDate.getMilliseconds());
@@ -357,27 +374,17 @@ export class ChatRoomComponent {
 
   chatRoomOperationAdmin(key: string, value: any) {
     let operation: ChatRoomOperationModel;
-    let chatRoom: ChatRoom;
     operation = {
       propertyName: key,
       nickName: value,
       endOfTime: null
     }
     this.sendChatRoomOperation(operation);
-    this.chatRoomService.getByAccessId(this.chatRoomAccessId).subscribe(response => {
-      if (response.success) {
-        chatRoom = response.data;
-        if (this.authService.getCurrentUserId() != chatRoom.roomUserId) {
-          this.toastrService.info(Messages.notChatRoomAdmin, Messages.info)
-          return;
-        }
-        this.getUserByNickName(chatRoom, value);
-      }
-    }, responseError => {
-      if (responseError.error) {
-        this.toastrService.error(Messages.error, Messages.error);
-      }
-    });
+    if (this.authService.getCurrentUserId() != this.chatRoom.roomUserId) {
+      this.toastrService.info(Messages.notChatRoomAdmin, Messages.info)
+      return;
+    }
+    this.getUserByNickName(this.chatRoom, value);
   }
 
   chatRoomUpdate(chatRoom: ChatRoom, nickName: string) {
@@ -407,14 +414,14 @@ export class ChatRoomComponent {
   }
 
   messageInterpreter(newMessage: any) {
-    let message = newMessage.text;
+    let message: string = newMessage.text;
     let keyValueArray = message.split(":");
     let key = keyValueArray[0];
     let value = keyValueArray[1];
 
-    if (key === "mute") {
+    if (key === "mute" && message.indexOf(":") > 0) {
       this.chatRoomOperationMute(key, value);
-    } else if (key === "admin") {
+    } else if (key === "admin" && message.indexOf(":") > 0) {
       this.chatRoomOperationAdmin(key, value);
     }
   }
@@ -448,7 +455,7 @@ export class ChatRoomComponent {
     this.messagesContentRef = messagesContentRef;
   }
 
-  updateScrollBarChat(){
+  updateScrollBarChat() {
     const messagesContent = this.messagesContentRef.nativeElement;
     this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
   }
@@ -502,6 +509,18 @@ export class ChatRoomComponent {
     const data = { "playerTotalArray": this.playerTotalArray, "accessId": this.chatRoomAccessId };
     const response = { message: 'Player', data: data };
     this.chatRoomService.sendChatRoomHandlePlayer(response);
+  }
+
+  getChatRoomByAccessId() {
+    this.chatRoomService.getByAccessId(this.chatRoomAccessId).subscribe(response => {
+      if (response.success) {
+        this.chatRoomSubject.next(response.data);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error, Messages.error);
+      }
+    });
   }
 
   @HostListener('window:keydown', ['$event'])

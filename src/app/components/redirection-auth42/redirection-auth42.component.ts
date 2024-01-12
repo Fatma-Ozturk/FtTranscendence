@@ -42,6 +42,9 @@ export class RedirectionAuth42Component {
       if (this.message === 'User Not Found') {
         this.toastrService.error(Messages.userNotFound);
       }
+      if (this.message === 'Password Error') {
+        this.toastrService.error(Messages.passwordError);
+      }
       this.router.navigate(['/main']);
     }
     if (this.success === 'true') {
