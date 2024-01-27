@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/services/auth.service';
 import { GameService } from './../../services/game.service';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
 import { Messages } from 'src/app/constants/Messages';
 
@@ -27,7 +27,8 @@ export class GameMatchmakingComponent {
     private gameTotalScoreService: GameTotalScoreService,
     private authService: AuthService,
     private toastrService: ToastrService,
-    private router: Router) {
+    private router: Router,
+    private activatedRouter: ActivatedRoute) {
 
   }
 
@@ -40,10 +41,11 @@ export class GameMatchmakingComponent {
   }
 
   ngDoCheck() {
-    
+
   }
 
-  matchmakingStart(){
+  matchmakingStart() {
+    this.gameService.sendMatchmaking('');
     this.gameService.getNewMatchmakingResponse().subscribe(
       (response: any) => {
         if (response.message === "Matchmaking Search") {
@@ -76,11 +78,23 @@ export class GameMatchmakingComponent {
     );
   }
 
+  matchmakingTwoUserStart(hostUserNickName: string, guestUserNickName: string) {
+    let matchmakingTwoUserModel: any = {
+      hostUserNickName: hostUserNickName,
+      guestUserNickName: guestUserNickName
+    }
+    this.gameService.sendMatchmakingTwoUser(matchmakingTwoUserModel);
+  }
+
   matchGame() {
     this.gameService.connectSocket();
-    console.log("this.gameService.getNewMatchmakingResponse() " + JSON.stringify(this.gameService.getNewMatchmakingResponse));
-    this.gameService.sendMatchmaking('');
-    this.matchmakingStart();
+    this.activatedRouter.queryParams.subscribe((response: any) => {
+      if (response) {
+        this.matchmakingTwoUserStart(response.hostUserNickName, response.guestUserNickName);
+      } else {
+        this.matchmakingStart();
+      }
+    })
   }
 
   getGameTotalScoreByNickName() {

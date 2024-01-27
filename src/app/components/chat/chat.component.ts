@@ -3,6 +3,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChatRoomMessageModel } from './../../models/model/chatRoomMessageModel';
 import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, HostListener, Renderer2, Input, EventEmitter, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-chat',
@@ -18,6 +19,8 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   message: string = "";
   changeMessages: boolean = false;
 
+  profileImageUrl: string;
+
   @Input() chatRoomAccessId: string;
   @Input() messages: ChatRoomMessageModel[];
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
@@ -25,20 +28,20 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   @Output() sendMessageClickOutput = new EventEmitter<any>();
   @Output() updateScrollbarOutput = new EventEmitter<any>();
 
-
   constructor(
     private renderer: Renderer2,
     private authService: AuthService,
     private toastrService: ToastrService,
-    private router:Router) {
+    private router: Router) {
 
   }
 
   ngOnInit() {
     this.currentNickName = this.authService.getCurrentNickName();
     this.currentFullName = this.authService.getCurrentFullName();
+    this.profileImageUrl = environment.profileImageUrl;
   }
-  
+
   ngAfterViewInit(): void {
     this.updateScrollbar();
   }
@@ -85,11 +88,15 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
     }, 100);
   }
 
-  navigateProfile(message: ChatRoomMessageModel){
+  navigateProfile(message: ChatRoomMessageModel) {
     this.router.navigate(['/user-profile', message.sender]);
   }
 
-  navigateMyProfile(){
+  navigateMyProfile() {
     this.router.navigate(['/user-profile', this.currentNickName]);
+  }
+
+  gameInvate(hostUserNickName: string, guestUserNickName: string) {
+    this.router.navigate(['/game-matchmaking//two-user'], { queryParams: { hostUserNickName: hostUserNickName, guestUserNickName: guestUserNickName } });
   }
 }

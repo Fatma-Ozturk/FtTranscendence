@@ -68,8 +68,8 @@
 
         <div class="info-container">
             <div class="achievements">
-                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement">
-                    <div *ngIf="userAchievementByAchievement?.length > 0; else noAchievements">
+                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement ">
+                    <div *ngIf="editProfileVisible && userAchievementByAchievement?.length > 0; else noAchievements">
                         <div *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
                             <div style="text-align: center;">
                                 <div>
@@ -87,7 +87,7 @@
                 </ng-container>
 
                 <ng-template #noAchievements>
-                    Achievement
+                    Achievement not found
                 </ng-template>
             </div>
         </div>

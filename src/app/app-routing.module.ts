@@ -33,6 +33,7 @@ const routes: Routes = [
 	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
 	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
 	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
+	{ path: "game-matchmaking/two-user", component: GameMatchmakingComponent, canActivate: [loginGuard] },
 	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
 	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard] },
 	{ path: "user-edit-profile/:nickname", component: UserProfileEditComponent, canActivate: [loginGuard, editableProfileGuard] },

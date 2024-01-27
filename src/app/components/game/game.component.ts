@@ -94,6 +94,8 @@ export class GameComponent {
 			(response: any) => {
 				if (response){
 					if (response.message === 'GameRoomSocketResponse Info') {
+						console.log("response ", response);
+						
 						this.gameRoomSocket = JSON.parse(response.data);
 						this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
 						if (this.whoIs == -1) return;
@@ -149,11 +151,18 @@ export class GameComponent {
 	}
 	ngDoCheck() { }
 	ngOnDestroy() {
+		this.gameService.removeGameRoomSocketResponse();
 		this.gameService.removeScoreRespnse();
 		this.gameService.removePaddleResponse();
 		this.gameService.removeScore();
+		this.gameService.removeScoreRespnse();
 		this.gameService.removeBallLocation();
+		this.gameService.removeBallLocationResponse();
+		this.gameService.removeGame();
+		this.gameService.removeKeydown();
+		this.gameService.removeGameRoomSocket();
 		this.gameService.disconnectSocket();
+
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -535,6 +544,16 @@ export class GameComponent {
 		this.visibleGameDisconnectPopup = true;
 		if (this.gameService.isConnected()) {
 			// this.gameService.sendGameDisconnect();
+			this.gameService.removeGameRoomSocketResponse();
+			this.gameService.removeScoreRespnse();
+			this.gameService.removePaddleResponse();
+			this.gameService.removeScore();
+			this.gameService.removeScoreRespnse();
+			this.gameService.removeBallLocation();
+			this.gameService.removeBallLocationResponse();
+			this.gameService.removeGame();
+			this.gameService.removeKeydown();
+			this.gameService.removeGameRoomSocket();
 			this.gameService.disconnectSocket();
 		}
 		setTimeout(() => {

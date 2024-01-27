@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { Messages } from 'src/app/constants/Messages';
 import { User } from 'src/app/models/entities/user';
 import { UserInfo } from 'src/app/models/entities/userInfo';
+import { AchievementRuleService } from 'src/app/services/achievement-rule.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
@@ -27,7 +28,8 @@ export class RedirectionAuth42Component {
     private localStorageService: LocalStorageService,
     private toastrService: ToastrService,
     private authService:AuthService,
-    private userInfoService: UserInfoService) {
+    private userInfoService: UserInfoService,
+    private achievementRuleService:AchievementRuleService) {
 
   }
 
@@ -51,6 +53,7 @@ export class RedirectionAuth42Component {
       if (this.jwtControllerService.isActive(this.token)) {
         this.localStorageService.saveItem("token", this.token);
         this.updateUserInfo();
+        this.checkAchievement('sign');
         this.router.navigate(['/view'])
         this.toastrService.info(Messages.success);
       }
@@ -71,12 +74,17 @@ export class RedirectionAuth42Component {
     };
     this.userInfoService.add(userInfo).subscribe(response => {
       if (response.success) {
-
       }
     }, responseError => {
       if (responseError.error) {
         this.toastrService.error(Messages.error);
       }
     })
+  }
+
+  checkAchievement(achievementName: string) {
+    let currentUserId = this.authService.getCurrentUserId();
+    console.log("currentUserId ", currentUserId);
+    return this.achievementRuleService.checkAchievement(currentUserId, achievementName);
   }
 }

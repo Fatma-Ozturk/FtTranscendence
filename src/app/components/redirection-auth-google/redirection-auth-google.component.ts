@@ -10,6 +10,7 @@ import { JwtControllerService } from 'src/app/services/jwt-controller.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { UserInfoService } from 'src/app/services/user-info.service';
 import { UserInfo } from 'src/app/models/entities/userInfo';
+import { AchievementRuleService } from 'src/app/services/achievement-rule.service';
 
 @Component({
   selector: 'app-redirection-auth-google',
@@ -27,7 +28,8 @@ export class RedirectionAuthGoogleComponent {
     private localStorageService: LocalStorageService,
     private toastrService: ToastrService,
     private authService:AuthService,
-    private userInfoService: UserInfoService) {
+    private userInfoService: UserInfoService,
+    private achievementRuleService:AchievementRuleService) {
 
   }
 
@@ -47,7 +49,8 @@ export class RedirectionAuthGoogleComponent {
     if (this.success === 'true') {
       if (this.jwtControllerService.isActive(this.token)) {
         this.localStorageService.saveItem("token", this.token);
-        this.router.navigate(['/view'])
+        this.checkAchievement('sign');
+        this.router.navigate(['/view']);
         this.toastrService.info(Messages.success);
       }
     }
@@ -67,12 +70,18 @@ export class RedirectionAuthGoogleComponent {
     };
     this.userInfoService.add(userInfo).subscribe(response => {
       if (response.success) {
-
       }
     }, responseError => {
       if (responseError.error) {
         this.toastrService.error(Messages.error);
       }
     })
+  }
+
+  checkAchievement(achievementName: string) {
+    let currentUserId = this.authService.getCurrentUserId();
+    console.log("currentUserId ", currentUserId);
+    
+    return this.achievementRuleService.checkAchievement(currentUserId, achievementName);
   }
 }

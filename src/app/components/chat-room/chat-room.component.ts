@@ -22,6 +22,10 @@ import { ChatRoom } from 'src/app/models/entities/chatRoom';
 import { Messages } from 'src/app/constants/Messages';
 import { switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, throwError } from 'rxjs';
+import { UserInfoService } from 'src/app/services/user-info.service';
+import { UserInfo } from 'src/app/models/entities/userInfo';
+import { environment } from 'src/environments/environment';
+import { GameInvateModel } from 'src/app/models/model/gameInvateModel';
 
 @Component({
   selector: 'app-chat-room',
@@ -55,6 +59,8 @@ export class ChatRoomComponent {
   messages: ChatRoomMessageModel[] = [];
   newMessage: string = '';
 
+  gameInvateModel: GameInvateModel;
+
   screenHeight: number;
   screenWidth: number;
 
@@ -64,6 +70,12 @@ export class ChatRoomComponent {
 
   chatRoomSubject = new BehaviorSubject<ChatRoom | null>(null);
   chatRoom$ = this.chatRoomSubject.asObservable();
+
+  currentUserNickName: string;
+  userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
+  userInfo$ = this.userInfoSubject.asObservable();
+  userInfo: UserInfo;
+
   chatRoom: ChatRoom;
   messagesContentRef: ElementRef;
 
@@ -74,6 +86,7 @@ export class ChatRoomComponent {
     private chatRoomService: ChatRoomService,
     private authService: AuthService,
     private userService: UserService,
+    private userInfoService: UserInfoService,
     private el: ElementRef,
     private route: ActivatedRoute,
     private router: Router,
@@ -86,9 +99,16 @@ export class ChatRoomComponent {
     this.route.paramMap.subscribe(params => {
       const accessId = params.get('accessId');
       this.chatRoomAccessId = accessId; //accesIdControlü yap
+      this.currentUserNickName = this.authService.getCurrentNickName();
+      this.getUserInfoByNickName(this.currentUserNickName);
       this.getChatRoomByAccessId();
     });
 
+    this.userInfo$.subscribe(response => {
+      if (response) {
+        this.userInfo = response;
+      }
+    })
     this.createChatMessageForm();
     this.chatRoomService.connectSocket();
     let response: any = { "data": this.chatRoomAccessId, "messages": "accessId", "success": true };
@@ -273,10 +293,27 @@ export class ChatRoomComponent {
 
   sendMessage() {
     // Kullanıcının girdiği metni mesajlar dizisine ekleyin
-    let newMessage: ChatRoomMessageModel = { text: this.newMessage, sender: this.player.name, date: new Date() };
+    let newMessage: ChatRoomMessageModel = {
+      text: this.newMessage,
+      sender: this.player.name,
+      date: new Date(),
+      imageUrl: this.userInfo?.profileImagePath,
+      gameInvateModel: {
+        hostUserNickName: null,
+        guestUserNickName: null
+      },
+      isInterpreted: false
+    };
+    let isInterpreted = this.messageInterpreter(newMessage);
+    if (isInterpreted == true){
+      newMessage.gameInvateModel = {
+        hostUserNickName: this.gameInvateModel.hostUserNickName,
+        guestUserNickName: this.gameInvateModel.guestUserNickName
+      }
+    }
+    newMessage.isInterpreted = isInterpreted;
+
     this.messages.push(newMessage);
-    this.messageInterpreter(newMessage);
-    // Kullanıcının girdiği metni temizleyin
     this.newMessage = '';
   }
 
@@ -358,7 +395,7 @@ export class ChatRoomComponent {
     }
     this.sendChatRoomOperation(operation);
     if (this.authService.getCurrentNickName() === value) {
-    this.toastrService.info(Messages.notChatRoomAdmin, String(this.chatRoom.roomUserId) + " " + String(this.authService.getCurrentUserId()))
+      this.toastrService.info(Messages.notChatRoomAdmin, String(this.chatRoom.roomUserId) + " " + String(this.authService.getCurrentUserId()))
 
       this.isMuteVisible = false;
     }
@@ -384,7 +421,14 @@ export class ChatRoomComponent {
       this.toastrService.info(Messages.notChatRoomAdmin, Messages.info)
       return;
     }
-    this.getUserByNickName(this.chatRoom, value);
+    this.getUserByNickNameForChatRoomUpdate(this.chatRoom, value);
+  }
+
+  chatRoomOperationGameInvate(key: string, value: any) {
+    this.gameInvateModel = {
+      hostUserNickName: String(this.authService.getCurrentNickName()),
+      guestUserNickName: String(value.trim())
+    }
   }
 
   chatRoomUpdate(chatRoom: ChatRoom, nickName: string) {
@@ -400,7 +444,7 @@ export class ChatRoomComponent {
     });
   }
 
-  getUserByNickName(chatRoom: ChatRoom, nickName: string) {
+  getUserByNickNameForChatRoomUpdate(chatRoom: ChatRoom, nickName: string) {
     this.userService.getByNickName(nickName).subscribe(response => {
       if (response.success) {
         chatRoom.roomUserId = response.data.id
@@ -413,17 +457,38 @@ export class ChatRoomComponent {
     });
   }
 
-  messageInterpreter(newMessage: any) {
+  getUserInfoByNickName(nickName: string) {
+    this.userInfoService.getByNickName(nickName).subscribe(response => {
+      if (response.success) {
+        this.userInfoSubject.next(response.data);
+      }
+    }, responseError => {
+      if (responseError.error) {
+        this.toastrService.error(Messages.error, Messages.error);
+      }
+    });
+  }
+
+  messageInterpreter(newMessage: any): boolean {
     let message: string = newMessage.text;
     let keyValueArray = message.split(":");
     let key = keyValueArray[0];
     let value = keyValueArray[1];
 
-    if (key === "mute" && message.indexOf(":") > 0) {
-      this.chatRoomOperationMute(key, value);
-    } else if (key === "admin" && message.indexOf(":") > 0) {
-      this.chatRoomOperationAdmin(key, value);
+    const colonCount = (message.match(/:/g) || []).length;
+    if (colonCount == 1 && message.indexOf(":") > 0){
+      if (key === "mute") {
+        this.chatRoomOperationMute(key, value);
+        return true;
+      } else if (key === "admin") {
+        this.chatRoomOperationAdmin(key, value);
+        return true;
+      } else if (key === "game-invate") {
+        this.chatRoomOperationGameInvate(key, value);
+        return true;
+      }
     }
+    return false;
   }
 
   sendChatRoomOperation(operation: ChatRoomOperationModel) {

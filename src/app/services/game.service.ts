@@ -11,6 +11,7 @@ export class GameService {
 	public score$: BehaviorSubject<string> = new BehaviorSubject('');
 	public game$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
+	public matchmakingTwoUser$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public ballLocation$: BehaviorSubject<string> = new BehaviorSubject('');
 	public scoreRespose$: BehaviorSubject<string> = new BehaviorSubject('');
@@ -34,43 +35,46 @@ export class GameService {
 	}
 
 	private setupSocketListeners() {
-		this.socket.on('keydown', (message: any): any => {
+		this.socket.on('keydown', (message: any): any => {//+
 			this.keydown$.next(message);
 		});
-		this.socket.on('score', (message: any): any => {
+		this.socket.on('score', (message: any): any => {//+
 			this.score$.next(message);
 		});
-		this.socket.on('game', (message: any): any => {
+		this.socket.on('game', (message: any): any => { //+
 			this.game$.next(message);
 		});
-		this.socket.on('ballLocation', (message: any): any => {
+		this.socket.on('ballLocation', (message: any): any => {//+
 			this.ballLocation$.next(message);
 		});
-		this.socket.on('matchmaking', (message: any): any => {
+		this.socket.on('matchmaking', (message: any): any => {//+
 			this.matchmaking$.next(message);
 		});
-		this.socket.on('matchmakingResponse', (message: any): any => {
+		this.socket.on('matchmakingResponse', (message: any): any => {//+
 			this.matchmakingResponse$.next(message);
 		});
-		this.socket.on('gameRoomId', (message: any): any => {
+		this.socket.on('matchmakingTwoUser', (message: any): any => {//+
+			this.matchmakingTwoUser$.next(message);
+		});
+		this.socket.on('gameRoomId', (message: any): any => {//+
 			this.gameRoomId$.next(message);
 		});
 		this.socket.on('gameRoomSocket', (message: any): any => {
 			this.gameRoomSocket$.next(message);
 		});
-		this.socket.on('gameRoomSocketResponse', (message: any): any => {
+		this.socket.on('gameRoomSocketResponse', (message: any): any => { //+
 			this.gameRoomSocketResponse$.next(message);
 		});
-		this.socket.on('ballLocationResponse', (message: any): any => {
+		this.socket.on('ballLocationResponse', (message: any): any => {//+
 			this.ballLocationResponse$.next(message);
 		});
-		this.socket.on('paddleResponse', (message: any): any => {
+		this.socket.on('paddleResponse', (message: any): any => {//+
 			this.paddleResponse$.next(message);
 		});
-		this.socket.on('scoreResponse', (message: any): any => {
+		this.socket.on('scoreResponse', (message: any): any => { //+
 			this.scoreRespose$.next(message);
 		});
-		this.socket.on('gameDisconnected', (message: any): any => {
+		this.socket.on('gameDisconnected', (message: any): any => {//+
 			this.gameDisconnected$.next(message);
 		});
 		// this.socket.on('gameDisconnect', (message: any):any => {
@@ -106,6 +110,10 @@ export class GameService {
 		this.socket.emit('matchmaking', matchmaking);
 	}
 
+	public sendMatchmakingTwoUser(matchmakingTwoUser: any) {
+		this.socket.emit('matchmakingTwoUser', matchmakingTwoUser);
+	}
+
 	// public sendGameDisconnect(data?: any) {
 	//   this.socket.emit('disconnect', data);
 	// }
@@ -124,6 +132,10 @@ export class GameService {
 
 	public getNewMatchmaking = () => {
 		return this.matchmaking$.asObservable();
+	};
+
+	public getNewMatchmakingTwoUser = () => {
+		return this.matchmakingTwoUser$.asObservable();
 	};
 
 	public getNewMatchmakingResponse = () => {
@@ -158,6 +170,10 @@ export class GameService {
 		this.socket.off('keydown');
 	}
 
+	public removeGame(): void {
+		this.socket.off('game');
+	}
+
 	public removeGameRoomId(): void {
 		this.socket.off('gameRoomId');
 	}
@@ -169,7 +185,7 @@ export class GameService {
 	public removeMatchmakingResponse(): void {
 		this.socket.off('matchmakingResponse');
 	}
-//
+	
 	public removeScoreRespnse(): void {
 		this.socket.off('scoreResponse');
 	}
@@ -184,6 +200,18 @@ export class GameService {
 
 	public removeBallLocation(): void {
 		this.socket.off('ballLocation')
+	}
+
+	public removeGameRoomSocket():void{
+		this.socket.off('gameRoomSocket');
+	}
+
+	public removeGameRoomSocketResponse(): void{
+		this.socket.off('gameRoomSocketResponse');
+	}
+
+	public removeBallLocationResponse(): void{
+		this.socket.off('ballLocationResponse');
 	}
 
 	public isConnected(): boolean {
