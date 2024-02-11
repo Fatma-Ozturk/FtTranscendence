@@ -13,6 +13,7 @@ export class GameService {
 	public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmakingTwoUser$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+	public matchmakingTwoResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public ballLocation$: BehaviorSubject<string> = new BehaviorSubject('');
 	public scoreRespose$: BehaviorSubject<string> = new BehaviorSubject('');
 	public ballLocationResponse$: BehaviorSubject<string> = new BehaviorSubject('');
@@ -52,6 +53,9 @@ export class GameService {
 		});
 		this.socket.on('matchmakingResponse', (message: any): any => {//+
 			this.matchmakingResponse$.next(message);
+		});
+		this.socket.on('matchmakingTwoResponse', (message: any): any => {//+
+			this.matchmakingTwoResponse$.next(message);
 		});
 		this.socket.on('matchmakingTwoUser', (message: any): any => {//+
 			this.matchmakingTwoUser$.next(message);
@@ -141,7 +145,9 @@ export class GameService {
 	public getNewMatchmakingResponse = () => {
 		return this.matchmakingResponse$.asObservable();
 	};
-
+	public getNewMatchmakingTwoResponse = () => {
+		return this.matchmakingTwoResponse$.asObservable();
+	};
 	public getGameRoomId = () => {
 		return this.gameRoomId$.asObservable();
 	};
@@ -182,10 +188,18 @@ export class GameService {
 		this.socket.off('matchmaking');
 	}
 
+	public removeNewMatchmakingTwoUser(): void {
+		this.socket.off('matchmakingTwoUser');
+	}
+
 	public removeMatchmakingResponse(): void {
 		this.socket.off('matchmakingResponse');
 	}
-	
+
+	public removeMatchmakingTwoResponse(): void {
+		this.socket.off('matchmakingTwoResponse');
+	}
+
 	public removeScoreRespnse(): void {
 		this.socket.off('scoreResponse');
 	}

@@ -18,6 +18,8 @@ import { GameTotalScoreByUserDto } from 'src/app/models/dto/gameTotalScoreByUser
 import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
 import { GameTotalScore } from 'src/app/models/entities/gameTotalScore';
 import { UserAchievementByAchievementDto } from 'src/app/models/dto/userAchievementByAchievementDto';
+import { UserBlockService } from 'src/app/services/user-block.service';
+import { UserBlock } from 'src/app/models/entities/userBlock';
 
 @Component({
   selector: 'app-user-profile',
@@ -31,6 +33,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
   userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
   user$ = this.userSubject.asObservable();
   currentUserId: number;
+  profileUserId: number;
   nickName: string = "";
   editProfileVisible: boolean = false;
 
@@ -47,20 +50,12 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
     private gameTotalScoreService: GameTotalScoreService,
     private achievementRuleService: AchievementRuleService,
     private userAchievementService: UserAchievementService,
+	private userBlockService: UserBlockService,
     private toastrService: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService) {
 
-  }
-  ngAfterViewInit(): void {
-    this.user$.subscribe(response => {
-      if (response) {
-        this.editProfileVisible = (this.currentUserId == response.id);
-      }
-    })
-    this.getGameTotalScories();
-    this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
   }
 
   ngOnInit(): void {
@@ -88,6 +83,17 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
           this.toastrService.error(Messages.error);
         }
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.user$.subscribe(response => {
+      if (response) {
+		this.profileUserId = response.id;
+        this.editProfileVisible = (this.currentUserId == response.id);
+      }
+    })
+    this.getGameTotalScories();
+    this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
   }
 
   getUserGameHistoryDtos(userId: number) {
@@ -127,5 +133,21 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
         this.userAchievementByAchievementDtoSubject.next(response.data);
       }
     })
+  }
+
+  userBlockUser(){
+	let userBlock: UserBlock = {
+		id: 0,
+		blockerId: this.profileUserId,
+		blockedId: this.currentUserId,
+		createdAt: new Date(),
+		updateTime: new Date(),
+		status: true,
+	};
+	this.userBlockService.add(userBlock).subscribe(response => {
+		if (response.success) {
+			this.toastrService.success(Messages.success);
+		}
+	});
   }
 }

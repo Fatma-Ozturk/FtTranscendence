@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="block-user-container" *ngIf="!editProfileVisible">
-            <p-button label="Kullanıcıyı Engelle" icon="pi pi-external-link" class="btn block-user-btn"
+            <p-button label="Kullanıcıyı Engelle" (click)="userBlockUser()" icon="pi pi-external-link" class="btn block-user-btn"
                 styleClass="p-button-outlined p-button-secondary w-100">
             </p-button>
         </div>

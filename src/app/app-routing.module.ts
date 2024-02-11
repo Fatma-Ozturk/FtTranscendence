@@ -20,6 +20,7 @@ import { GameMatchmakingComponent } from './components/game-matchmaking/game-mat
 import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { editableProfileGuard } from './guards/editable-profile.guard';
+import { userBlockGuard } from './guards/user-block.guard';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -35,7 +36,7 @@ const routes: Routes = [
 	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
 	{ path: "game-matchmaking/two-user", component: GameMatchmakingComponent, canActivate: [loginGuard] },
 	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
-	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard] },
+	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard, userBlockGuard] },
 	{ path: "user-edit-profile/:nickname", component: UserProfileEditComponent, canActivate: [loginGuard, editableProfileGuard] },
 	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },,
 	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },

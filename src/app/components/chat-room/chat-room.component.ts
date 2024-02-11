@@ -521,7 +521,9 @@ export class ChatRoomComponent {
   }
 
   updateScrollBarChat() {
-    const messagesContent = this.messagesContentRef.nativeElement;
+    const messagesContent = this.messagesContentRef?.nativeElement;
+	if (messagesContent === undefined)
+		return;
     this.renderer.setProperty(messagesContent, 'scrollTop', messagesContent.scrollHeight);
   }
 
