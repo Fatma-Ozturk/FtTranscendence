@@ -83,6 +83,7 @@ import { ChatRoomCreateComponent } from './components/chat-room-create/chat-room
 import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { DirectMessageComponent } from './components/direct-message/direct-message.component';
 
 @NgModule({
   declarations: [
@@ -111,7 +112,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     UserProfileEditComponent,
     CreateUserProfileComponent,
     GameMatchmakingComponent,
-    ChatRoomCreateComponent
+    ChatRoomCreateComponent,
+    DirectMessageComponent
   ],
   imports: [
     BrowserModule,
