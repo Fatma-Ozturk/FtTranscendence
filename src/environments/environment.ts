@@ -7,10 +7,11 @@ export const environment = {
     appurl:"http://localhost:3000/api/",
     profileImageUrl:"http://localhost:3000/profile-images/",
     appurlSocketGame:"http://localhost:3000/socket/game",
+    appurlSocketDirectMessage:"http://localhost:3000/socket/direct-message",
     appurlSocketChatRoom:"http://localhost:3000/socket/chat-room",
     production: false,
   };
-  
+
   /*
    * For easier debugging in development mode, you can import the following file
    * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

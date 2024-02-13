@@ -26,7 +26,7 @@
     </ng-template>
     <ng-template pTemplate="footer">
       <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-        <p-button icon="pi pi-comment" styleClass="p-button-rounded p-button-success"></p-button>
+        <p-button icon="pi pi-comment" styleClass="p-button-rounded p-button-success" [routerLink]="'/direct-message/' + user.nickName"  routerLinkActive="active"></p-button>
         <p-button icon="pi pi-heart" styleClass="p-button-rounded p-button-danger"></p-button>
         <p-button icon="pi pi-user" styleClass="p-button-rounded p-button-primary" [routerLink]="'/user-profile/' + user.nickName"  routerLinkActive="active"></p-button>
       </div>

@@ -1,12 +1,4 @@
 <div class="container">
-	<div class="row">
-		<div class="col">
-
-		</div>
-		<div class="col">
-			<app-chat [messages]="messages"
-				(messageInput)="chatRoomMessageInput($event)" (sendMessageClickOutput)="sendMessageClick()"
-				(updateScrollbarOutput)="updateScrollBar($event)"></app-chat>
-		</div>
-	</div>
+	<app-chat [chatRoomAccessId]="'0'" [messages]="messages" (messageInput)="chatRoomMessageInput($event)"
+		(sendMessageClickOutput)="sendMessageClick()" (updateScrollbarOutput)="updateScrollBar($event)"></app-chat>
 </div>

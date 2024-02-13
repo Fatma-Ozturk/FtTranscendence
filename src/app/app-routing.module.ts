@@ -21,6 +21,7 @@ import { ChatRoomsComponent } from './components/chat-rooms/chat-rooms.component
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { editableProfileGuard } from './guards/editable-profile.guard';
 import { userBlockGuard } from './guards/user-block.guard';
+import { DirectMessageComponent } from './components/direct-message/direct-message.component';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -43,6 +44,7 @@ const routes: Routes = [
 	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard] },
 	{ path: 'chat-rooms/invite/:accessId', component: ChatRoomsComponent, canActivate: [loginGuard] },
 	{ path: 'chat-room/:accessId', component: ChatRoomComponent, canActivate: [loginGuard] },
+	{ path: 'direct-message/:nickname', component: DirectMessageComponent, canActivate: [loginGuard] },
 	{ path: '**', component: NotFoundComponent },
 ];
 

@@ -17,6 +17,6 @@ export class UserProfileCardComponent {
   }
 
   getUserProfile(){
-    
+
   }
 }
