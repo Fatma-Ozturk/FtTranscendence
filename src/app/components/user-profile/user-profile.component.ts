@@ -22,132 +22,170 @@ import { UserBlockService } from 'src/app/services/user-block.service';
 import { UserBlock } from 'src/app/models/entities/userBlock';
 
 @Component({
-  selector: 'app-user-profile',
-  templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.css']
+	selector: 'app-user-profile',
+	templateUrl: './user-profile.component.html',
+	styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit, AfterViewInit {
-  userSubject = new BehaviorSubject<User | null>(null);
-  userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
+	userSubject = new BehaviorSubject<User | null>(null);
+	userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
 
-  userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
-  user$ = this.userSubject.asObservable();
-  currentUserId: number;
-  profileUserId: number;
-  nickName: string = "";
-  editProfileVisible: boolean = false;
+	userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
+	user$ = this.userSubject.asObservable();
+	currentUserId: number;
+	profileUserId: number;
+	nickName: string = "";
+	editProfileVisible: boolean = false;
 
-  gameHistoryDialogVisible: boolean = false;
+	gameHistoryDialogVisible: boolean = false;
 
-  gameTotalScoriesSubject = new BehaviorSubject<GameTotalScore | null>(null);
-  gameTotalScories$ = this.gameTotalScoriesSubject.asObservable();
+	gameTotalScoriesSubject = new BehaviorSubject<GameTotalScore | null>(null);
+	gameTotalScories$ = this.gameTotalScoriesSubject.asObservable();
 
-  userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>(null);
-  userAchievementByAchievementDtos$ = this.userAchievementByAchievementDtoSubject.asObservable();
-  constructor(
-    private userService: UserService,
-    private gameHistoryService: GameHistoryService,
-    private gameTotalScoreService: GameTotalScoreService,
-    private achievementRuleService: AchievementRuleService,
-    private userAchievementService: UserAchievementService,
-	private userBlockService: UserBlockService,
-    private toastrService: ToastrService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private authService: AuthService) {
+	userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>(null);
+	userAchievementByAchievementDtos$ = this.userAchievementByAchievementDtoSubject.asObservable();
 
-  }
+	isUserBlockerSubject = new BehaviorSubject<boolean | null>(null);
+	isUserBlocker$ = this.isUserBlockerSubject.asObservable();
+	isUserBlocker: boolean | null = null;
 
-  ngOnInit(): void {
-    this.currentUserId = this.authService.getCurrentUserId();
-    this.route.paramMap
-      .pipe(
-        switchMap((params: any) => {
-          this.nickName = params.get('nickname');
-          if (!this.nickName) {
-            throw new Error('Nickname is required');
-          }
-          return this.userService.getByNickName(this.nickName);
-        })
-      )
-      .subscribe({
-        next: (response: any) => {
-          if (response.success) {
-            this.userSubject.next(response.data);
-            this.getUserGameHistoryDtos(response.data.id);
-          } else {
-            throw new Error('User not found');
-          }
-        },
-        error: (error) => {
-          this.toastrService.error(Messages.error);
-        }
-      });
-  }
+	constructor(
+		private userService: UserService,
+		private gameHistoryService: GameHistoryService,
+		private gameTotalScoreService: GameTotalScoreService,
+		private achievementRuleService: AchievementRuleService,
+		private userAchievementService: UserAchievementService,
+		private userBlockService: UserBlockService,
+		private toastrService: ToastrService,
+		private route: ActivatedRoute,
+		private router: Router,
+		private authService: AuthService) {
 
-  ngAfterViewInit(): void {
-    this.user$.subscribe(response => {
-      if (response) {
-		this.profileUserId = response.id;
-        this.editProfileVisible = (this.currentUserId == response.id);
-      }
-    })
-    this.getGameTotalScories();
-    this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
-  }
+	}
 
-  getUserGameHistoryDtos(userId: number) {
-    this.gameHistoryService.getByUserIdGameHistoryDto(userId)
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.userGameHistoryDtosSubject.next(response.data);
-          }
-        },
-        error: (responseError) => {
-          this.toastrService.error(Messages.error);
-        }
-      });
-  }
+	ngOnInit(): void {
+		this.currentUserId = this.authService.getCurrentUserId();
+		this.route.paramMap
+			.pipe(
+				switchMap((params: any) => {
+					this.nickName = params.get('nickname');
+					if (!this.nickName) {
+						throw new Error('Nickname is required');
+					}
+					return this.userService.getByNickName(this.nickName);
+				})
+			)
+			.subscribe({
+				next: (response: any) => {
+					if (response.success) {
+						this.userSubject.next(response.data);
+						this.getUserGameHistoryDtos(response.data.id);
+					} else {
+						throw new Error('User not found');
+					}
+				},
+				error: (error) => {
+					this.toastrService.error(Messages.error);
+				}
+			});
+	}
 
-  showGameHistoryDialog() {
-    this.gameHistoryDialogVisible = true;
-  }
+	ngAfterViewInit(): void {
+		this.user$.subscribe(response => {
+			if (response) {
+				this.profileUserId = response.id;
+				this.editProfileVisible = (this.currentUserId == response.id);
+			}
+		})
+		this.getGameTotalScories();
+		this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
+		this.getUserBlock();
+		this.isUserBlocker$.subscribe(response => {
+			this.isUserBlocker = response;
+		})
+	}
 
-  showProfileSettingDialog() {
-    // this.profileSettingsDialogVisible = true;
-    this.router.navigate(['/user-edit-profile/', this.nickName])
-  }
+	getUserGameHistoryDtos(userId: number) {
+		this.gameHistoryService.getByUserIdGameHistoryDto(userId)
+			.subscribe({
+				next: (response) => {
+					if (response.success) {
+						this.userGameHistoryDtosSubject.next(response.data);
+					}
+				},
+				error: (responseError) => {
+					this.toastrService.error(Messages.error);
+				}
+			});
+	}
 
-  getGameTotalScories() {
-    this.gameTotalScoreService.getByNickName(this.nickName).subscribe(response => {
-      if (response.success) {
-        this.gameTotalScoriesSubject.next(response.data);
-      }
-    });
-  }
+	showGameHistoryDialog() {
+		this.gameHistoryDialogVisible = true;
+	}
 
-  getAllUserAchievementByAchievementDtoWithUserId(userId: number) {
-    this.userAchievementService.getAllUserAchievementByAchievementDtoWithUserId(userId).subscribe(response => {
-      if (response.success) {
-        this.userAchievementByAchievementDtoSubject.next(response.data);
-      }
-    })
-  }
+	showProfileSettingDialog() {
+		// this.profileSettingsDialogVisible = true;
+		this.router.navigate(['/user-edit-profile/', this.nickName])
+	}
 
-  userBlockUser(){
-	let userBlock: UserBlock = {
-		id: 0,
-		blockerId: this.profileUserId,
-		blockedId: this.currentUserId,
-		createdAt: new Date(),
-		updateTime: new Date(),
-		status: true,
-	};
-	this.userBlockService.add(userBlock).subscribe(response => {
-		if (response.success) {
-			this.toastrService.success(Messages.success);
+	getGameTotalScories() {
+		this.gameTotalScoreService.getByNickName(this.nickName).subscribe(response => {
+			if (response.success) {
+				this.gameTotalScoriesSubject.next(response.data);
+			}
+		});
+	}
+
+	getAllUserAchievementByAchievementDtoWithUserId(userId: number) {
+		this.userAchievementService.getAllUserAchievementByAchievementDtoWithUserId(userId).subscribe(response => {
+			if (response.success) {
+				this.userAchievementByAchievementDtoSubject.next(response.data);
+			}
+		})
+	}
+
+	userBlock() {
+		if (this.isUserBlocker == null){
+			this.userBlockAdd();
+			return;
 		}
-	});
-  }
+		let userBlock: UserBlock = {
+			id: 0,
+			blockerId: this.profileUserId,
+			blockedId: this.currentUserId,
+			createdAt: new Date(),
+			updateTime: new Date(),
+			status: !this.isUserBlocker,
+		};
+		this.userBlockService.updateStatusByBlockerIdBlockedId(userBlock).subscribe(response => {
+			if (response.success) {
+				this.toastrService.success(Messages.success);
+			}
+		});
+	}
+
+	userBlockAdd() {
+		let userBlock: UserBlock = {
+			id: 0,
+			blockerId: this.profileUserId,
+			blockedId: this.currentUserId,
+			createdAt: new Date(),
+			updateTime: null,
+			status: true,
+		};
+		this.userBlockService.add(userBlock).subscribe(response => {
+			if (response.success) {
+				this.toastrService.success(Messages.success);
+			}
+		});
+	}
+
+	getUserBlock() {
+		this.userBlockService.getByBlockerId(this.currentUserId).subscribe(response => {
+			if (response.success) {
+				const blocked = response.data.some((block: UserBlock) => block.blockedId === this.profileUserId);
+				this.isUserBlockerSubject.next(blocked);
+			}
+		})
+	}
 }

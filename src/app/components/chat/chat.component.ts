@@ -22,7 +22,7 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
   profileImageUrl: string;
 
   @Input() chatRoomAccessId: string;
-  @Input() messages: ChatRoomMessageModel[];
+  @Input() messages: any[];
   @ViewChild('messagesContent') messagesContentRef: ElementRef;
   @Output() messageInput = new EventEmitter<string>();
   @Output() sendMessageClickOutput = new EventEmitter<any>();

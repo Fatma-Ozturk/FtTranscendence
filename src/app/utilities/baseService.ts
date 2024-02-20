@@ -36,7 +36,7 @@ export class BaseService<T>{
     update(t: T): Observable<ResponseModel> {
         return this.httpClientBase.post<ResponseModel>(environment.appurl + this._name + "/update", t)
     }
-    delete(t:T):Observable<ResponseModel>{
-        return this.httpClientBase.post<ResponseModel>(environment.appurl + this._name + "/delete", t)
+    delete(id: number):Observable<ResponseModel>{
+        return this.httpClientBase.get<ResponseModel>(environment.appurl + this._name + "/delete?id=" + id)
     }
 }

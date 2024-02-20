@@ -27,11 +27,18 @@
                 </div>
             </div>
         </div>
-        <div class="block-user-container" *ngIf="!editProfileVisible">
-            <p-button label="Kullanıcıyı Engelle" (click)="userBlockUser()" icon="pi pi-external-link" class="btn block-user-btn"
-                styleClass="p-button-outlined p-button-secondary w-100">
-            </p-button>
-        </div>
+		<div class="block-user-container" *ngIf="!editProfileVisible">
+			<!-- isUserBlocker$ true ise, Kullanıcıyı Engelle butonunu göster -->
+			<p-button *ngIf="isUserBlocker$ | async; else unblockUser" label="Kullanıcıyı Engelle" (click)="userBlock()" icon="pi pi-ban" class="btn block-user-btn"
+				styleClass="p-button-outlined p-button-danger w-100">
+			</p-button>
+			<!-- isUserBlocker$ false ise, Engeli Kaldır butonunu tanımlanan ng-template içinde göster -->
+			<ng-template #unblockUser>
+				<p-button label="Engeli Kaldır" (click)="userBlock()" icon="pi pi-check" class="btn unblock-user-btn"
+					styleClass="p-button-outlined p-button-eror w-100">
+				</p-button>
+			</ng-template>
+		</div>
         <div class="edit-profile-container" *ngIf="editProfileVisible">
             <p-button label="Profili Düzenle" (click)="showProfileSettingDialog()" icon="pi pi-external-link"
                 class="btn profile-edit-btn" styleClass="p-button-outlined p-button-secondary w-100">

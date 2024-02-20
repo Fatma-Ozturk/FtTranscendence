@@ -23,10 +23,14 @@ export const userBlockGuard: CanActivateFn = (route, state) => {
 			}
 			return userBlockService.getByBlockerId(blockerId).pipe(
 				map((blocks: any) => {
-					const blocked = blocks.data.some((block: UserBlock) => block.blockedId === user.data.id);
-					if (blocked == true) {
-						window.location.href = ('https://www.youtube.com/watch?v=gBRQGqb04Y0');
-					}
+					console.log("blocks.data ", blocks.data);
+
+					let blocked:boolean = blocks.data.some((block: UserBlock) => block.blockedId === user.data.id);
+					console.log("blocked ", blocked);
+
+					// if (blocked == true) {
+					// 	window.location.href = ('https://www.youtube.com/watch?v=gBRQGqb04Y0');
+					// }
 					return !blocked;
 				}),
 				catchError(() => of(true))
