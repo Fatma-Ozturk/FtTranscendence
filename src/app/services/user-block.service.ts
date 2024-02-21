@@ -5,6 +5,7 @@ import { BaseService } from '../utilities/baseService';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { ResponseModel } from '../models/responseModel/responseModel';
+import { SingleResponseModel } from '../models/singleResponseModel';
 
 @Injectable({
 	providedIn: 'root'
@@ -19,7 +20,7 @@ export class UserBlockService extends BaseService<UserBlock> {
 	getByBlockerId(blockerId: number) {
 		return this.httpClient.get<ListResponseModel<UserBlock>>(environment.appurl + this.name + "/getbyblockerid?blockerId=" + blockerId);
 	}
-	updateStatusByBlockerIdBlockedId(updateUserBlock: UserBlock){
-		return this.httpClient.post<ResponseModel>(environment.appurl + this.name + "/updateStatusByBlockerIdBlockedId", updateUserBlock)
+	getByBlockerIdBlockedId(updateUserBlock: UserBlock){
+		return this.httpClient.post<SingleResponseModel<UserBlock>>(environment.appurl + this.name + "/getByBlockerIdBlockedId", updateUserBlock)
 	}
 }

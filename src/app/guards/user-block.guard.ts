@@ -12,7 +12,7 @@ export const userBlockGuard: CanActivateFn = (route, state) => {
 	let authService = inject(AuthService);
 	let userBlockService = inject(UserBlockService);
 	let userService = inject(UserService);
-	let blockerId = authService.getCurrentUserId();
+	let currentId = authService.getCurrentUserId();
 	let nickName = route.paramMap.get('nickname');
 
 	return userService.getByNickName(nickName).pipe(
@@ -21,17 +21,26 @@ export const userBlockGuard: CanActivateFn = (route, state) => {
 			if (!user) {
 				return of(true);
 			}
-			return userBlockService.getByBlockerId(blockerId).pipe(
-				map((blocks: any) => {
-					console.log("blocks.data ", blocks.data);
+			return userBlockService.getByBlockerIdBlockedId({
+				id: 0,
+				blockerId: Number(user.data.id),
+				blockedId: Number(currentId),
+				createdAt: new Date(),
+				updateTime: new Date(),
+				status: true
+			}).pipe(
+				map((block: any) => {
+					console.log("blocks.data ", block.data);
+					console.log("user.data.id ", user.data.id);
 
-					let blocked:boolean = blocks.data.some((block: UserBlock) => block.blockedId === user.data.id);
-					console.log("blocked ", blocked);
+					// let blocked:UserBlock = blocks.data.find((block: UserBlock) => block.blockedId === user.data.id);
+					// console.log("blocked ", blocked);
 
-					// if (blocked == true) {
-					// 	window.location.href = ('https://www.youtube.com/watch?v=gBRQGqb04Y0');
-					// }
-					return !blocked;
+					//
+					if (block && block.success == true){
+						return false;
+					}
+					return (true);
 				}),
 				catchError(() => of(true))
 			);

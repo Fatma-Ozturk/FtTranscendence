@@ -74,6 +74,8 @@ export class GameComponent {
 	gameTotalScore$ = this.gameTotalScoreSubject.asObservable();
 	gameTotalScore: GameTotalScore;
 
+	currentUserId: number;
+
 	constructor(
 		private gameService: GameService,
 		private gameScoreService: GameScoreService,
@@ -92,10 +94,10 @@ export class GameComponent {
 		this.bendCall = 0;
 		this.gameService.getGameRoomSocketResponse().subscribe(
 			(response: any) => {
-				if (response){
+				if (response) {
 					if (response.message === 'GameRoomSocketResponse Info') {
 						console.log("response ", response);
-						
+
 						this.gameRoomSocket = JSON.parse(response.data);
 						this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
 						if (this.whoIs == -1) return;
@@ -129,12 +131,13 @@ export class GameComponent {
 		}
 		this.gameTotalScore$.subscribe(response => {
 			this.gameTotalScore = response;
-			if (response?.totalWin > 1){
+			if (response?.totalWin > 1) {
 				this.checkAchievement("firstPongWin");
 			}
 		})
 	}
 	ngOnInit(): void {
+		this.currentUserId = this.authService.getCurrentUserId();
 		this.getGameTotalScore();
 		this.setupScoreListener();
 		this.setupBallListener();
@@ -146,6 +149,11 @@ export class GameComponent {
 			this.initGameModels();
 			this.route.queryParams.subscribe((data: any) => {
 				this.gameRoomId = Number(data['room-id']);
+				if (this.currentUserId != this.gameRoomSocket.userGuestId ||
+					this.currentUserId != this.gameRoomSocket.userHostId) {
+					this.gameService.connectSocket();
+					this.whoIs = 2;
+				}
 			});
 		}
 	}

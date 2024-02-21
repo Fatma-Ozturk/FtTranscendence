@@ -44,7 +44,7 @@ const routes: Routes = [
 	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard] },
 	{ path: 'chat-rooms/invite/:accessId', component: ChatRoomsComponent, canActivate: [loginGuard] },
 	{ path: 'chat-room/:accessId', component: ChatRoomComponent, canActivate: [loginGuard] },
-	{ path: 'direct-message/:nickname', component: DirectMessageComponent, canActivate: [loginGuard] },
+	{ path: 'direct-message/:nickname', component: DirectMessageComponent, canActivate: [loginGuard, userBlockGuard] },
 	{ path: '**', component: NotFoundComponent },
 ];
 

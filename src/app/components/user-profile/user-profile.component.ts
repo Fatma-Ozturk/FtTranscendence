@@ -7,7 +7,7 @@ import { GameHistoryService } from './../../services/game-history.service';
 import { GameHistory } from './../../models/entities/gameHistory';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from 'src/app/services/user.service';
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { User } from 'src/app/models/entities/user';
 import { Messages } from 'src/app/constants/Messages';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -45,9 +45,9 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	userAchievementByAchievementDtoSubject = new BehaviorSubject<UserAchievementByAchievementDto[] | null>(null);
 	userAchievementByAchievementDtos$ = this.userAchievementByAchievementDtoSubject.asObservable();
 
-	isUserBlockerSubject = new BehaviorSubject<boolean | null>(null);
-	isUserBlocker$ = this.isUserBlockerSubject.asObservable();
-	isUserBlocker: boolean | null = null;
+	userBlockSubject = new BehaviorSubject<UserBlock | null>(null);
+	userBlock$ = this.userBlockSubject.asObservable();
+	userBlock: UserBlock;
 
 	constructor(
 		private userService: UserService,
@@ -59,7 +59,8 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 		private toastrService: ToastrService,
 		private route: ActivatedRoute,
 		private router: Router,
-		private authService: AuthService) {
+		private authService: AuthService,
+		private cdr: ChangeDetectorRef) {
 
 	}
 
@@ -93,16 +94,19 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	ngAfterViewInit(): void {
 		this.user$.subscribe(response => {
 			if (response) {
-				this.profileUserId = response.id;
+				this.profileUserId = Number(response.id);
 				this.editProfileVisible = (this.currentUserId == response.id);
 			}
 		})
 		this.getGameTotalScories();
 		this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
 		this.getUserBlock();
-		this.isUserBlocker$.subscribe(response => {
-			this.isUserBlocker = response;
-		})
+
+		this.userBlock$.subscribe(response => {
+			// if (response) {
+			this.userBlock = response;
+			// }
+		});
 	}
 
 	getUserGameHistoryDtos(userId: number) {
@@ -144,22 +148,23 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 		})
 	}
 
-	userBlock() {
-		if (this.isUserBlocker == null){
+	userBlockDelete() {
+		// Eğer userBlock yoksa, yeni bir engelleme ekleyin.
+		if (!this.userBlock) {
 			this.userBlockAdd();
 			return;
 		}
-		let userBlock: UserBlock = {
-			id: 0,
-			blockerId: this.profileUserId,
-			blockedId: this.currentUserId,
-			createdAt: new Date(),
-			updateTime: new Date(),
-			status: !this.isUserBlocker,
-		};
-		this.userBlockService.updateStatusByBlockerIdBlockedId(userBlock).subscribe(response => {
-			if (response.success) {
-				this.toastrService.success(Messages.success);
+		// Var olan engellemeyi kaldır
+		this.userBlockService.delete(this.userBlock.id).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.toastrService.success(Messages.success);
+					this.getUserBlock(); // Güncel engelleme durumunu yeniden al
+				}
+			},
+			error: () => {
+				// Hata yönetimi
+				this.toastrService.error(Messages.error);
 			}
 		});
 	}
@@ -167,25 +172,39 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	userBlockAdd() {
 		let userBlock: UserBlock = {
 			id: 0,
-			blockerId: this.profileUserId,
-			blockedId: this.currentUserId,
+			blockerId: this.currentUserId,
+			blockedId: this.profileUserId,
 			createdAt: new Date(),
 			updateTime: null,
 			status: true,
 		};
-		this.userBlockService.add(userBlock).subscribe(response => {
-			if (response.success) {
-				this.toastrService.success(Messages.success);
+		this.userBlockService.add(userBlock).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.toastrService.success(Messages.success);
+					this.getUserBlock(); // Engelleme başarılı ise, durumu güncelleyin
+				}
+			},
+			error: () => {
+				// Hata yönetimi
+				this.toastrService.error(Messages.error);
 			}
 		});
 	}
 
 	getUserBlock() {
-		this.userBlockService.getByBlockerId(this.currentUserId).subscribe(response => {
-			if (response.success) {
-				const blocked = response.data.some((block: UserBlock) => block.blockedId === this.profileUserId);
-				this.isUserBlockerSubject.next(blocked);
-			}
+		this.userBlockService.getByBlockerIdBlockedId({
+			id: 0,
+			blockerId: Number(this.currentUserId),
+			blockedId: Number(this.profileUserId),
+			createdAt: new Date(),
+			updateTime: new Date(),
+			status: true
+		}).subscribe(response => {
+			// if (response.success) {
+				this.userBlockSubject.next(response.data);
+				this.cdr.detectChanges();
+			// }
 		})
 	}
 }
