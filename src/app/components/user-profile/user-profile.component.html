@@ -29,12 +29,12 @@
         </div>
 		<div class="block-user-container" *ngIf="!editProfileVisible">
 			<p-button
-				[label]="(userBlock == null || userBlock === undefined) ? 'Kullanıcıyı Engelle' : 'Engeli Kaldır'"
-				(click)="userBlockDelete(); getUserBlock();"
+				[label]="(!isUserBlock) ? 'Kullanıcıyı Engelle' : 'Engeli Kaldır'"
+				(click)="userBlockDelete();"
 				icon="pi"
-				[icon]="(userBlock == null || userBlock === undefined) ? 'pi-ban' : 'pi-check'"
+				[icon]="(!isUserBlock) ? 'pi-user' : 'pi-user'"
 				class="btn block-user-btn"
-				[styleClass]="(userBlock == null || userBlock === undefined) ? 'p-button-outlined p-button-danger w-100' : 'p-button-outlined p-button-success w-100'">
+				[styleClass]="(!isUserBlock) ? 'p-button-outlined p-button-danger w-100' : 'p-button-outlined p-button-success w-100'">
 			</p-button>
 		</div>
         <div class="edit-profile-container" *ngIf="editProfileVisible">

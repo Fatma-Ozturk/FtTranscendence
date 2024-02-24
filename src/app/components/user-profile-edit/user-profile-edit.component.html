@@ -1,215 +1,229 @@
 <div class="profile-pic-wrapper">
-    <div class="pic-holder">
-        <img id="profilePic" class="pic" [src]="profileUrl">
-        <label for="newProfilePhoto" class="upload-file-block">
-            <div class="text-center">
-                <div class="mb-2">
-                    <i class="bi bi-camera"></i>
-                </div>
-                <div class="text-uppercase">
-                    Update <br /> Profile Photo
-                </div>
-            </div>
-        </label>
-        <Input class="uploadProfileInput" type="file" name="profile_pic" id="newProfilePhoto" accept="image/*"
-            style="display: none;" (change)="onFileSelected($event)"/>
-    </div>
+	<div class="pic-holder">
+		<img id="profilePic" class="pic" [src]="profileUrl">
+		<label for="newProfilePhoto" class="upload-file-block">
+			<div class="text-center">
+				<div class="mb-2">
+					<i class="bi bi-camera"></i>
+				</div>
+				<div class="text-uppercase">
+					Update <br /> Profile Photo
+				</div>
+			</div>
+		</label>
+		<Input class="uploadProfileInput" type="file" name="profile_pic" id="newProfilePhoto" accept="image/*"
+			style="display: none;" (change)="onFileSelected($event)" />
+	</div>
 </div>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12 col-md-3">
-            <div class="card flex justify-content-center">
-                <p-panelMenu [model]="menuItems" [style]="{'width':'100%'}"></p-panelMenu>
-            </div>
-        </div>
-        <div class="col-12 col-md-9">
-            <div class="container-fluid" *ngIf="userFormVisible">
-                <div class="row h-100">
-                    <div class="col-12 h-10 d-table">
-                        <div class="card d-table-cell align-middle border-0">
-                            <form [formGroup]="userForm" (ngSubmit)="submitUpdateUser()">
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Ad</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input pInputText type="text" placeholder="Ad" formControlName="firstName"
-                                            id="firstName" [class]="'w-100 '+validatorRequired">
-                                        <a class="base-error-message" *ngIf="userForm.controls['firstName'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userForm.controls['firstName'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Soyad</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input pInputText type="text" placeholder="Soyad" formControlName="lastName"
-                                            id="lastName" [class]="'w-100 '+validatorRequired">
-                                        <a class="base-error-message" *ngIf="userForm.controls['lastName'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userForm.controls['lastName'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Kullanıcı
-                                            Adı</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input pInputText type="text" placeholder="Kullanıcı Adı"
-                                            formControlName="nickName" id="nickName"
-                                            [class]="'w-100 '+validatorRequired">
-                                        <a class="base-error-message" *ngIf="userForm.controls['nickName'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userForm.controls['nickName'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-    
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <div class="float-left">
-                                            <p-button type="reset" label="Vazgeç" value="Vazgeç"
-                                                [styleClass]="'p-button-danger'"></p-button>
-                                            <p-button type="submit" label="Kaydet" value="Kaydet"
-                                                styleClass="p-button-primary" [disabled]="lockedButtonClass"
-                                                [class]="'m-2'"></p-button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid" *ngIf="userInfoFormVisible">
-                <div class="row h-100">
-                    <div class="col-12 h-10 d-table">
-                        <div class="card d-table-cell align-middle border-0">
-                            <form [formGroup]="userInfoForm" (ngSubmit)="submitUpdateUserInfo()">
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Profil
-                                            Açıklama</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <textarea rows="5" cols="30" pInputTextarea [autoResize]="true" type="text"
-                                            placeholder="Profil Açıklaması" formControlName="profileText"
-                                            id="profileText" [class]="'w-100 '+validatorRequired"></textarea>
-                                        <a class="base-error-message"
-                                            *ngIf="userInfoForm.controls['profileText'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userInfoForm.controls['profileText'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Cinsiyet</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p-selectButton [options]="stateGenderOptions" optionLabel="label"
-                                            optionValue="value" placeholder="Cinsiyet" formControlName="gender"
-                                            id="gender" [class]="'ng-invalid ng-dirty w-100 '+validatorRequired"></p-selectButton>
-                                        <a class="base-error-message" *ngIf="userInfoForm.controls['gender'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userInfoForm.controls['gender'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-                                        <label
-                                            class="control-label float-left text-left col-form-label font-weight-bold">Doğum
-                                            Tarihi</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                            <p-calendar placeholder="Doğum Tarihi"
-                                            formControlName="birthdayDate" id="birthdayDate"
-                                            [class]="'w-100 '+validatorRequired"></p-calendar>
-                                        <a class="base-error-message"
-                                            *ngIf="userInfoForm.controls['birthdayDate'].invalid">
-                                            <a class="error-message col-sm-6"
-                                                *ngIf="userInfoForm.controls['birthdayDate'].errors['required']">
-                                                <app-validation-view text="Zorunlu Alan"></app-validation-view>
-                                            </a>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="form-group row m-1">
-                                    <div style="white-space: nowrap;" class="col-sm-3">
-    
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <div class="float-left">
-                                            <p-button type="reset" label="Vazgeç" value="Vazgeç"
-                                                [styleClass]="'p-button-danger'"></p-button>
-                                            <p-button type="submit" label="Kaydet" value="Kaydet"
-                                                styleClass="p-button-primary" [disabled]="lockedButtonClass"
-                                                [class]="'m-2'"></p-button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid" *ngIf="userVerifVisible">
-                <div class="row h-100">
-                    <div class="col-12 h-10 d-table">
-                        <div class="card d-table-cell align-middle border-0">
-                            <div class="form-group row m-1">
-                                <div style="white-space: nowrap;" class="col-sm-2">
-                                    <label
-                                        class="control-label float-left text-left col-form-label font-weight-bold">Profil
-                                        Onay</label>
-                                </div>
-                                <div class="col-sm-10">
-                                    <p-tag icon="pi pi-user" [severity]="userInfoSubject.getValue().profileCheck == true ? 'success': 'danger'" [value]="userInfoSubject.getValue().profileCheck == true ? 'Onaylandı': 'Onaylanmadı'"></p-tag>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fuild" *ngIf="twoFAVisible">
-                <div class="row h-100">
-                    <div class="col-12 h-10 d-table">
-                        <div class="card d-table-cell align-middle border-0">
-                            <div class="row">
-                                <div class="verification-button">
-                                    <p-button styleClass="p-button-outlined w-100" (onClick)="updateUserProfile()">
-                                        <img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
-                                        <span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>
-                                    </p-button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-12 col-md-3">
+			<div class="card flex justify-content-center">
+				<p-panelMenu [model]="menuItems" [style]="{'width':'100%'}"></p-panelMenu>
+			</div>
+		</div>
+		<div class="col-12 col-md-9">
+			<div class="container-fluid" *ngIf="userFormVisible">
+				<div class="row h-100">
+					<div class="col-12 h-10 d-table">
+						<div class="card d-table-cell align-middle border-0">
+							<form [formGroup]="userForm" (ngSubmit)="submitUpdateUser()">
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Ad</label>
+									</div>
+									<div class="col-sm-9">
+										<input pInputText type="text" placeholder="Ad" formControlName="firstName"
+											id="firstName" [class]="'w-100 '+validatorRequired">
+										<a class="base-error-message" *ngIf="userForm.controls['firstName'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userForm.controls['firstName'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Soyad</label>
+									</div>
+									<div class="col-sm-9">
+										<input pInputText type="text" placeholder="Soyad" formControlName="lastName"
+											id="lastName" [class]="'w-100 '+validatorRequired">
+										<a class="base-error-message" *ngIf="userForm.controls['lastName'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userForm.controls['lastName'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Kullanıcı
+											Adı</label>
+									</div>
+									<div class="col-sm-9">
+										<input pInputText type="text" placeholder="Kullanıcı Adı"
+											formControlName="nickName" id="nickName"
+											[class]="'w-100 '+validatorRequired">
+										<a class="base-error-message" *ngIf="userForm.controls['nickName'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userForm.controls['nickName'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+
+									</div>
+									<div class="col-sm-9">
+										<div class="float-left">
+											<p-button type="reset" label="Vazgeç" value="Vazgeç"
+												[styleClass]="'p-button-danger'"></p-button>
+											<p-button type="submit" label="Kaydet" value="Kaydet"
+												styleClass="p-button-primary" [disabled]="lockedButtonClass"
+												[class]="'m-2'"></p-button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid" *ngIf="userInfoFormVisible">
+				<div class="row h-100">
+					<div class="col-12 h-10 d-table">
+						<div class="card d-table-cell align-middle border-0">
+							<form [formGroup]="userInfoForm" (ngSubmit)="submitUpdateUserInfo()">
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Profil
+											Açıklama</label>
+									</div>
+									<div class="col-sm-9">
+										<textarea rows="5" cols="30" pInputTextarea [autoResize]="true" type="text"
+											placeholder="Profil Açıklaması" formControlName="profileText"
+											id="profileText" [class]="'w-100 '+validatorRequired"></textarea>
+										<a class="base-error-message"
+											*ngIf="userInfoForm.controls['profileText'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userInfoForm.controls['profileText'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Cinsiyet</label>
+									</div>
+									<div class="col-sm-9">
+										<p-selectButton [options]="stateGenderOptions" optionLabel="label"
+											optionValue="value" placeholder="Cinsiyet" formControlName="gender"
+											id="gender"
+											[class]="'ng-invalid ng-dirty w-100 '+validatorRequired"></p-selectButton>
+										<a class="base-error-message" *ngIf="userInfoForm.controls['gender'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userInfoForm.controls['gender'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+										<label
+											class="control-label float-left text-left col-form-label font-weight-bold">Doğum
+											Tarihi</label>
+									</div>
+									<div class="col-sm-9">
+										<p-calendar placeholder="Doğum Tarihi" formControlName="birthdayDate"
+											id="birthdayDate" [class]="'w-100 '+validatorRequired"></p-calendar>
+										<a class="base-error-message"
+											*ngIf="userInfoForm.controls['birthdayDate'].invalid">
+											<a class="error-message col-sm-6"
+												*ngIf="userInfoForm.controls['birthdayDate'].errors['required']">
+												<app-validation-view text="Zorunlu Alan"></app-validation-view>
+											</a>
+										</a>
+									</div>
+								</div>
+								<div class="form-group row m-1">
+									<div style="white-space: nowrap;" class="col-sm-3">
+
+									</div>
+									<div class="col-sm-9">
+										<div class="float-left">
+											<p-button type="reset" label="Vazgeç" value="Vazgeç"
+												[styleClass]="'p-button-danger'"></p-button>
+											<p-button type="submit" label="Kaydet" value="Kaydet"
+												styleClass="p-button-primary" [disabled]="lockedButtonClass"
+												[class]="'m-2'"></p-button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid" *ngIf="userVerifVisible">
+				<div class="row h-100">
+					<div class="col-12 h-10 d-table">
+						<div class="card d-table-cell align-middle border-0">
+							<div class="form-group row m-1">
+								<div style="white-space: nowrap;" class="col-sm-2">
+									<label
+										class="control-label float-left text-left col-form-label font-weight-bold">Profil
+										Onay</label>
+								</div>
+								<div class="col-sm-10">
+									<p-tag icon="pi pi-user"
+										[severity]="userInfoSubject.getValue().profileCheck == true ? 'success': 'danger'"
+										[value]="userInfoSubject.getValue().profileCheck == true ? 'Onaylandı': 'Onaylanmadı'"></p-tag>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fuild" *ngIf="twoFAVisible">
+				<div class="row h-100">
+					<div class="col-12 h-10 d-table">
+						<div class="card d-table-cell align-middle border-0">
+							<div class="row" *ngIf="user$ | async as user">
+								<div class="verification-button">
+									<p-button
+										[styleClass]="user.isTwoFA == true ? 'p-button-danger p-button-outlined w-100' : 'p-button-primary p-button-outlined w-100'"
+										(onClick)="updateTwoFA()">
+										<img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
+										<span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>
+									</p-button>
+								</div>
+								<div class="row" *ngIf="user.isTwoFA == true">
+									<div class="col-6">
+										<div *ngIf="twoFA$ | async as twoFA">
+											<img [src]="twoFA.qrCode" alt="qrCode">
+										</div>
+									</div>
+									<div class="col-6">
+										Bu qr code'u uygulamadan okutunuz!
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

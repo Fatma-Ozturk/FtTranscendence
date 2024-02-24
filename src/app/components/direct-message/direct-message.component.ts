@@ -31,9 +31,12 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 	userInfo$ = this.userInfoSubject.asObservable();
 	userInfo: UserInfo;
 	gameInvateModel: GameInvateModel;
+
 	usersConnectionCompleteSubject = new BehaviorSubject<boolean>(false);
 	usersConnectionComplete$ = this.usersConnectionCompleteSubject.asObservable();
-	usersConnectionComplete: boolean
+	usersConnectionComplete: boolean;
+
+	messageMaxLength: number= 10;
 	constructor(
 		private directMessageService: DirectMessageService,
 		private userService: UserService,
@@ -54,14 +57,14 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 				return of(null);
 			}
 			this.nickName = nickName;
-			console.log("this.nickname " , nickName);
 			return this.userInfoService.getByNickName(nickName);
-		})).subscribe(response => {
-			console.log("response ", response);
-
-			if (response) {
-				this.userInfoSubject.next(response.data);
-				console.log(response.data);
+		})).subscribe({
+			next: (response) => {
+				if (response) {
+					this.userInfoSubject.next(response.data);
+				}
+			},
+			error: () => {
 
 			}
 		});
@@ -75,12 +78,21 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 	ngAfterViewInit(): void {
 		let response: any = { "data": this.accessId, "messages": "accessId", "success": true };
 		this.directMessageService.sendDirectMessageConnected(response);
-		this.usersConnectionComplated();
+		this.getUserConnectionComplateResponse();
 		this.getMessageResponse();
+
+		this.usersConnectionComplete$.subscribe({
+			next:(response)=>{
+				if (response){
+					this.usersConnectionComplete = response;
+					//mesaj getir
+				}
+			}
+		})
 	}
 
 	ngOnDestroy(): void {
-		this.directMessageAddAll();
+
 	}
 
 	chatRoomMessageInput(event: any) {
@@ -116,9 +128,7 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 			"messages": this.messages, "accessId": this.accessId, "operations": ""
 		}
 		let responseMessage = { message: 'Message Text', data: data };
-		let responseOperation = { message: 'Message Text', data: data };
 		this.directMessageService.sendDirectMessageHandleMessage(responseMessage);
-		// this.directMessageService.sendDirectMessageHandleOperations(responseOperation);
 		setTimeout(() => {
 			this.updateScrollBarChat();
 		}, 100);
@@ -167,9 +177,13 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 
 	getMessageResponse() {
 		this.directMessageService.getMessageResponse().subscribe((response: any) => {
-			if (response.data !== undefined || response.data != null) {
+			if (response.data !== undefined && response.data != null) {
 				this.messages = response.data;
+				setTimeout(() => {
+					this.updateScrollBarChat();
+				}, 100);
 				if (this.messages.length > 100) {
+					// this.messages.splice(-1);
 					this.messages = [];
 				}
 			}
@@ -183,70 +197,87 @@ export class DirectMessageComponent implements OnInit, AfterViewInit, OnDestroy 
 		}
 	}
 
-	directMessageAddAll() {
-		this.userInfo$.subscribe(response => {
-			if (response) {
-				let directMessages: DirectMessage[] = [];
-				for (const message of this.messages) {
-					let directMessage: DirectMessage;
-					directMessage = {
-						id: 0,
-						senderId: this.authService.getCurrentUserId(),
-						receiverId: this.userInfo.userId,
-						messageText: JSON.stringify(message),
-						createdAt: new Date(),
-						updateTime: new Date(),
-						status: true,
-					};
-					directMessages.push(directMessage);
-				}
-				this.directMessageService.addAll(directMessages).subscribe(response => {
-					if (response && response.success == false) {
-						this.toastrService.error(Messages.error, Messages.error);
+	directMessageAddAll(messages: DirectMessageModel[]) {
+		this.userInfo$.subscribe({
+			next: (response) => {
+				if (response) {
+					let directMessages: DirectMessage[] = [];
+					for (const message of messages) {
+						let directMessage: DirectMessage;
+						directMessage = {
+							id: 0,
+							senderId: this.authService.getCurrentUserId(),
+							receiverId: this.userInfo.userId,
+							messageText: JSON.stringify(message),
+							createdAt: new Date(),
+							updateTime: new Date(),
+							status: true,
+						};
+						directMessages.push(directMessage);
 					}
-				});
+					this.directMessageService.addAll(directMessages).subscribe(response => {
+						if (response && response.success == false) {
+							this.toastrService.error(Messages.error, Messages.error);
+						}
+					});
+				}
+			},
+			error: () => {
+
 			}
 		})
 
 	}
 
 	directMessageGetAllByUserId() {
-		this.directMessageService.getAllByUserId(this.currentUserId).subscribe((response: any) => {
-			if (response && response.success == true && response.data.length > 0) {
-				for (const data of response.data) {
-					let message: DirectMessageModel;
-					message = JSON.parse(data.messageText)
-					this.messages.push(message);
+		this.directMessageService.getAllByUserId(this.currentUserId).subscribe({
+			next: (response: any) => {
+				if (response && response.success == true && response.data.length > 0) {
+					for (const data of response.data) {
+						let message: DirectMessageModel;
+						message = JSON.parse(data.messageText)
+						this.messages.push(message);
+					}
 				}
+			},
+			error: () => {
+
 			}
 		})
 	}
 
-	usersConnectionComplated() {
-		this.directMessageService.getUsersConnectionComplatedResponse().subscribe((response: any) => {
-			if (response && response.success == true && response.message === "Users Connection Complated") {
-				console.log("this.userInfo.userId ", this.userInfo?.userId);
-				console.log("response ", response);
-				if (this.userInfo?.userId == this.currentUserId) {
-					this.directMessageGetAllByUserId();
+	directMessageView(){
+		if (this.messages.length == this.messageMaxLength && !this.usersConnectionComplete){
+			this.directMessageAddAll(this.messages);
+		}
+	}
+
+	getUserConnectionComplateResponse(){
+		this.directMessageService.getUsersConnectionComplatedResponse().subscribe({
+			next:(response: any)=>{
+				if (response){
+					this.usersConnectionCompleteSubject.next(response.success);
 				}
+			},
+			error:()=>{
+				this.usersConnectionCompleteSubject.next(false);
 			}
-			if (response && response.success == false && response.message === "Users Connection Complated"){
-				this.directMessageAddAll();
-			}
-		});
+		})
 	}
 
 
 	//utils
 	getUserInfoByNickName(nickName: string) {
-		this.userInfoService.getByNickName(nickName).subscribe(response => {
-			if (response.success) {
-				this.userInfoSubject.next(response.data);
-			}
-		}, responseError => {
-			if (responseError.error) {
-				this.toastrService.error(Messages.error, Messages.error);
+		this.userInfoService.getByNickName(nickName).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.userInfoSubject.next(response.data);
+				}
+			},
+			error: (responseError) => {
+				if (responseError.error) {
+					this.toastrService.error(Messages.error, Messages.error);
+				}
 			}
 		});
 	}

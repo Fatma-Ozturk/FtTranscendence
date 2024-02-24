@@ -96,8 +96,6 @@ export class GameComponent {
 			(response: any) => {
 				if (response) {
 					if (response.message === 'GameRoomSocketResponse Info') {
-						console.log("response ", response);
-
 						this.gameRoomSocket = JSON.parse(response.data);
 						this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
 						if (this.whoIs == -1) return;

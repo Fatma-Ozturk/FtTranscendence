@@ -11,6 +11,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserInfo } from 'src/app/models/entities/userInfo';
 import { Messages } from 'src/app/constants/Messages';
 import { environment } from 'src/environments/environment';
+import { TwoFAService } from 'src/app/services/two-fa.service';
 
 @Component({
   selector: 'app-user-profile-edit',
@@ -54,6 +55,9 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
   //towFa
   twoFAVisible: boolean = false;
 
+  twoFASubject = new BehaviorSubject<any | null>(null);
+  twoFA$ = this.twoFASubject.asObservable();
+
   //proifle image file
   selectedFile: File | null = null;
   profileUrl: string = "https://source.unsplash.com/random/150x150";
@@ -63,7 +67,8 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private toastrService: ToastrService) {
+    private toastrService: ToastrService,
+	private twoFAService: TwoFAService) {
 
   }
 
@@ -156,12 +161,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateUser() {
-    let userFormObject: any = Object.assign({}, this.userForm.value);
-    let user: User = this.userSubject.getValue();
-    user.firstName = userFormObject.firstName;
-    user.lastName = userFormObject.lastName;
-    user.nickName = userFormObject.nickName;
+  updateUser(user:User) {
     this.userService.update(user).subscribe(response => {
       if (response.success) {
         this.toastrService.success(Messages.success);
@@ -173,13 +173,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     })
   }
 
-  updateUserInfo() {
-    let userInfoFormObject: any = Object.assign({}, this.userInfoForm.value);
-    let userInfo: UserInfo = this.userInfoSubject.getValue();
-
-    userInfo.profileText = userInfoFormObject.profileText;
-    userInfo.gender = userInfoFormObject.gender;
-    userInfo.birthdayDate = userInfoFormObject.birthdayDate;
+  updateUserInfo(userInfo: UserInfo) {
     this.userInfoService.update(userInfo).subscribe(response => {
       if (response.success) {
         this.toastrService.success(Messages.success);
@@ -194,13 +188,24 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
   submitUpdateUser() {
     if (!this.userForm.valid)
       return;
-    this.updateUser();
+	let userFormObject: any = Object.assign({}, this.userForm.value);
+	let user: User = this.userSubject.getValue();
+	user.firstName = userFormObject.firstName;
+	user.lastName = userFormObject.lastName;
+	user.nickName = userFormObject.nickName;
+    this.updateUser(user);
   }
 
   submitUpdateUserInfo() {
     if (!this.userInfoForm.valid)
       return;
-    this.updateUserInfo();
+	let userInfoFormObject: any = Object.assign({}, this.userInfoForm.value);
+	let userInfo: UserInfo = this.userInfoSubject.getValue();
+
+	userInfo.profileText = userInfoFormObject.profileText;
+	userInfo.gender = userInfoFormObject.gender;
+	userInfo.birthdayDate = userInfoFormObject.birthdayDate;
+    this.updateUserInfo(userInfo);
   }
 
   getMenuItems() {
@@ -288,16 +293,25 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     ];
   }
 
-  twoFA() {
+  twoFAGenerate(user:any) {
+	this.twoFAService.generate(user).subscribe({
+		next:(response)=>{
+			this.twoFASubject.next(response.data);
+		},
+		error:()=>{
 
+		}
+	})
   }
 
-  updateUserProfile() {
-    this.userInfoService.gets().subscribe(response => {
-      if (response.success) {
-        alert("ok");
-      }
-    })
+  updateTwoFA() {
+	let user: User = this.userSubject.getValue();
+	user.twoFAType = 1;
+	user.isTwoFA = !user.isTwoFA;
+    this.updateUser(user);
+	if (user.isTwoFA){
+		this.twoFAGenerate({"email":user.email});
+	}
   }
 
   visibleUser() {
@@ -322,6 +336,13 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
     this.userInfoFormVisible = false;
     this.userFormVisible = false;
     this.userVerifVisible = false;
+
+	let user: User = this.userSubject.getValue();
+	if (this.twoFAVisible){
+		if (user.isTwoFA){
+			this.twoFAGenerate({"email": user.email});
+		}
+	}
   }
 
   visibleUserVerif() {

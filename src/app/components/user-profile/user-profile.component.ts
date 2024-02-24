@@ -48,6 +48,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	userBlockSubject = new BehaviorSubject<UserBlock | null>(null);
 	userBlock$ = this.userBlockSubject.asObservable();
 	userBlock: UserBlock;
+	isUserBlock:boolean = false;
 
 	constructor(
 		private userService: UserService,
@@ -150,7 +151,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
 	userBlockDelete() {
 		// Eğer userBlock yoksa, yeni bir engelleme ekleyin.
-		if (!this.userBlock) {
+		if (!this.isUserBlock) {
 			this.userBlockAdd();
 			return;
 		}
@@ -159,7 +160,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 			next: (response) => {
 				if (response.success) {
 					this.toastrService.success(Messages.success);
-					this.getUserBlock(); // Güncel engelleme durumunu yeniden al
+					this.getUserBlock();
 				}
 			},
 			error: () => {
@@ -182,7 +183,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 			next: (response) => {
 				if (response.success) {
 					this.toastrService.success(Messages.success);
-					this.getUserBlock(); // Engelleme başarılı ise, durumu güncelleyin
+					this.getUserBlock();
 				}
 			},
 			error: () => {
@@ -200,11 +201,25 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 			createdAt: new Date(),
 			updateTime: new Date(),
 			status: true
-		}).subscribe(response => {
-			// if (response.success) {
-				this.userBlockSubject.next(response.data);
+		}).subscribe({
+			next: (response)=>{
+
+				console.log("response ", response);
+
+				// if (response.success) {
+					if (response.data == null || response.data === undefined){
+						this.isUserBlock = false;
+					}else{
+						this.userBlockSubject.next(response.data);
+						this.isUserBlock = true;
+					}
+					this.cdr.detectChanges();
+				// }
+			},
+			error:() =>{
+				this.isUserBlock = false;
 				this.cdr.detectChanges();
-			// }
+			}
 		})
 	}
 }
