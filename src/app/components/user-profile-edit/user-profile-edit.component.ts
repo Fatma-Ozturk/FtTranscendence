@@ -339,9 +339,9 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
 	let user: User = this.userSubject.getValue();
 	if (this.twoFAVisible){
-		if (user.isTwoFA){
-			this.twoFAGenerate({"email": user.email});
-		}
+	   if (user.isTwoFA){
+	   	this.twoFAGenerate({"email": user.email});
+	   }
 	}
   }
 
