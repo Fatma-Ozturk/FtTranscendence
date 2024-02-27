@@ -1,0 +1,35 @@
+<body class="text-center">
+	<div class="container-fluid">
+	  <div class="row">
+		<div class="col-12">
+		  <main class="form-signin">
+			<form [formGroup]="twoFAForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
+			  <p-card header="Giriş Yap" class="border-round w-full lg:w-6">
+				<div>
+				  <div class="form-floating text-left">
+					<input pInputText formControlName="token" type="token" class="form-control"
+					  id="floatingToken" placeholder="" pTooltip="Doğrulama Kodu" />
+					<label htmlFor="floatingToken">Şifre
+					  <small *ngIf="isFieldInvalid('token')" class="p-error">
+						{{ getErrorMessage('token') }}
+					  </small>
+					</label>
+				  </div>
+				</div>
+				<div class="w-100">
+				  <div class="pt-2 w-100">
+					<p-button type="submit" label="Giriş Yap" icon="pi pi-user" styleClass="p-button-rounded w-100"
+					  class="w-100" [disabled]="checkRequiredForDisable()">
+					</p-button>
+				  </div>
+				</div>
+			  </p-card>
+			</form>
+		  </main>
+		</div>
+	  </div>
+	  <div class="row">
+		<p class="mt-5 mb-3 text-muted">&copy; Copyright 2023-..</p>
+	  </div>
+	</div>
+  </body>

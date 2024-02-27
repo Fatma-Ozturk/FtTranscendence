@@ -4,6 +4,7 @@ import { BaseService } from '../utilities/baseService';
 import { User } from '../models/entities/user';
 import { SingleResponseModel } from '../models/singleResponseModel';
 import { environment } from 'src/environments/environment';
+import { ListResponseModel } from '../models/listResponseModel';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +18,9 @@ export class TwoFAService extends BaseService<any> {
 
 	generate(user: any) {
 		return this.httpClient.post<SingleResponseModel<any>>(environment.appurl + "two-fas/generate", user);
+	}
+
+	verify(userSecret: any, token: string) {
+		return this.httpClient.get<SingleResponseModel<any>>(environment.appurl + "two-fas/verify?userSecret=" + userSecret + "&token=" + token);
 	}
 }

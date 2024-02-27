@@ -84,6 +84,7 @@ import { TagModule } from 'primeng/tag';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DirectMessageComponent } from './components/direct-message/direct-message.component';
+import { UserTwoFAComponent } from './components/user-two-fa/user-two-fa.component';
 
 @NgModule({
   declarations: [
@@ -113,7 +114,8 @@ import { DirectMessageComponent } from './components/direct-message/direct-messa
     CreateUserProfileComponent,
     GameMatchmakingComponent,
     ChatRoomCreateComponent,
-    DirectMessageComponent
+    DirectMessageComponent,
+    UserTwoFAComponent
   ],
   imports: [
     BrowserModule,

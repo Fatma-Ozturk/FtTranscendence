@@ -200,19 +200,19 @@
 				<div class="row h-100">
 					<div class="col-12 h-10 d-table">
 						<div class="card d-table-cell align-middle border-0">
-							<div class="row" *ngIf="user$ | async as user">
+							<div class="row">
 								<div class="verification-button">
 									<p-button
-										[styleClass]="user.isTwoFA == true ? 'p-button-danger p-button-outlined w-100' : 'p-button-primary p-button-outlined w-100'"
+										[styleClass]="(userTwoFA$ | async)?.isTwoFA == true ? 'p-button-danger p-button-outlined w-100' : 'p-button-primary p-button-outlined w-100'"
 										(onClick)="updateTwoFA()">
 										<img alt="logo" src="/assets/icons/Google__G__Logo.png" style="width: 1.5rem" />
 										<span class="m-2 font-bold">Google İki Adımlı Doğrulama</span>
 									</p-button>
 								</div>
-								<div class="row" *ngIf="user.isTwoFA == true">
+								<div class="row" *ngIf="(userTwoFA$ | async)?.isTwoFA == true">
 									<div class="col-6">
-										<div *ngIf="twoFA$ | async as twoFA">
-											<img [src]="twoFA.qrCode" alt="qrCode">
+										<div>
+											<img [src]="(twoFA$ | async)?.qrCode" alt="qrCode">
 										</div>
 									</div>
 									<div class="col-6">
