@@ -1,3 +1,4 @@
+import { LocalStorageService } from './../../services/local-storage.service';
 import { GoogleTwoFASettingsModel } from './../../models/model/googleTwoFASettingsModel';
 import { UserTwoFAService } from 'src/app/services/user-two-fa.service';
 import { UserTwoFA } from './../../models/entities/userTwoFA';
@@ -9,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 import { Messages } from 'src/app/constants/Messages';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
 @Component({
 	selector: 'app-user-two-fa',
@@ -19,6 +21,7 @@ export class UserTwoFAComponent implements OnInit {
 	protected twoFAForm: FormGroup;
 	currentUserId: number;
 	userTwoFA: UserTwoFA;
+	tryOutCounter: number = 0;
 	formErrors: { [key: string]: string } = {};
 
 	constructor(private formBuilder: FormBuilder,
@@ -27,9 +30,12 @@ export class UserTwoFAComponent implements OnInit {
 		private toastrService: ToastrService,
 		private router: Router,
 		private twoFAService: TwoFAService,
-		private userTwoFAService: UserTwoFAService) { }
+		private userTwoFAService: UserTwoFAService,
+		private localStorageService:LocalStorageService) { }
 	ngOnInit(): void {
+		this.createTwoFAFrom();
 		this.currentUserId = this.authService.getCurrentUserId();
+		this.getByUserIdTwoFA();
 	}
 
 	createTwoFAFrom() {
@@ -50,18 +56,46 @@ export class UserTwoFAComponent implements OnInit {
 		});
 	}
 	verifyTwoFAOtp(settings: any, token: string) {
-		this.twoFAService.verify(settings, token).subscribe({
-			next: (value)=> {
-
+		this.twoFAService.verify(settings, token).pipe(
+		  switchMap((value: any) => {
+			// Doğrulama başarılıysa, buradan sonraki işlemi belirleyin
+			if (value && value.success && value.data) {
+			  // Örneğin, kullanıcının TwoFA ayarlarını güncellemek için updateUserTwoFA çağırabilirsiniz
+			  // Bu kısım, iş akışınıza bağlı olarak değişiklik gösterebilir
+			  this.userTwoFA.isVerify = true;
+			  return this.updateUserTwoFA(this.userTwoFA);
+			} else {
+			  // Başarılı bir doğrulama olmaması durumunda, işlemi burada sonlandırın
+			  return of(null);
+			}
+		  }),
+		  tap((response) => {
+			// switchMap'ten başarılı bir sonuç alındığında çalışacak kısım
+			if (response && response.success){
+				this.router.navigate(['/view']);
 				this.toastrService.success(Messages.success);
-			},
-			error: (err) => {
-
-			},
-		});
+			}else{
+				this.tryOutCounter++;
+				this.toastrService.error(Messages.error);
+			}
+			if (this.tryOutCounter > 3){
+				this.localStorageService.clearItem("token");
+				this.toastrService.info(Messages.info, Messages.twoFAError);
+				this.router.navigate(['/']);
+			}
+		  }),
+		  catchError((err) => {
+			// Hata yönetimi
+			this.localStorageService.clearItem("token");
+			this.toastrService.info(Messages.info, Messages.twoFAError);
+			this.router.navigate(['/']);
+			return of(null); // catchError içinde bir Observable döndürmek gerekiyor
+		  })
+		).subscribe();
+	  }
+	updateUserTwoFA(userTwoFA: UserTwoFA) {
+		return this.userTwoFAService.update(userTwoFA);
 	}
-	//token'ı localstrogae'den sakla
-	//guard ile router path hiyerarşi token'ı ver ve (this.twoFAService.verify)'a göre  erişim kontrolü yap
 	onSubmit(): void {
 		if (!this.twoFAForm.valid)
 			return;
@@ -80,7 +114,6 @@ export class UserTwoFAComponent implements OnInit {
 	checkRequiredForDisable(): boolean {
 		return (this.twoFAForm.get("token").hasError('required'))
 	}
-
 	isFieldInvalid(fieldName: string): boolean {
 		const control = this.twoFAForm.get(fieldName);
 		return control.invalid && (control.dirty || control.touched);

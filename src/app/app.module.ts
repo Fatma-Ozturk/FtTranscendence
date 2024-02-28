@@ -85,6 +85,9 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DirectMessageComponent } from './components/direct-message/direct-message.component';
 import { UserTwoFAComponent } from './components/user-two-fa/user-two-fa.component';
+import { MainContainerComponent } from './container/main-container/main-container.component';
+import { UserTwoFAContainerComponent } from './container/user-two-facontainer/user-two-facontainer.component';
+import { UserLoginContainerComponent } from './container/user-login-container/user-login-container.component';
 
 @NgModule({
   declarations: [
@@ -115,7 +118,10 @@ import { UserTwoFAComponent } from './components/user-two-fa/user-two-fa.compone
     GameMatchmakingComponent,
     ChatRoomCreateComponent,
     DirectMessageComponent,
-    UserTwoFAComponent
+    UserTwoFAComponent,
+    MainContainerComponent,
+    UserTwoFAContainerComponent,
+    UserLoginContainerComponent
   ],
   imports: [
     BrowserModule,

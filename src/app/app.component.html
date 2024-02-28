@@ -1,24 +1,12 @@
-<div class="progress-container" *ngIf="isAuthBool==true">
-  <div class="progress-bar" id="scrollBar"></div>
-</div>
-<div>
-  <div>
-      <div>
-          <app-navbar *ngIf="isAuthBool==true"></app-navbar>
-      </div>
-      <br>
-      <div class="content" style="margin-top: 10px !important;padding-right: 20px !important;padding-left: 20px !important;">
-          <ngx-spinner bdColor="rgba(255, 255, 255, 0.5)" template="<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' />">
-          </ngx-spinner>
-          <div class="router-wrapper">
-              <router-outlet appScrollProgresbar></router-outlet>
-          </div>
-      </div>
-      <app-footer *ngIf="isAuthBool==true"></app-footer>
+<div >
+	<div *ngIf="(isAuthBool$ | async) === false">
+	  <app-main-container *ngIf="(isAuthBool$ | async) === false"></app-main-container>
+	</div>
+	<div *ngIf="(isAuthBool$ | async) === true">
+	  <app-user-two-facontainer *ngIf="(isVerifContainerVisible$ | async) === false" ></app-user-two-facontainer>
+	  <app-user-login-container *ngIf="(isVerifContainerVisible$ | async) === true" ></app-user-login-container>
+	</div>
   </div>
-  <small>
-  <div class="card-footer fixed-bottom text-muted py-0 " *ngIf="isAuthBool==false" small>
-      <app-footer></app-footer>
-  </div>
-</small>
-</div>
+
+  <ngx-spinner bdColor="rgba(255, 255, 255, 0.5)" template="<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' />">
+</ngx-spinner>

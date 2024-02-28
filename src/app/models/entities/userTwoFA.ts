@@ -4,6 +4,7 @@ export interface UserTwoFA{
 	twoFAType: number;
 	isTwoFA: boolean;
 	settings: string;
+	isVerify: boolean;
 	updateTime: Date;
 	status: boolean;
 }

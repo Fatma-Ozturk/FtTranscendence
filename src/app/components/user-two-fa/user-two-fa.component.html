@@ -3,11 +3,11 @@
 	  <div class="row">
 		<div class="col-12">
 		  <main class="form-signin">
-			<form [formGroup]="twoFAForm" (ngSubmit)="onSubmit()" (keydown.enter)="onSubmit()">
-			  <p-card header="Giriş Yap" class="border-round w-full lg:w-6">
+			<form [formGroup]="twoFAForm" (ngSubmit)="onSubmit()">
+			  <p-card header="İki faktörlü kimlik doğrulama" class="border-round w-full lg:w-6">
 				<div>
 				  <div class="form-floating text-left">
-					<input pInputText formControlName="token" type="token" class="form-control"
+					<input pInputText formControlName="token" type="text" class="form-control"
 					  id="floatingToken" placeholder="" pTooltip="Doğrulama Kodu" />
 					<label htmlFor="floatingToken">Şifre
 					  <small *ngIf="isFieldInvalid('token')" class="p-error">
@@ -18,7 +18,7 @@
 				</div>
 				<div class="w-100">
 				  <div class="pt-2 w-100">
-					<p-button type="submit" label="Giriş Yap" icon="pi pi-user" styleClass="p-button-rounded w-100"
+					<p-button type="submit" label="Kontrol et" icon="pi pi-user" styleClass="p-button-rounded w-100"
 					  class="w-100" [disabled]="checkRequiredForDisable()">
 					</p-button>
 				  </div>

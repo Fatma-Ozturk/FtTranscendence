@@ -2,11 +2,11 @@ import { GoogleTwoFASettingsModel } from './../../models/model/googleTwoFASettin
 import { UserTwoFA } from './../../models/entities/userTwoFA';
 import { ToastrService } from 'ngx-toastr';
 import { UserInfoService } from './../../services/user-info.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from './../../services/user.service';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { User } from 'src/app/models/entities/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -63,6 +63,8 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
 	userTwoFASubject = new BehaviorSubject<UserTwoFA | null>(null);
 	userTwoFA$ = this.userTwoFASubject.asObservable();
+
+	googleTwoFASetting: GoogleTwoFASettingsModel;
 
 	//proifle image file
 	selectedFile: File | null = null;
@@ -320,36 +322,66 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 	updateTwoFA() {
 		let user: User = this.userSubject.getValue();
 		let userTwoFA: UserTwoFA = this.userTwoFASubject.getValue();
-		let twoFA: any = this.twoFASubject.getValue();
 		let twoFAType: number = 1;
-		let settings: string;
 
-		if (!userTwoFA) {
-			if (userTwoFA.twoFAType == 1){
-				settings = this.googleTwoFASettings(twoFA.secretBase32);
-			}
-			this.addUserTwoFA(twoFAType, settings);
-			return;
-		}
-		userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
-		userTwoFA.updateTime = new Date();
-		if (userTwoFA.isTwoFA) {
-			this.twoFAGenerate({ "email": user.email });
-			if (userTwoFA.twoFAType == 1){
-				settings = this.googleTwoFASettings(twoFA.secretBase32);
-			}
-			userTwoFA.settings = settings;
-		}
-		this.updateUserTwoFA(userTwoFA);
-	}
+		// userTwoFA yoksa veya userTwoFA.isTwoFA değişikliği varsa twoFAGenerate çağrılır
+		if (!userTwoFA || userTwoFA.isTwoFA == false) {
+		  this.twoFAService.generate({ "email": user.email }).pipe(
+			switchMap((response) => {
+			  if (response.success) {
+				this.twoFASubject.next(response.data);
+				let settings = '';
+				if (userTwoFA.twoFAType == 1){
+				  settings = this.googleTwoFASettings(response.data.secretBase32, response.data.barcode);
+				}
 
-	googleTwoFASettings(secret: any) : string{
+				// userTwoFA yoksa yeni bir kayıt oluştur, varsa güncelle
+				if (!userTwoFA) {
+				  return from(this.addUserTwoFA(twoFAType, settings));
+				} else {
+					let settings = '';
+					if (userTwoFA.twoFAType == 1){
+					  settings = this.googleTwoFASettings(response.data.secretBase32, response.data.barcode);
+					}
+				  userTwoFA.settings = settings;
+				  userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
+				  userTwoFA.updateTime = new Date();
+				  return from(this.updateUserTwoFA(userTwoFA));
+				}
+			  } else {
+				// Başarısız olursa, boş bir Observable döndür
+				return from([]);
+			  }
+			}),
+			tap(() => {
+			  // İşlem başarılı olduktan sonra yapılacak ek işlemler
+			})
+		  ).subscribe({
+			error: () => {
+			  // Hata yönetimi
+			}
+		  });
+		} else {
+		  // Eğer userTwoFA var ve isTwoFA false ise, sadece güncelleme yap
+		  userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
+		  userTwoFA.updateTime = new Date();
+		  this.updateUserTwoFA(userTwoFA);
+		}
+	  }
+
+	googleTwoFASettings(secret: any, barcode: any) : string{
 		let googleTwoFASettingsModel: GoogleTwoFASettingsModel = {
-			secretBase32: secret
+			secretBase32: secret,
+			barcode: barcode
 		}
 		let seriliazeGoogleTwoFASettingsModel = JSON.stringify(googleTwoFASettingsModel);
 
 		return seriliazeGoogleTwoFASettingsModel;
+	}
+
+	parseGoogleTwoFASettings(settings: string) : GoogleTwoFASettingsModel{
+		let googleTwoFASettingsModel: GoogleTwoFASettingsModel = JSON.parse(settings);
+		return googleTwoFASettingsModel;
 	}
 
 	visibleUser() {
@@ -375,13 +407,13 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		this.userFormVisible = false;
 		this.userVerifVisible = false;
 
-		let userTwoFA: UserTwoFA = this.userTwoFASubject.getValue();
-		let user: User = this.userSubject.getValue();
-		if (this.twoFAVisible) {
-			if (userTwoFA.isTwoFA) {
-				this.twoFAGenerate({ "email": user.email });
-			}
-		}
+		// let userTwoFA: UserTwoFA = this.userTwoFASubject.getValue();
+		// let user: User = this.userSubject.getValue();
+		// if (this.twoFAVisible) {
+		// 	if (userTwoFA.isTwoFA) {
+		// 		this.twoFAGenerate({ "email": user.email });
+		// 	}
+		// }
 	}
 
 	visibleUserVerif() {
@@ -398,22 +430,20 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 			twoFAType: twoFAType,
 			isTwoFA: true,
 			settings: settings,
+			isVerify: false,
 			updateTime: new Date(),
 			status: true,
 		}
-		this.userTwoFAService.add(userTwoFA).subscribe({
-			next: (response) => {
-				if (response && response.success) {
-					this.toastrService.success(Messages.success, Messages.add);
-				}
-			}
-		});
+		return this.userTwoFAService.add(userTwoFA);
 	}
 
 	getByIdUserTwoFA(userId: number) {
 		this.userTwoFAService.getByUserId(userId).subscribe({
 			next: (response) => {
 				if (response && response.success) {
+					if (response.data && response.data.twoFAType == 1){
+						this.googleTwoFASetting =  this.parseGoogleTwoFASettings(response.data.settings);
+					}
 					this.userTwoFASubject.next(response.data);
 				}
 			}
@@ -421,13 +451,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 	}
 
 	updateUserTwoFA(userTwoFA: UserTwoFA) {
-		this.userTwoFAService.update(userTwoFA).subscribe({
-			next: (response) => {
-				if (response && response.success) {
-					this.toastrService.success(Messages.success, Messages.update);
-				}
-			}
-		});
+		return this.userTwoFAService.update(userTwoFA);
 	}
 
 	userTwoFADelete() {

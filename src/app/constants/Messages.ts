@@ -31,4 +31,5 @@ export class Messages {
     public static readonly notSelectFile: string = "Dosya seçilmedi";
     public static readonly updloadFileSuccess: string = "Dosya yüklendi";
     public static readonly updloadFileError: string = "Dosya yüklenemedi";
-}   
+	public static readonly twoFAError: string = "İki faktörlü kimlik doğrulama hatası";
+}

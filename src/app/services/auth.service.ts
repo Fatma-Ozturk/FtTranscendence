@@ -121,4 +121,7 @@ export class AuthService {
     }
     return false;
   }
+  getIsAuth(){
+    return this.isAuth;
+  }
 }

@@ -1,1 +1,19 @@
-<p>not-found works!</p>
+<div class="not-found" v-bind:style="{ width: sizeWidth + 'px', height: sizeHeight + 'px' }">
+	<div class="container">
+		<h1 class="neg title"><span class="bg">Error - 404</span></h1>
+		<p>Bir hata oluştu, devam etmek için:</p>
+		<p>* Ana sayfamıza dönün.<br />
+			* Bize bu hatayla ilgili bir e-posta gönderin ve daha sonra deneyin.</p>
+		<nav class="nav">
+			<a href="#" class="link">
+				<router-link to="/">
+					Anasayfa
+				</router-link>
+			</a>
+			&nbsp;|&nbsp;
+			<a href="#" class="link">
+				Web Yöneticisi
+			</a>
+		</nav>
+	</div>
+  </div>

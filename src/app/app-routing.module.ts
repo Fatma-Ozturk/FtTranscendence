@@ -22,6 +22,8 @@ import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { editableProfileGuard } from './guards/editable-profile.guard';
 import { userBlockGuard } from './guards/user-block.guard';
 import { DirectMessageComponent } from './components/direct-message/direct-message.component';
+import { UserTwoFAComponent } from './components/user-two-fa/user-two-fa.component';
+import { twoFAGuard } from './guards/two-fa.guard';
 
 const routes: Routes = [
 	{ path: "", pathMatch: "full", component: MainComponent, canActivate: [notLoginGuard] },
@@ -32,19 +34,20 @@ const routes: Routes = [
 	{ path: "register", component: RegisterComponent, canActivate: [notLoginGuard] },
 	{ path: "redirection-auth42/:token/:success/:message", component: RedirectionAuth42Component },
 	{ path: "redirection-auth-google/:token/:success/:message", component: RedirectionAuthGoogleComponent },
-	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard] },
-	{ path: "game", component: GameComponent, canActivate: [loginGuard] },
-	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard] },
-	{ path: "game-matchmaking/two-user", component: GameMatchmakingComponent, canActivate: [loginGuard] },
-	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard] },
-	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard, userBlockGuard] },
-	{ path: "user-edit-profile/:nickname", component: UserProfileEditComponent, canActivate: [loginGuard, editableProfileGuard] },
-	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard] },,
-	{ path: "chat", component: ChatComponent, canActivate: [loginGuard] },
-	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard] },
-	{ path: 'chat-rooms/invite/:accessId', component: ChatRoomsComponent, canActivate: [loginGuard] },
-	{ path: 'chat-room/:accessId', component: ChatRoomComponent, canActivate: [loginGuard] },
-	{ path: 'direct-message/:nickname', component: DirectMessageComponent, canActivate: [loginGuard, userBlockGuard] },
+	{ path: "leaderboard", component: LeaderboardComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "game", component: GameComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "game-matchmaking", component: GameMatchmakingComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "game-matchmaking/two-user", component: GameMatchmakingComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "search-users", component: SearchUsersComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "user-profile/:nickname", component: UserProfileComponent, canActivate: [loginGuard, userBlockGuard, twoFAGuard] },
+	{ path: "user-edit-profile/:nickname", component: UserProfileEditComponent, canActivate: [loginGuard, editableProfileGuard, twoFAGuard] },
+	{ path: "create-user-profile", component: CreateUserProfileComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: "chat", component: ChatComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: 'chat-rooms', component: ChatRoomsComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: 'chat-rooms/invite/:accessId', component: ChatRoomsComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: 'chat-room/:accessId', component: ChatRoomComponent, canActivate: [loginGuard, twoFAGuard] },
+	{ path: 'direct-message/:nickname', component: DirectMessageComponent, canActivate: [loginGuard, userBlockGuard, twoFAGuard] },
+	{ path: 'user-two-fa', component: UserTwoFAComponent, canActivate: [loginGuard] },
 	{ path: '**', component: NotFoundComponent },
 ];
 
