@@ -1,3 +1,4 @@
+import { UserInfoService } from 'src/app/services/user-info.service';
 import { UserAchievementService } from './../../services/user-achievement.service';
 import { UserAchievement } from './../../models/entities/userAchievement';
 import { Achievement } from './../../models/entities/achievement';
@@ -12,7 +13,7 @@ import { User } from 'src/app/models/entities/user';
 import { Messages } from 'src/app/constants/Messages';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { GameHistoryDto } from 'src/app/models/dto/gameHistoryDto';
 import { GameTotalScoreByUserDto } from 'src/app/models/dto/gameTotalScoreByUserDto';
 import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
@@ -20,6 +21,7 @@ import { GameTotalScore } from 'src/app/models/entities/gameTotalScore';
 import { UserAchievementByAchievementDto } from 'src/app/models/dto/userAchievementByAchievementDto';
 import { UserBlockService } from 'src/app/services/user-block.service';
 import { UserBlock } from 'src/app/models/entities/userBlock';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 
 @Component({
 	selector: 'app-user-profile',
@@ -27,13 +29,19 @@ import { UserBlock } from 'src/app/models/entities/userBlock';
 	styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit, AfterViewInit {
-	userSubject = new BehaviorSubject<User | null>(null);
 	userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
-
 	userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
+
+	userSubject = new BehaviorSubject<User | null>(null);
 	user$ = this.userSubject.asObservable();
-	currentUserId: number;
-	profileUserId: number;
+	user: User;
+
+	userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
+	userInfo$ = this.userInfoSubject.asObservable();
+	profileUrl: string = "assets/player.png";
+
+	currentUserId: number = 0;
+	profileUserId: number = 0;
 	nickName: string = "";
 	editProfileVisible: boolean = false;
 
@@ -52,6 +60,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
 	constructor(
 		private userService: UserService,
+		private userInfoService: UserInfoService,
 		private gameHistoryService: GameHistoryService,
 		private gameTotalScoreService: GameTotalScoreService,
 		private achievementRuleService: AchievementRuleService,
@@ -66,10 +75,27 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	}
 
 	ngOnInit(): void {
+		this.profileUrl = "assets/player.png";
 		this.currentUserId = this.authService.getCurrentUserId();
 		this.route.paramMap
 			.pipe(
 				switchMap((params: any) => {
+					this.nickName = params.get('nickname');
+					if (!this.nickName) {
+						throw new Error('Nickname is required');
+					}
+					return this.gameTotalScoreService.getByNickName(this.nickName);
+				}),
+				switchMap((params: any) => {
+					this.nickName = params.get('nickname');
+					if (!this.nickName) {
+						throw new Error('Nickname is required');
+					}
+					return this.userInfoService.getByNickName(this.nickName);
+				}),
+				switchMap((params: any) => {
+					this.profileUrl = this.userInfoService.getProfileImage(params.data.profileImagePath);
+
 					this.nickName = params.get('nickname');
 					if (!this.nickName) {
 						throw new Error('Nickname is required');
@@ -79,9 +105,14 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 			)
 			.subscribe({
 				next: (response: any) => {
+
 					if (response.success) {
+						this.user = response.data;
+						this.profileUserId = Number(this.user.id);
+						this.editProfileVisible = (this.currentUserId == this.user.id);
 						this.userSubject.next(response.data);
 						this.getUserGameHistoryDtos(response.data.id);
+						this.getUserBlock();
 					} else {
 						throw new Error('User not found');
 					}
@@ -94,14 +125,11 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		this.user$.subscribe(response => {
-			if (response) {
-				this.profileUserId = Number(response.id);
-				this.editProfileVisible = (this.currentUserId == response.id);
-			}
-		})
-		this.getGameTotalScories();
+			console.log("res ", response);
+		});
+		// this.getGameTotalScories();
 		this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
-		this.getUserBlock();
+		// this.getUserBlock();
 
 		this.userBlock$.subscribe(response => {
 			// if (response) {
@@ -221,5 +249,18 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				this.cdr.detectChanges();
 			}
 		})
+	}
+
+	getUserInfoByNickName(nickName: string) {
+		this.userInfoService.getByNickName(nickName).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.userInfoSubject.next(response.data);
+				}
+			},
+			error: () => {
+				this.toastrService.error(Messages.error);
+			}
+		});
 	}
 }

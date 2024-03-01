@@ -57,7 +57,7 @@ export class RedirectionAuth42Component {
 		if (this.success === 'true') {
 			if (this.jwtControllerService.isActive(this.token)) {
 				this.localStorageService.saveItem("token", this.token);
-				this.updateUserInfo();
+				// this.updateUserInfo();
 				this.checkAchievement('sign');
 				this.getUserTwoFA();
 			}
@@ -67,27 +67,27 @@ export class RedirectionAuth42Component {
 		}
 	}
 
-	updateUserInfo() {
-		let currentUserId = this.authService.getCurrentUserId();
-		let userInfo: UserInfo = {
-			id: 0,
-			userId: currentUserId,
-			loginDate: new Date(),
-			profileCheck: true,
-			profileImagePath: "",
-			profileText: "",
-			gender: false,
-			birthdayDate: new Date()
-		};
-		this.userInfoService.add(userInfo).subscribe(response => {
-			if (response.success) {
-			}
-		}, responseError => {
-			if (responseError.error) {
-				this.toastrService.error(Messages.error);
-			}
-		})
-	}
+	// updateUserInfo() {
+	// 	let currentUserId = this.authService.getCurrentUserId();
+	// 	let userInfo: UserInfo = {
+	// 		id: 0,
+	// 		userId: currentUserId,
+	// 		loginDate: new Date(),
+	// 		profileCheck: true,
+	// 		profileImagePath: "",
+	// 		profileText: "",
+	// 		gender: false,
+	// 		birthdayDate: new Date()
+	// 	};
+	// 	this.userInfoService.add(userInfo).subscribe(response => {
+	// 		if (response.success) {
+	// 		}
+	// 	}, responseError => {
+	// 		if (responseError.error) {
+	// 			this.toastrService.error(Messages.error);
+	// 		}
+	// 	})
+	// }
 
 	handleError(message: string) {
 		if (message === 'User Already Exists') {
@@ -109,7 +109,7 @@ export class RedirectionAuth42Component {
 	getUserTwoFA() {
 		this.userTwoFAService.getByUserId(this.authService.getCurrentUserId()).pipe(
 			tap((value: any) => {
-				if (value && value.success) {
+				if (value && value.success && value.data) {
 					this.userTwoFA = value.data;
 					this.userTwoFA.isVerify = false;
 					this.updateUserTwoFA(this.userTwoFA);
@@ -120,6 +120,8 @@ export class RedirectionAuth42Component {
 						this.router.navigate(['/view']);
 						this.toastrService.success(Messages.success);
 					}
+				}else{
+					this.router.navigate(['/view']);
 				}
 			}),
 			catchError((error) => {

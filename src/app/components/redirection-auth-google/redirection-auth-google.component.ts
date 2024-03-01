@@ -79,31 +79,31 @@ export class RedirectionAuthGoogleComponent {
 		this.router.navigate(['/main']);
 	}
 
-	updateUserInfo() {
-		let currentUserId = this.authService.getCurrentUserId();
-		let userInfo: UserInfo = {
-			id: 0,
-			userId: currentUserId,
-			loginDate: new Date(),
-			profileCheck: true,
-			profileImagePath: "",
-			profileText: "",
-			gender: false,
-			birthdayDate: new Date()
-		};
-		this.userInfoService.add(userInfo).subscribe(response => {
-			if (response.success) {
-			}
-		}, responseError => {
-			if (responseError.error) {
-				this.toastrService.error(Messages.error);
-			}
-		})
-	}
+	// updateUserInfo() {
+	// 	let currentUserId = this.authService.getCurrentUserId();
+	// 	let userInfo: UserInfo = {
+	// 		id: 0,
+	// 		userId: currentUserId,
+	// 		loginDate: new Date(),
+	// 		profileCheck: true,
+	// 		profileImagePath: "",
+	// 		profileText: "",
+	// 		gender: false,
+	// 		birthdayDate: new Date()
+	// 	};
+	// 	this.userInfoService.add(userInfo).subscribe(response => {
+	// 		if (response.success) {
+	// 		}
+	// 	}, responseError => {
+	// 		if (responseError.error) {
+	// 			this.toastrService.error(Messages.error);
+	// 		}
+	// 	})
+	// }
 	getUserTwoFA() {
 		this.userTwoFAService.getByUserId(this.authService.getCurrentUserId()).pipe(
 			tap((value: any) => {
-				if (value && value.success) {
+				if (value && value.success && value.data) {
 					this.userTwoFA = value.data;
 					this.userTwoFA.isVerify = false;
 					this.updateUserTwoFA(this.userTwoFA);
@@ -114,6 +114,8 @@ export class RedirectionAuthGoogleComponent {
 						this.router.navigate(['/view']);
 						this.toastrService.success(Messages.success);
 					}
+				}else{
+					this.router.navigate(['/view']);
 				}
 			}),
 			catchError((error) => {

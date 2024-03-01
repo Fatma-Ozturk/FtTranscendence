@@ -62,7 +62,7 @@ body {
 }
 
 .image-container .avatar {
-    background-color: black;
+    /* background-color: black; */
     height: 96px;
     width: 96px;
     border-radius: 50%;

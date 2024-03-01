@@ -10,6 +10,7 @@ export const twoFAGuard: CanActivateFn = (route, state) => {
 	const userTwoFAService = inject(UserTwoFAService);
 	const currentId = authService.getCurrentUserId();
 
+	console.log('currentId', currentId);
 	if (!currentId) {
 		// Kullanıcı girişi yapılmamışsa veya currentId yoksa, erişimi reddet
 		router.navigate(['/user-two-fa']);
@@ -17,13 +18,13 @@ export const twoFAGuard: CanActivateFn = (route, state) => {
 	}
 
 	return userTwoFAService.getByUserId(currentId).pipe(
-		// tap(response => console.log('UserTwoFA fetched:', response.data.isVerify && response.data.isTwoFA)),
+		// tap(response => console.log('UserTwoFA fetched:', response.data)),
 		map(response => {
 			// Kullanıcının 2FA doğrulaması varsa ve 2FA aktifse, true dön
 			// Not: response yapısının doğru olduğunu varsayıyorum. Gerçek response yapınıza göre ayarlama yapmanız gerekebilir.
-			if (!response.data){
-				router.navigate(['/user-two-fa']);
-				return false;
+			if (!response.data || response.data == null){
+				// router.navigate(['/user-two-fa']);
+				return true;
 			}
 			if(response.data.isVerify && response.data.isTwoFA){
 				return true;

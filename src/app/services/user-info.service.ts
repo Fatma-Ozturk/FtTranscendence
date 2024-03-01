@@ -29,7 +29,7 @@ export class UserInfoService extends BaseService<UserInfo>{
 
   getProfileImage(profileImagePath: string): string {
     if (profileImagePath == null || profileImagePath === undefined || profileImagePath == "") {
-      return ("https://source.unsplash.com/random/150x150");
+      return ("assets/player.png");
     }
     return (environment.profileImageUrl + profileImagePath);
   }

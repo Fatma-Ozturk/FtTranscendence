@@ -1,6 +1,7 @@
 import { UserService } from './../../services/user.service';
 import { Component, Input } from '@angular/core';
 import { User } from 'src/app/models/entities/user';
+import { UserInfo } from 'src/app/models/entities/userInfo';
 
 @Component({
   selector: 'app-user-profile-card',
@@ -9,6 +10,7 @@ import { User } from 'src/app/models/entities/user';
 })
 export class UserProfileCardComponent {
   @Input() user: User;
+  @Input() userInfo: UserInfo;
   constructor(private userService:UserService) {
   }
 

@@ -2,11 +2,11 @@ import { GoogleTwoFASettingsModel } from './../../models/model/googleTwoFASettin
 import { UserTwoFA } from './../../models/entities/userTwoFA';
 import { ToastrService } from 'ngx-toastr';
 import { UserInfoService } from './../../services/user-info.service';
-import { switchMap, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from './../../services/user.service';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { BehaviorSubject, from } from 'rxjs';
+import { BehaviorSubject, from, of } from 'rxjs';
 import { User } from 'src/app/models/entities/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -68,7 +68,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
 	//proifle image file
 	selectedFile: File | null = null;
-	profileUrl: string = "https://source.unsplash.com/random/150x150";
+	profileUrl: string = "assets/player.png";
 
 	constructor(private userService: UserService,
 		private userInfoService: UserInfoService,
@@ -147,17 +147,31 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 	}
 
 	getUserByNickName(nickName: string) {
-		this.userService.getByNickName(nickName).subscribe({
-			next: (response) => {
+		this.userService.getByNickName(nickName).pipe(
+			switchMap(response => {
 				if (response.success) {
 					this.userSubject.next(response.data);
-					this.getByIdUserTwoFA(response.data.id);
+					return this.userTwoFAService.getByUserId(response.data.id);
+				} else {
+					this.toastrService.error(Messages.error);
+					return of(null);
+				}
+			}),
+			catchError(error => {
+				this.toastrService.error(Messages.error);
+				return of(null);
+			})
+		).subscribe({
+			next: (response: any) => {
+				if (response && response.success) {
+					if (response.data && response.data.twoFAType == 1) {
+						this.googleTwoFASetting = this.parseGoogleTwoFASettings(response.data.settings);
+					}
+					this.userTwoFASubject.next(response.data);
 				}
 			},
-			error: (responseError) => {
-				if (responseError.error) {
-					this.toastrService.error(Messages.error);
-				}
+			error: (error) => {
+				this.toastrService.error(Messages.error);
 			}
 		});
 	}
@@ -263,14 +277,14 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 						icon: 'pi pi-fw pi-user-plus',
 						command: () => this.visibleTwoFA()
 					},
-					{
-						label: 'İki Adımlı E-Posta Doğrulama',
-						icon: 'pi pi-fw pi-user-minus'
-					},
-					{
-						label: 'İki Adımlı Telefon Doğrulama',
-						icon: 'pi pi-fw pi-user-minus'
-					},
+					// {
+					// 	label: 'İki Adımlı E-Posta Doğrulama',
+					// 	icon: 'pi pi-fw pi-user-minus'
+					// },
+					// {
+					// 	label: 'İki Adımlı Telefon Doğrulama',
+					// 	icon: 'pi pi-fw pi-user-minus'
+					// },
 				]
 			},
 			{
@@ -326,50 +340,52 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
 		// userTwoFA yoksa veya userTwoFA.isTwoFA değişikliği varsa twoFAGenerate çağrılır
 		if (!userTwoFA || userTwoFA.isTwoFA == false) {
-		  this.twoFAService.generate({ "email": user.email }).pipe(
-			switchMap((response) => {
-			  if (response.success) {
-				this.twoFASubject.next(response.data);
-				let settings = '';
-				if (userTwoFA.twoFAType == 1){
-				  settings = this.googleTwoFASettings(response.data.secretBase32, response.data.barcode);
-				}
+			this.twoFAService.generate({ "email": user.email }).pipe(
+				switchMap((response) => {
+					if (response.success) {
+						this.twoFASubject.next(response.data);
+						let settings = '';
+						if (userTwoFA.twoFAType == 1) {
+							settings = this.googleTwoFASettings(response.data.secretBase32, response.data.qrCode);
+						}
 
-				// userTwoFA yoksa yeni bir kayıt oluştur, varsa güncelle
-				if (!userTwoFA) {
-				  return from(this.addUserTwoFA(twoFAType, settings));
-				} else {
-					let settings = '';
-					if (userTwoFA.twoFAType == 1){
-					  settings = this.googleTwoFASettings(response.data.secretBase32, response.data.barcode);
+						// userTwoFA yoksa yeni bir kayıt oluştur, varsa güncelle
+						if (!userTwoFA) {
+							return from(this.addUserTwoFA(twoFAType, settings));
+						} else {
+							let settings = '';
+							if (userTwoFA.twoFAType == 1) {
+								settings = this.googleTwoFASettings(response.data.secretBase32, response.data.qrCode);
+							}
+							userTwoFA.settings = settings;
+							userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
+							userTwoFA.updateTime = new Date();
+							return from(this.updateUserTwoFA(userTwoFA));
+						}
+					} else {
+						// Başarısız olursa, boş bir Observable döndür
+						return from([]);
 					}
-				  userTwoFA.settings = settings;
-				  userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
-				  userTwoFA.updateTime = new Date();
-				  return from(this.updateUserTwoFA(userTwoFA));
+				}),
+				tap(() => {
+					// İşlem başarılı olduktan sonra yapılacak ek işlemler
+				})
+			).subscribe({
+				error: () => {
+					// Hata yönetimi
 				}
-			  } else {
-				// Başarısız olursa, boş bir Observable döndür
-				return from([]);
-			  }
-			}),
-			tap(() => {
-			  // İşlem başarılı olduktan sonra yapılacak ek işlemler
-			})
-		  ).subscribe({
-			error: () => {
-			  // Hata yönetimi
-			}
-		  });
+			});
 		} else {
-		  // Eğer userTwoFA var ve isTwoFA false ise, sadece güncelleme yap
-		  userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
-		  userTwoFA.updateTime = new Date();
-		  this.updateUserTwoFA(userTwoFA);
-		}
-	  }
+			// Eğer userTwoFA var ve isTwoFA false ise, sadece güncelleme yap
+			console.log("userTwoFA ", userTwoFA);
 
-	googleTwoFASettings(secret: any, barcode: any) : string{
+			userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
+			userTwoFA.updateTime = new Date();
+			this.updateUserTwoFA(userTwoFA);
+		}
+	}
+
+	googleTwoFASettings(secret: any, barcode: any): string {
 		let googleTwoFASettingsModel: GoogleTwoFASettingsModel = {
 			secretBase32: secret,
 			barcode: barcode
@@ -379,7 +395,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		return seriliazeGoogleTwoFASettingsModel;
 	}
 
-	parseGoogleTwoFASettings(settings: string) : GoogleTwoFASettingsModel{
+	parseGoogleTwoFASettings(settings: string): GoogleTwoFASettingsModel {
 		let googleTwoFASettingsModel: GoogleTwoFASettingsModel = JSON.parse(settings);
 		return googleTwoFASettingsModel;
 	}
@@ -438,16 +454,17 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 	}
 
 	getByIdUserTwoFA(userId: number) {
-		this.userTwoFAService.getByUserId(userId).subscribe({
-			next: (response) => {
-				if (response && response.success) {
-					if (response.data && response.data.twoFAType == 1){
-						this.googleTwoFASetting =  this.parseGoogleTwoFASettings(response.data.settings);
-					}
-					this.userTwoFASubject.next(response.data);
-				}
-			}
-		});
+		return this.userTwoFAService.getByUserId(userId);
+		// .subscribe({
+		// 	next: (response) => {
+		// 		if (response && response.success) {
+		// 			if (response.data && response.data.twoFAType == 1){
+		// 				this.googleTwoFASetting =  this.parseGoogleTwoFASettings(response.data.settings);
+		// 			}
+		// 			this.userTwoFASubject.next(response.data);
+		// 		}
+		// 	}
+		// });
 	}
 
 	updateUserTwoFA(userTwoFA: UserTwoFA) {
@@ -474,12 +491,12 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		if (this.selectedFile) {
 			this.userInfoService.uploadProfileImage(this.nickName, this.selectedFile).subscribe({
 				next: (response) => {
-					if (response && response.success){
+					if (response && response.success) {
 						this.toastrService.success(Messages.updloadFileSuccess, Messages.success);
 					}
 				},
 				error: (errorResponse) => {
-					if (errorResponse && errorResponse.success){
+					if (errorResponse && errorResponse.success) {
 						this.toastrService.error(Messages.updloadFileError, Messages.error);
 					}
 				}

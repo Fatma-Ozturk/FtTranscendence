@@ -14,7 +14,7 @@
         <div class="user">
             <div class="image-container">
                 <img class="avatar" alt=""
-                    src="https://image.freepik.com/free-vector/coloured-knight-design_1152-54.jpg">
+                    [src]="profileUrl">
             </div>
             <div class="user-info" *ngIf="(userSubject | async) as User">
                 <p class="user-name" *ngIf="userSubject.getValue().firstName && userSubject.getValue().lastName">

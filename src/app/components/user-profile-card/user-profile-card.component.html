@@ -3,7 +3,7 @@
       <div class="container-fuild">
         <div class="d-flex justify-content-center align-self-center">
           <div class="mt-4 mb-2">
-              <img src="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" alt="image_profile">
+              <img [src]="userInfo?.profileImagePath != null ? userInfo?.profileImagePath : '../../../assets/player.png'" alt="image_profile">
           </div>
         </div>
         <div class="d-flex justify-content-center">

@@ -70,12 +70,17 @@ export class LoginComponent {
 	handleLoginSuccess(userTwoFAResponse: any) {
 		if (userTwoFAResponse && userTwoFAResponse.success) {
 			this.userTwoFA = userTwoFAResponse.data;
-			this.userTwoFA.isVerify = false;
-			this.updateUserTwoFA(this.userTwoFA)
-			this.toastrService.info(Messages.success);
-			if (this.userTwoFA !== undefined && this.userTwoFA !== null && this.userTwoFA.isTwoFA === true) {
-				this.router.navigate(['/user-two-fa']);
-			} else {
+			console.log("this.userTwoFA ", this.userTwoFA);
+			if (!userTwoFAResponse.data && userTwoFAResponse.data != null){
+				this.userTwoFA.isVerify = false;
+				this.updateUserTwoFA(this.userTwoFA)
+				this.toastrService.info(Messages.success);
+				if (this.userTwoFA !== undefined && this.userTwoFA !== null && this.userTwoFA.isTwoFA === true) {
+					this.router.navigate(['/user-two-fa']);
+				} else {
+					this.router.navigate(['/view']);
+				}
+			}else{
 				this.router.navigate(['/view']);
 			}
 		} else {

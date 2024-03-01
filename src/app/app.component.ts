@@ -3,7 +3,7 @@ import { User } from './models/entities/user';
 import { UserService } from './services/user.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChangeDetectorRef, Component, OnInit, SimpleChange } from '@angular/core';
-import { BehaviorSubject, from, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, from, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ActivePageNameService } from './services/active-page-name.service';
 import { AuthService } from './services/auth.service';
 import { LoadProgressService } from './services/load-progress.service';
@@ -51,6 +51,8 @@ export class AppComponent implements OnInit {
 	isAuther() {
 		// Öncelikle, kullanıcının doğrulanıp doğrulanmadığını kontrol edin
 		this.authService.getIsAuth().pipe(
+			distinctUntilChanged(),
+			shareReplay(1),
 			tap(response => {
 				// isAuthBoolSubject güncellenir
 				this.isAuthBoolSubject.next(response);
@@ -66,12 +68,12 @@ export class AppComponent implements OnInit {
 					// Kullanıcı doğrulanmamışsa, akışı burada sonlandır
 					return of(null);
 				}
-			})
+			}),
 		).subscribe({
 			next: (response: any) => {
 				if (response) {
 					// Kullanıcının doğrulama durumuna göre isVerifContainerVisibleSubject güncellenir
-					this.isVerifContainerVisibleSubject.next(response?.success ? response.data.isVerify : false);
+					this.isVerifContainerVisibleSubject.next(response?.data ? response?.data?.isVerify : true);
 				}
 			},
 			error: err => {
