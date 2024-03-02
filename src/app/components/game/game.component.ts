@@ -92,40 +92,42 @@ export class GameComponent {
 		this.paddleHost = new PaddleGameModel();
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
-		this.gameService.getGameRoomSocketResponse().subscribe(
-			(response: any) => {
-				if (response) {
-					if (response.message === 'GameRoomSocketResponse Info') {
-						this.gameRoomSocket = JSON.parse(response.data);
-						this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
-						if (this.whoIs == -1) return;
-						if (this.whoIs == 0) {
-							this.leftPaddle = this.paddleHost;
-							this.rightPaddle = this.paddleGuest;
-							this.paddleHost.whoIs = GamePlayerEnum.host;
-							this.paddleGuest.whoIs = GamePlayerEnum.guest;
-							this.ball.whoIs = this.paddleHost.whoIs;
-							this.ball.remainingTime = this.gameRoomSocket.startTime;
-						} else if (this.whoIs == 1) {
-							this.leftPaddle = this.paddleHost;
-							this.rightPaddle = this.paddleGuest;
-							this.paddleHost.whoIs = GamePlayerEnum.host;
-							this.paddleGuest.whoIs = GamePlayerEnum.guest;
-							this.ball.whoIs = this.paddleGuest.whoIs;
-							this.ball.remainingTime = this.gameRoomSocket.startTime;
-						}
+		this.gameService.getGameRoomSocketResponse().subscribe({
+			next: (response: any) => {
+				if (response && response.message === 'GameRoomSocketResponse Info') {
+					this.gameRoomSocket = JSON.parse(response.data);
+					this.whoIs = this.whoIsHostOrGuest(this.gameRoomSocket);
+					if (this.whoIs == -1) return;
+					if (this.whoIs == 0) {
+						this.leftPaddle = this.paddleHost;
+						this.rightPaddle = this.paddleGuest;
+						this.paddleHost.whoIs = GamePlayerEnum.host;
+						this.paddleGuest.whoIs = GamePlayerEnum.guest;
+						this.ball.whoIs = this.paddleHost.whoIs;
+						this.ball.remainingTime = this.gameRoomSocket.startTime;
+					} else if (this.whoIs == 1) {
+						this.leftPaddle = this.paddleHost;
+						this.rightPaddle = this.paddleGuest;
+						this.paddleHost.whoIs = GamePlayerEnum.host;
+						this.paddleGuest.whoIs = GamePlayerEnum.guest;
+						this.ball.whoIs = this.paddleGuest.whoIs;
+						this.ball.remainingTime = this.gameRoomSocket.startTime;
 					}
 				}
 			},
-			(error) => {
-				console.error('Error reading gameRoomSocket response:', error);
+			error: (error) => {
+				this.toastrService.error(Messages.error);
+				this.router.navigate(['/view']);
 			}
-		);
+		});
 	}
 
 	ngAfterViewInit(): void {
-		if (this.whoIs != -1) {
+		if (this.whoIs != -1 && this.whoIs != 3) {
 			this.gameLoop();
+		}
+		if (this.whoIs == 3){
+			this.gameViewLoop();
 		}
 		this.gameTotalScore$.subscribe(response => {
 			this.gameTotalScore = response;
@@ -136,6 +138,9 @@ export class GameComponent {
 	}
 	ngOnInit(): void {
 		this.currentUserId = this.authService.getCurrentUserId();
+		this.route.queryParams.subscribe((data: any) => {
+			this.gameRoomId = Number(data['room-id']);
+		});
 		this.getGameTotalScore();
 		this.setupScoreListener();
 		this.setupBallListener();
@@ -145,14 +150,20 @@ export class GameComponent {
 			this.getScreenSize();
 			this.setCanvasSize();
 			this.initGameModels();
-			this.route.queryParams.subscribe((data: any) => {
-				this.gameRoomId = Number(data['room-id']);
-				if (this.currentUserId != this.gameRoomSocket.userGuestId ||
-					this.currentUserId != this.gameRoomSocket.userHostId) {
-					this.gameService.connectSocket();
-					this.whoIs = 2;
-				}
-			});
+		} else {
+			this.whoIs = 3;
+			this.getTimeNow();
+			this.getScreenSize();
+			this.setCanvasSize();
+			this.gameService.connectSocket();
+			this.paddleHost.roomId = this.gameRoomId;
+			this.paddleGuest.roomId = this.gameRoomId;
+			this.leftPaddle = this.paddleHost;
+			this.rightPaddle = this.paddleGuest;
+			this.ball.roomId = this.gameRoomId;
+			this.initGameModels();
+			this.gameService.sendViewer({ roomId: this.gameRoomId });
+			this.gameViewLoop();
 		}
 	}
 	ngDoCheck() { }
@@ -167,8 +178,11 @@ export class GameComponent {
 		this.gameService.removeGame();
 		this.gameService.removeKeydown();
 		this.gameService.removeGameRoomSocket();
-		this.gameService.disconnectSocket();
-
+		if (this.gameService.isConnected()) {
+			this.gameService.disconnectSocket();
+		}
+		if (this.gameRemainingTime > 0)
+			this.gameFinish();
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -178,7 +192,6 @@ export class GameComponent {
 				let serializeData: { host: number; guest: number } = JSON.parse(
 					response.data
 				);
-				console.log('Score : ', serializeData);
 				if (this.whoIs == 1) {
 					this.paddleGuest.score = serializeData.host;
 					this.paddleHost.score = serializeData.guest;
@@ -226,6 +239,20 @@ export class GameComponent {
 				}
 			});
 	}
+	gameViewLoop = (): void => {
+		this.gameViewUpdate();
+		this.gameDraw();
+		window.requestAnimationFrame(this.gameViewLoop);
+		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+
+		this.gameRemainingTime =
+			new Date(this.gameRoomSocket.startTime).getTime() +
+			this.gameRoomSocket.timer * 1000 -
+			this.gameNowDate.getTime();
+		if (this.gameRemainingTime <= 0)
+			this.navigeMainPage();
+	};
 	gameLoop = (): void => {
 		if (!this.gameRunning) return;
 		this.gameUpdate();
@@ -267,6 +294,10 @@ export class GameComponent {
 		this.ball.xVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 		this.ball.yVel = Math.floor(Math.random() * 100) % 2 == 0 ? 1 : -1;
 	}
+	gameViewUpdate(): void {
+		this.paddleUpdateHost();
+		this.updateBall();
+	}
 	gameUpdate(): void {
 		this.paddleUpdateHost();
 		this.updateBall();
@@ -274,11 +305,11 @@ export class GameComponent {
 	paddleUpdateHost(): void {
 		if (this.whoIs == 0) {
 			if (this.isArrowUpPressed) {
-				this.paddleHost.y = this.paddleHost.y - this.speedmultiplier;
+				this.paddleHost.y = this.paddleHost.y - (this.speedmultiplier * this.gameRoomSocket.speed);
 				if (this.paddleHost.y < 0) this.paddleHost.y = 2;
 			}
 			if (this.isArrowDownPressed) {
-				this.paddleHost.y = this.paddleHost.y + this.speedmultiplier;
+				this.paddleHost.y = this.paddleHost.y + (this.speedmultiplier * this.gameRoomSocket.speed);
 				if (
 					this.paddleHost.y + this.paddleHost.height >
 					this.canvasRef.nativeElement.height
@@ -296,11 +327,11 @@ export class GameComponent {
 		}
 		if (this.whoIs == 1) {
 			if (this.isArrowUpPressed) {
-				this.paddleGuest.y = this.paddleGuest.y - this.speedmultiplier;
+				this.paddleGuest.y = this.paddleGuest.y - (this.speedmultiplier * this.gameRoomSocket.speed);
 				if (this.paddleGuest.y < 0) this.paddleGuest.y = 2;
 			}
 			if (this.isArrowDownPressed) {
-				this.paddleGuest.y = this.paddleGuest.y + this.speedmultiplier;
+				this.paddleGuest.y = this.paddleGuest.y + (this.speedmultiplier * this.gameRoomSocket.speed);
 				if (
 					this.paddleGuest.y + this.paddleGuest.height >
 					this.canvasRef.nativeElement.height
@@ -315,6 +346,9 @@ export class GameComponent {
 			this.paddleGuest.topFixed =
 				this.paddleGuest.y / this.fixedScreenRatio;
 			this.gameService.sendKeydown(this.paddleGuest);
+		}
+		if (this.whoIs == 3) {
+
 		}
 	}
 	paddleUpdateGuest(): void { }
@@ -338,6 +372,7 @@ export class GameComponent {
 			else {
 				if (this.whoIs == 0)
 					this.gameService.sendScore({
+						roomId: this.gameRoomId,
 						host: this.paddleHost.score,
 						guest: this.paddleGuest.score + 1,
 					});
@@ -365,8 +400,8 @@ export class GameComponent {
 				return;
 			}
 		}
-		this.ball.x += this.fixedScreenRatio * this.ball.xVel;
-		this.ball.y += this.fixedScreenRatio * this.ball.yVel;
+		this.ball.x += this.fixedScreenRatio * this.ball.xVel * this.ball.speed;//
+		this.ball.y += this.fixedScreenRatio * this.ball.yVel * this.ball.speed;//
 	};
 	newBallDirection(paddle: PaddleGameModel): void {
 		let newVel: number;
@@ -535,7 +570,6 @@ export class GameComponent {
 		return 1;
 	}
 	gameFinish() {
-		// this.gameMessage = "Oyun bağlantınız koptu lütfen siktir olup gidin!";
 		clearInterval(this.intervalId);
 		if (this.paddleGuest.score < this.paddleHost.score) {
 			this.gameFinishWinnerHost();
@@ -562,9 +596,7 @@ export class GameComponent {
 			this.gameService.removeGameRoomSocket();
 			this.gameService.disconnectSocket();
 		}
-		setTimeout(() => {
-			this.router.navigate(['/view']);
-		}, 10000);
+		this.navigeMainPage();
 	}
 	gameFinishTie(): void {
 		this.gameScoreAdd(1);
@@ -597,16 +629,14 @@ export class GameComponent {
 			updateTime: new Date(),
 			status: true,
 		};
-		this.gameScoreService.add(gameScore).subscribe(
-			(response) => {
-			},
-			(responseError) => {
+		this.gameScoreService.add(gameScore).subscribe({
+			error: (responseError) => {
 				if (responseError.error) {
 					this.toastrService.info(Messages.error);
 					this.router.navigate(['/view']);
 				}
 			}
-		);
+		});
 	}
 	gameHistoryAdd() {
 		let gameHistory: GameHistory = {
@@ -617,15 +647,14 @@ export class GameComponent {
 			updateTime: new Date(),
 			status: true,
 		};
-		this.gameHistoryService.add(gameHistory).subscribe(
-			(response) => { },
-			(responseError) => {
+		this.gameHistoryService.add(gameHistory).subscribe({
+			error: (responseError) => {
 				if (responseError.error) {
 					this.toastrService.info(Messages.error);
 					this.router.navigate(['/view']);
 				}
-			}
-		);
+			},
+		});
 	}
 	gameTotalScoreUpdate() {
 		let gameTotalScore: GameTotalScore = {
@@ -637,45 +666,46 @@ export class GameComponent {
 			updateTime: new Date(),
 			status: true
 		};
-		this.gameTotalScoreService.update(gameTotalScore).subscribe(response => {
-			if (response.success) {
-
-			}
-		}, (responseError) => {
-			if (responseError.error) {
-				this.toastrService.info(Messages.error);
-				this.router.navigate(['/view']);
-			}
+		this.gameTotalScoreService.update(gameTotalScore).subscribe({
+			error: (responseError) => {
+				if (responseError.error) {
+					this.toastrService.info(Messages.error);
+					this.router.navigate(['/view']);
+				}
+			},
 		});
 	}
 	getGameTotalScore() {
 		let currentNickName: string = this.authService.getCurrentNickName();
-		this.gameTotalScoreService.getByNickName(currentNickName).subscribe(response => {
-			if (response.success) {
-				this.gameTotalScoreSubject.next(response.data);
-			}
-		}, (responseError) => {
-			if (responseError.error) {
-				this.toastrService.info(Messages.error);
-				this.router.navigate(['/view']);
-			}
+		this.gameTotalScoreService.getByNickName(currentNickName).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.gameTotalScoreSubject.next(response.data);
+				}
+			},
+			error: (responseError) => {
+				if (responseError.error) {
+					this.toastrService.info(Messages.error);
+					this.router.navigate(['/view']);
+				}
+			},
 		});
 	}
 	navigeMainPage() {
-		if (this.gameService.isConnected()) {
-			// this.gameService.sendGameDisconnect();
-			this.gameService.disconnectSocket();
-		}
-		this.router.navigate(['/view']);
+		setTimeout(() => {
+			this.router.navigate(['/view']);
+		}, 10000);
 	}
 
 	checkAchievement(achievementName: string) {
 		let currentUserId = this.authService.getCurrentUserId();
-		this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe(response => { },
-			errorResponse => {
-				if (errorResponse.error) {
-					// this.toastrService.error(Messages.error);
-				}
-			});
+		this.achievementRuleService.checkAchievement(currentUserId, achievementName).subscribe({
+			next: () => {
+
+			},
+			error: () => {
+				// this.toastrService.error(Messages.error);
+			}
+		});
 	}
 }

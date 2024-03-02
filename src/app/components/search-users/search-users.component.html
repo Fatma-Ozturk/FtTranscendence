@@ -26,8 +26,8 @@
 </div>
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-center mt-4 mb-4">
-        <div *ngFor="let user of users">
-            <app-user-profile-card [user]="user" ></app-user-profile-card>
+        <div *ngFor="let userForUserInfoDto of userForUserInfoDtos">
+            <app-user-profile-card [userForUserInfoDto]="userForUserInfoDto"></app-user-profile-card>
         </div>
     </div>
 </div>

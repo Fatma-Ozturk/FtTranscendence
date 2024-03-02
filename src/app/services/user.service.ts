@@ -48,9 +48,6 @@ export class UserService extends BaseService<User>{
   getStatusByMail(email: string) {
     return this.httpClient.get<SingleResponseModel<boolean>>(environment.appurl + "users/getstatusbymail?email=" + email);
   }
-  getByAttributes(userForSearchDto: UserForSearchDto) {
-    return this.httpClient.post<ListResponseModel<User>>(environment.appurl + "users/getbyattributes", userForSearchDto);
-  }
   getAllOperationClaimRank(userId: number): Observable<ListResponseModel<OperationClaim>> {
     let newPath = environment.appurl + "users/getalloperationclaimrank?userId=" + userId
     return this.httpClient.get<ListResponseModel<OperationClaim>>(newPath);

@@ -6,6 +6,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/entities/user';
 import { Messages } from 'src/app/constants/Messages';
 import { RegexService } from 'src/app/utilities/regex';
+import { UserInfo } from 'src/app/models/entities/userInfo';
+import { UserInfoService } from 'src/app/services/user-info.service';
+import { UserForUserInfoDto } from 'src/app/models/dto/userForUserInfoDto';
 
 @Component({
   selector: 'app-search-users',
@@ -14,9 +17,9 @@ import { RegexService } from 'src/app/utilities/regex';
 })
 export class SearchUsersComponent {
   searchUsersForm: FormGroup;
-  users: User[] = [];
+  userForUserInfoDtos: UserForUserInfoDto[] = [];
   constructor(private formBuilder: FormBuilder,
-    private userService: UserService,
+    private userInfoService: UserInfoService,
     private toastrService: ToastrService) {
 
   }
@@ -49,9 +52,9 @@ export class SearchUsersComponent {
         userForSearchDto.phone = res;
       }
     })
-    this.userService.getByAttributes(userForSearchDto).subscribe(response => {
+    this.userInfoService.getByAttributes(userForSearchDto).subscribe(response => {
       if (response.success){
-        this.users = response.data;
+        this.userForUserInfoDtos = response.data;
         this.toastrService.success(Messages.success);
       }
     }, responseError => {
@@ -72,7 +75,7 @@ export class SearchUsersComponent {
   }
 
   clearSearched(){
-    this.users.splice(0);
+    this.userForUserInfoDtos.splice(0);
   }
 
   clearAll(){

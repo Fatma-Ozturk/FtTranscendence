@@ -46,6 +46,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { RatingModule } from 'primeng/rating';
 import { RippleModule } from 'primeng/ripple';
+import { FieldsetModule } from 'primeng/fieldset';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { MyHttpLoadInterceptor } from './interceptors/my-http-load.interceptor';
@@ -162,6 +163,7 @@ import { UserLoginContainerComponent } from './container/user-login-container/us
     SpeedDialModule,
     RatingModule,
     CardModule,
+	FieldsetModule,
     RippleModule,
     AutoFocusModule,
     InputSwitchModule,

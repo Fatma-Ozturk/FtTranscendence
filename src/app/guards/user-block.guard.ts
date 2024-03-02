@@ -15,8 +15,11 @@ export const userBlockGuard: CanActivateFn = (route, state) => {
 	let currentId = authService.getCurrentUserId();
 	let nickName = route.paramMap.get('nickname');
 
+	if (!nickName || !currentId) {
+		return of(true);
+	}
+
 	return userService.getByNickName(nickName).pipe(
-		tap(user => console.log('User fetched:', user)),
 		switchMap(user => {
 			if (!user) {
 				return of(true);
@@ -30,13 +33,6 @@ export const userBlockGuard: CanActivateFn = (route, state) => {
 				status: true
 			}).pipe(
 				map((block: any) => {
-					console.log("blocks.data ", block.data);
-					console.log("user.data.id ", user.data.id);
-
-					// let blocked:UserBlock = blocks.data.find((block: UserBlock) => block.blockedId === user.data.id);
-					// console.log("blocked ", blocked);
-
-					//
 					if (block && block.success == true){
 						return false;
 					}

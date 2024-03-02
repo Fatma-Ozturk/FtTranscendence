@@ -10,6 +10,7 @@ export class GameService {
 	public keydown$: BehaviorSubject<string> = new BehaviorSubject('');
 	public score$: BehaviorSubject<string> = new BehaviorSubject('');
 	public game$: BehaviorSubject<string> = new BehaviorSubject('');
+	public viewer$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmaking$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmakingTwoUser$: BehaviorSubject<string> = new BehaviorSubject('');
 	public matchmakingResponse$: BehaviorSubject<string> = new BehaviorSubject('');
@@ -44,6 +45,9 @@ export class GameService {
 		});
 		this.socket.on('game', (message: any): any => { //+
 			this.game$.next(message);
+		});
+		this.socket.on('viewer', (message: any): any => { //+
+			this.viewer$.next(message);
 		});
 		this.socket.on('ballLocation', (message: any): any => {//+
 			this.ballLocation$.next(message);
@@ -102,6 +106,10 @@ export class GameService {
 		this.socket.emit('game', game);
 	}
 
+	public sendViewer(viewer: any) {
+		this.socket.emit('viewer', viewer);
+	}
+
 	public sendBallLocation(ballLocation: any) {
 		this.socket.emit('ballLocation', ballLocation);
 	}
@@ -128,6 +136,10 @@ export class GameService {
 
 	public getGame = () => {
 		return this.game$.asObservable();
+	};
+
+	public getViewer = () => {
+		return this.viewer$.asObservable();
 	};
 
 	public getBallLocation = () => {
@@ -178,6 +190,10 @@ export class GameService {
 
 	public removeGame(): void {
 		this.socket.off('game');
+	}
+
+	public removeView(): void {
+		this.socket.off('viewer');
 	}
 
 	public removeGameRoomId(): void {

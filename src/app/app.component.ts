@@ -49,30 +49,24 @@ export class AppComponent implements OnInit {
 		this.isAuther();
 	}
 	isAuther() {
-		// Öncelikle, kullanıcının doğrulanıp doğrulanmadığını kontrol edin
 		this.authService.getIsAuth().pipe(
 			distinctUntilChanged(),
 			shareReplay(1),
 			tap(response => {
-				// isAuthBoolSubject güncellenir
 				this.isAuthBoolSubject.next(response);
 			}),
 			switchMap(response => {
 				if (response) {
-					// Kullanıcı doğrulanmışsa, ek bilgileri al
 					this.currentNickName = this.authService.getCurrentNickName();
 					this.currentUserId = this.authService.getCurrentUserId();
-					// Kullanıcı doğrulama durumunu kontrol et
-					return this.isUserVerify();
+					return this.userTwoFAService.getByUserId(this.currentUserId);
 				} else {
-					// Kullanıcı doğrulanmamışsa, akışı burada sonlandır
 					return of(null);
 				}
 			}),
 		).subscribe({
 			next: (response: any) => {
 				if (response) {
-					// Kullanıcının doğrulama durumuna göre isVerifContainerVisibleSubject güncellenir
 					this.isVerifContainerVisibleSubject.next(response?.data ? response?.data?.isVerify : true);
 				}
 			},

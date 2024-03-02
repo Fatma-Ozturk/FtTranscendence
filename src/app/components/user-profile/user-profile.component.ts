@@ -34,7 +34,6 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
 	userSubject = new BehaviorSubject<User | null>(null);
 	user$ = this.userSubject.asObservable();
-	user: User;
 
 	userInfoSubject = new BehaviorSubject<UserInfo | null>(null);
 	userInfo$ = this.userInfoSubject.asObservable();
@@ -56,7 +55,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	userBlockSubject = new BehaviorSubject<UserBlock | null>(null);
 	userBlock$ = this.userBlockSubject.asObservable();
 	userBlock: UserBlock;
-	isUserBlock:boolean = false;
+	isUserBlock: boolean = false;
 
 	constructor(
 		private userService: UserService,
@@ -82,42 +81,32 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				switchMap((params: any) => {
 					this.nickName = params.get('nickname');
 					if (!this.nickName) {
-						throw new Error('Nickname is required');
+						this.toastrService.error(Messages.error);
+						this.router.navigate(['/']);
 					}
-					return this.gameTotalScoreService.getByNickName(this.nickName);
+					return this.getGameTotalScories(this.nickName);
 				}),
 				switchMap((params: any) => {
-					this.nickName = params.get('nickname');
-					if (!this.nickName) {
-						throw new Error('Nickname is required');
-					}
 					return this.userInfoService.getByNickName(this.nickName);
 				}),
 				switchMap((params: any) => {
 					this.profileUrl = this.userInfoService.getProfileImage(params.data.profileImagePath);
-
-					this.nickName = params.get('nickname');
-					if (!this.nickName) {
-						throw new Error('Nickname is required');
-					}
 					return this.userService.getByNickName(this.nickName);
 				})
 			)
 			.subscribe({
 				next: (response: any) => {
-
 					if (response.success) {
-						this.user = response.data;
-						this.profileUserId = Number(this.user.id);
-						this.editProfileVisible = (this.currentUserId == this.user.id);
+						this.profileUserId = Number(response.data.id);
+						this.editProfileVisible = (this.currentUserId == response.data.id);
 						this.userSubject.next(response.data);
 						this.getUserGameHistoryDtos(response.data.id);
-						this.getUserBlock();
 					} else {
 						throw new Error('User not found');
 					}
 				},
 				error: (error) => {
+					console.log("error ", error);
 					this.toastrService.error(Messages.error);
 				}
 			});
@@ -147,7 +136,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 					}
 				},
 				error: (responseError) => {
-					this.toastrService.error(Messages.error);
+					// this.toastrService.error(Messages.error);
 				}
 			});
 	}
@@ -157,16 +146,11 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	}
 
 	showProfileSettingDialog() {
-		// this.profileSettingsDialogVisible = true;
 		this.router.navigate(['/user-edit-profile/', this.nickName])
 	}
 
-	getGameTotalScories() {
-		this.gameTotalScoreService.getByNickName(this.nickName).subscribe(response => {
-			if (response.success) {
-				this.gameTotalScoriesSubject.next(response.data);
-			}
-		});
+	getGameTotalScories(nickName: string) {
+		return this.gameTotalScoreService.getByNickName(nickName);
 	}
 
 	getAllUserAchievementByAchievementDtoWithUserId(userId: number) {
@@ -178,12 +162,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	}
 
 	userBlockDelete() {
-		// Eğer userBlock yoksa, yeni bir engelleme ekleyin.
 		if (!this.isUserBlock) {
 			this.userBlockAdd();
 			return;
 		}
-		// Var olan engellemeyi kaldır
 		this.userBlockService.delete(this.userBlock.id).subscribe({
 			next: (response) => {
 				if (response.success) {
@@ -192,8 +174,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				}
 			},
 			error: () => {
-				// Hata yönetimi
-				this.toastrService.error(Messages.error);
+				// this.toastrService.error(Messages.error);
 			}
 		});
 	}
@@ -215,36 +196,31 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				}
 			},
 			error: () => {
-				// Hata yönetimi
-				this.toastrService.error(Messages.error);
+				// this.toastrService.error(Messages.error);
 			}
 		});
 	}
 
 	getUserBlock() {
-		this.userBlockService.getByBlockerIdBlockedId({
+		const userBlock = {
 			id: 0,
 			blockerId: Number(this.currentUserId),
 			blockedId: Number(this.profileUserId),
 			createdAt: new Date(),
 			updateTime: new Date(),
 			status: true
-		}).subscribe({
-			next: (response)=>{
-
-				console.log("response ", response);
-
-				// if (response.success) {
-					if (response.data == null || response.data === undefined){
-						this.isUserBlock = false;
-					}else{
-						this.userBlockSubject.next(response.data);
-						this.isUserBlock = true;
-					}
-					this.cdr.detectChanges();
-				// }
+		}
+		this.userBlockService.getByBlockerIdBlockedId(userBlock).subscribe({
+			next: (response) => {
+				if (response.data == null || response.data === undefined) {
+					this.isUserBlock = false;
+				} else {
+					this.userBlockSubject.next(response.data);
+					this.isUserBlock = true;
+				}
+				this.cdr.detectChanges();
 			},
-			error:() =>{
+			error: () => {
 				this.isUserBlock = false;
 				this.cdr.detectChanges();
 			}
@@ -259,7 +235,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				}
 			},
 			error: () => {
-				this.toastrService.error(Messages.error);
+				// this.toastrService.error(Messages.error);
 			}
 		});
 	}

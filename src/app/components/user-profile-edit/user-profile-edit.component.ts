@@ -338,19 +338,14 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		let userTwoFA: UserTwoFA = this.userTwoFASubject.getValue();
 		let twoFAType: number = 1;
 
-		// userTwoFA yoksa veya userTwoFA.isTwoFA değişikliği varsa twoFAGenerate çağrılır
 		if (!userTwoFA || userTwoFA.isTwoFA == false) {
 			this.twoFAService.generate({ "email": user.email }).pipe(
 				switchMap((response) => {
 					if (response.success) {
 						this.twoFASubject.next(response.data);
 						let settings = '';
-						if (userTwoFA.twoFAType == 1) {
-							settings = this.googleTwoFASettings(response.data.secretBase32, response.data.qrCode);
-						}
-
-						// userTwoFA yoksa yeni bir kayıt oluştur, varsa güncelle
-						if (!userTwoFA) {
+						settings = this.googleTwoFASettings(response.data.secretBase32, response.data.qrCode);
+						if (!userTwoFA || userTwoFA == null) {
 							return from(this.addUserTwoFA(twoFAType, settings));
 						} else {
 							let settings = '';
@@ -363,22 +358,18 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 							return from(this.updateUserTwoFA(userTwoFA));
 						}
 					} else {
-						// Başarısız olursa, boş bir Observable döndür
 						return from([]);
 					}
 				}),
 				tap(() => {
-					// İşlem başarılı olduktan sonra yapılacak ek işlemler
+					this.getUserByNickName(this.nickName);
 				})
 			).subscribe({
 				error: () => {
-					// Hata yönetimi
+
 				}
 			});
 		} else {
-			// Eğer userTwoFA var ve isTwoFA false ise, sadece güncelleme yap
-			console.log("userTwoFA ", userTwoFA);
-
 			userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
 			userTwoFA.updateTime = new Date();
 			this.updateUserTwoFA(userTwoFA);

@@ -6,4 +6,5 @@ export interface GameRoomSocket {
   resultNameId: number;
   startTime: Date;
   timer: number;
+  speed: number;
 }

@@ -5,6 +5,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { SingleResponseModel } from '../models/singleResponseModel';
+import { UserForSearchDto } from '../models/dto/userForSearchDto';
+import { ListResponseModel } from '../models/listResponseModel';
+import { UserForUserInfoDto } from '../models/dto/userForUserInfoDto';
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +35,8 @@ export class UserInfoService extends BaseService<UserInfo>{
       return ("assets/player.png");
     }
     return (environment.profileImageUrl + profileImagePath);
+  }
+  getByAttributes(userForSearchDto: UserForSearchDto) {
+    return this.httpClient.post<ListResponseModel<UserForUserInfoDto>>(environment.appurl + "user-infos/getbyattributes", userForSearchDto);
   }
 }

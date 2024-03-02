@@ -1,19 +1,21 @@
+import { of, switchMap } from 'rxjs';
 import { GameTotalScore } from './../../models/entities/gameTotalScore';
 import { ToastModule } from 'primeng/toast';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/services/auth.service';
 import { GameService } from './../../services/game.service';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameTotalScoreService } from 'src/app/services/game-total-score.service';
 import { Messages } from 'src/app/constants/Messages';
+import { GameRoomStartOptionSocket } from 'src/app/models/entities/gameRoomStartOptionSocket';
 
 @Component({
 	selector: 'app-game-matchmaking',
 	templateUrl: './game-matchmaking.component.html',
 	styleUrls: ['./game-matchmaking.component.css']
 })
-export class GameMatchmakingComponent {
+export class GameMatchmakingComponent implements OnInit {
 	gameText: string;
 
 	@ViewChild('processDiv', { static: true })
@@ -27,6 +29,9 @@ export class GameMatchmakingComponent {
 	isMatchTwoPlayersGame: boolean = false;
 	hostUserNickName: string = "";
 	guestUserNickName: string = "";
+
+	isSpeedBall: boolean;
+	isLongGame: boolean;
 	constructor(
 		private gameService: GameService,
 		private gameTotalScoreService: GameTotalScoreService,
@@ -58,14 +63,14 @@ export class GameMatchmakingComponent {
 		});
 	}
 
-	ngDoCheck() {
-
-	}
-
 	matchmakingRandomUserStart() {
-		this.gameService.sendMatchmaking('');
-		this.gameService.getNewMatchmakingResponse().subscribe(
-			(response: any) => {
+		let gameRoomStartOptionSocket: GameRoomStartOptionSocket = {
+			isSpeedBall: this.isSpeedBall,
+			isLongGame: this.isLongGame
+		};
+		this.gameService.sendMatchmaking(gameRoomStartOptionSocket);
+		this.gameService.getNewMatchmakingResponse().pipe(switchMap((response: any) => {
+			// if (response) {
 				if (response.message === "Matchmaking Search") {
 					this.progressBarDivVisible = true;
 					this.gameText = "Oyuncu Aranıyor..."
@@ -77,23 +82,23 @@ export class GameMatchmakingComponent {
 				else if (response.message === "Matchmaking Finish") {
 					this.progressBarDivVisible = false;
 					this.gameText = "Yönlendiriliyor..."
-					this.gameService.getGameRoomId().subscribe((response: any) => {
-						if (response != null && response !== undefined) {
-							setTimeout(() => {
-								const queryParams = { 'room-id': response.message };
-								this.gameService.removeGameRoomId();
-								this.gameService.removeNewMatchmaking();
-								this.gameService.removeMatchmakingResponse();
-								this.router.navigate(['/game'], { queryParams });
-							}, 1000);
-						}
-					})
+					return this.gameService.getGameRoomId();
 				}
-			},
-			(error) => {
-				console.error('Error reading matchmaking response:', error);
+				return of(null);
+			// }
+			// return of(null);
+		})).subscribe({
+			next: (response: any) => {
+				if (response && response != null && response !== undefined) {
+					console.log("response.message ", response.message);
+					const queryParams = { 'room-id': response.message };
+					this.gameService.removeGameRoomId();
+					this.gameService.removeNewMatchmaking();
+					this.gameService.removeMatchmakingResponse();
+					this.router.navigate(['/game'], { queryParams });
+				}
 			}
-		);
+		});
 	}
 
 	matchmakingTwoUserStart(hostUserNickName: string, guestUserNickName: string) {
@@ -102,40 +107,42 @@ export class GameMatchmakingComponent {
 			guestUserNickName: guestUserNickName
 		}
 		this.gameService.sendMatchmakingTwoUser(matchmakingTwoUserModel);
-		this.gameService.getNewMatchmakingTwoResponse().subscribe(
-			(response: any) => {
-				console.log("response", response.message);
-
-				if (response.message === "Matchmaking Two Waiting") {
-					this.progressBarDivVisible = true;
-					this.gameText = "Oyuncu Bekleniyor..."
+		this.gameService.getNewMatchmakingTwoResponse().pipe(
+			switchMap((response: any) => {
+				if (response) {
+					if (response.message === "Matchmaking Two Waiting") {
+						this.progressBarDivVisible = true;
+						this.gameText = "Oyuncu Bekleniyor..."
+					}
+					else if (response.message === "Matchmaking Two Join") {
+						this.progressBarDivVisible = false;
+						this.gameText = "Oyuncu Katıldı..."
+					}
+					else if (response.message === "Matchmaking Two Finish") {
+						this.progressBarDivVisible = false;
+						this.gameText = "Yönlendiriliyor..."
+						return this.gameService.getGameRoomId();
+					}
 				}
-				else if (response.message === "Matchmaking Two Join") {
-					this.progressBarDivVisible = false;
-					this.gameText = "Oyuncu Katıldı..."
-				}
-				else if (response.message === "Matchmaking Two Finish") {
-					this.progressBarDivVisible = false;
-					this.gameText = "Yönlendiriliyor..."
-					this.gameService.getGameRoomId().subscribe((response: any) => {
-						if (response != null && response !== undefined) {
-							setTimeout(() => {
-								const queryParams = { 'room-id': response.message };
-								console.log("reoom id" , response.message);
+				console.log("enes");
 
-								this.gameService.removeGameRoomId();
-								this.gameService.removeNewMatchmakingTwoUser();
-								this.gameService.removeMatchmakingTwoResponse();
-								this.router.navigate(['/game'], { queryParams });
-							}, 1000);
-						}
-					})
+				return of(null);
+			})
+		).subscribe({
+			next: (response: any) => {
+				if (response && response != null && response !== undefined) {
+					const queryParams = { 'room-id': response.message };
+					this.gameService.removeGameRoomId();
+					this.gameService.removeNewMatchmakingTwoUser();
+					this.gameService.removeMatchmakingTwoResponse();
+					// this.router.navigate(['/game'], { queryParams });
 				}
 			},
-			(error) => {
-				console.error('Error reading matchmaking response:', error);
+			error: (errorResponse) => {
+				this.toastrService.error(Messages.error);
+				this.router.navigate(['/view']);
 			}
-		);
+		});
 	}
 
 	matchGame() {
@@ -148,13 +155,16 @@ export class GameMatchmakingComponent {
 	}
 
 	getGameTotalScoreByNickName() {
-		this.gameTotalScoreService.getByNickName(this.currentNickName).subscribe(response => {
-			if (response.success && (response.data == null || response.data == undefined)) {
-				this.addGameTotalScore();
-			}
-		}, errorResponse => {
-			if (errorResponse.error) {
-				this.toastrService.error(Messages.error);
+		this.gameTotalScoreService.getByNickName(this.currentNickName).subscribe({
+			next: (response) => {
+				if (response.success && (response.data == null || response.data == undefined)) {
+					this.addGameTotalScore();
+				}
+			},
+			error: (errorResponse) => {
+				if (errorResponse.error) {
+					this.toastrService.error(Messages.error);
+				}
 			}
 		})
 	}
@@ -169,11 +179,12 @@ export class GameMatchmakingComponent {
 			updateTime: new Date(),
 			status: true
 		}
-		this.gameTotalScoreService.add(gameTotalGameScore).subscribe(response => {
-		}, errorResponse => {
-			if (errorResponse.error) {
-				this.toastrService.error(Messages.error);
-			}
+		this.gameTotalScoreService.add(gameTotalGameScore).subscribe({
+			error: (errorResponse) => {
+				if (errorResponse.error) {
+					this.toastrService.error(Messages.error);
+				}
+			},
 		});
 	}
 }
