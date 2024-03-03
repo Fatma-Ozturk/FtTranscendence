@@ -70,7 +70,6 @@ export class LoginComponent {
 	handleLoginSuccess(userTwoFAResponse: any) {
 		if (userTwoFAResponse && userTwoFAResponse.success) {
 			this.userTwoFA = userTwoFAResponse.data;
-			console.log("this.userTwoFA ", this.userTwoFA);
 			if (!userTwoFAResponse.data && userTwoFAResponse.data != null){
 				this.userTwoFA.isVerify = false;
 				this.updateUserTwoFA(this.userTwoFA)

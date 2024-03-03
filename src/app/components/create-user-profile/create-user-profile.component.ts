@@ -48,7 +48,6 @@ export class CreateUserProfileComponent {
       user.firstName = userProfileModel.firstName;
       user.lastName = userProfileModel.lastName;
       user.status = true;
-      console.log("user " + JSON.stringify(user));
     }, responseError => {
       if (responseError.error.message == "User Not Found")
         this.toastrService.info(Messages.userNotFound)

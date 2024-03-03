@@ -18,13 +18,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let token = localStorage.getItem("token");
-    // let userStatus: boolean = this.authService.getCurrentStatus();
-    // if (userStatus == false) {
-    //   console.log("enes");
-    //   if (window.location.href.toString().indexOf("create-user-profile") <= -1) {
-    //     this.router.navigate(['/create-user-profile']);
-    //   }
-    // }
     let newRequest: HttpRequest<any>;
     newRequest = request.clone({
       headers: request.headers.set("Authorization", "Bearer " + token)

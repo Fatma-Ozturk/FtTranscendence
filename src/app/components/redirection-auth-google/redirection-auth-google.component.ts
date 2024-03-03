@@ -45,13 +45,17 @@ export class RedirectionAuthGoogleComponent {
 		if (this.success === 'true') {
 			if (this.jwtControllerService.isActive(this.token)) {
 				this.localStorageService.saveItem("token", this.token);
-				this.checkAchievement('sign');
-				this.toastrService.info(Messages.success);
-				if (this.userTwoFA !== undefined && this.userTwoFA !== null && this.userTwoFA.isTwoFA === true) {
-					this.router.navigate(['/user-two-fa']);
-				} else {
-					this.router.navigate(['/view']);
-				}
+				this.checkAchievement('sign').subscribe({
+					next: (value: any) => {
+						if (value) {
+							this.toastrService.success(Messages.newAchievement);
+						}
+					},
+					error: (error: any) => {
+						// this.toastrService.error(Messages.error);
+					}
+				});
+				this.getUserTwoFA();
 			}
 		} else if (this.success === 'false') {
 			this.handleError(this.message);
@@ -94,8 +98,6 @@ export class RedirectionAuthGoogleComponent {
 	}
 	checkAchievement(achievementName: string) {
 		let currentUserId = this.authService.getCurrentUserId();
-		console.log("currentUserId ", currentUserId);
-
 		return this.achievementRuleService.checkAchievement(currentUserId, achievementName);
 	}
 	updateUserTwoFA(userTwoFA: UserTwoFA) {

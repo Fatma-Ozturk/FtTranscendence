@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { MessageService } from 'primeng/api';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { Messages } from 'src/app/constants/Messages';
 import { User } from 'src/app/models/entities/user';
 import { UserInfo } from 'src/app/models/entities/userInfo';
@@ -45,7 +45,16 @@ export class RedirectionAuth42Component {
 		if (this.success === 'true') {
 			if (this.jwtControllerService.isActive(this.token)) {
 				this.localStorageService.saveItem("token", this.token);
-				this.checkAchievement('sign');
+				this.checkAchievement('sign').subscribe({
+					next: (value: any) => {
+						if (value) {
+							this.toastrService.success(Messages.newAchievement);
+						}
+					},
+					error: (error: any) => {
+						// this.toastrService.error(Messages.error);
+					}
+				});
 				this.getUserTwoFA();
 			}
 		} else if (this.success === 'false') {
@@ -67,7 +76,6 @@ export class RedirectionAuth42Component {
 
 	checkAchievement(achievementName: string) {
 		let currentUserId = this.authService.getCurrentUserId();
-		console.log("currentUserId ", currentUserId);
 		return this.achievementRuleService.checkAchievement(currentUserId, achievementName);
 	}
 

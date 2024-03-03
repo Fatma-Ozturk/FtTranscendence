@@ -613,7 +613,7 @@ export class GameComponent implements OnInit , OnDestroy, AfterViewInit {
 			this.gameService.removeGameRoomSocket();
 			this.gameService.disconnectSocket();
 		}
-		this.navigeMainPage();
+		this.navigeMainPageTimer();
 	}
 	gameFinishTie(): void {
 		this.gameScoreAdd(1);
@@ -709,6 +709,10 @@ export class GameComponent implements OnInit , OnDestroy, AfterViewInit {
 		});
 	}
 	navigeMainPage() {
+		this.router.navigate(['/view']);
+	}
+
+	navigeMainPageTimer() {
 		setTimeout(() => {
 			this.router.navigate(['/view']);
 		}, 10000);

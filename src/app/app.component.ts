@@ -2,7 +2,7 @@ import { UserTwoFAService } from './services/user-two-fa.service';
 import { User } from './models/entities/user';
 import { UserService } from './services/user.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { ChangeDetectorRef, Component, OnInit, SimpleChange } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, SimpleChange } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, from, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ActivePageNameService } from './services/active-page-name.service';
 import { AuthService } from './services/auth.service';
@@ -14,7 +14,7 @@ import { SidebarService } from './services/sidebar.service';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit{
 	title = 'FtTranscendence';
 	isAuthBoolSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 	isAuthBool$ = this.isAuthBoolSubject.asObservable();
@@ -28,15 +28,9 @@ export class AppComponent implements OnInit {
 	isVerifContainerVisible$ = this.isVerifContainerVisibleSubject.asObservable();
 
 	constructor(private authService: AuthService,
-		private userService: UserService,
-		private loadProgressService: LoadProgressService,
-		private sidebarService: SidebarService,
-		private changeDetectorRef: ChangeDetectorRef,
 		private activePageNameService: ActivePageNameService,
 		private router: Router,
-		private activatedRoute: ActivatedRoute,
 		private userTwoFAService: UserTwoFAService) {
-		this.isAuther();
 		this.getActivePageName();
 		this.monitorRouterEvents();
 	}
@@ -47,11 +41,9 @@ export class AppComponent implements OnInit {
 	}
 	isAuther() {
 		this.authService.getIsAuth().pipe(
-			distinctUntilChanged(), // Yalnızca önceki değerden farklı olduğunda çalışır.
 			tap(isAuthenticated => {
 				this.isAuthBoolSubject.next(isAuthenticated);
 				if (!isAuthenticated) {
-					// Kullanıcı kimlik doğrulaması başarısız olursa, 2FA konteynerini gizle.
 					this.isVerifContainerVisibleSubject.next(false);
 				}
 			}),
@@ -61,12 +53,12 @@ export class AppComponent implements OnInit {
 					this.currentUserId = this.authService.getCurrentUserId();
 					return this.userTwoFAService.getByUserId(this.currentUserId);
 				} else {
-					return of(null); // Kullanıcı kimlik doğrulaması başarısız olduğunda bir sonraki adıma geçme.
+					return of(null);
 				}
 			}),
 		).subscribe({
 			next: response => {
-				if (!response || response == null) {
+				if (response && (!response.data || response.data == null)) {
 					this.isVerifContainerVisibleSubject.next(true);
 				} else if (response && response.data && !response.data.isTwoFA) {
 					this.isVerifContainerVisibleSubject.next(true);
@@ -75,7 +67,6 @@ export class AppComponent implements OnInit {
 				}
 			},
 			error: err => {
-				console.error("Authentication verification failed", err);
 			}
 		});
 	}

@@ -23,7 +23,6 @@ export class BaseService<T>{
     }
     gets(): Observable<ListResponseModel<T>> {
         let newPath = environment.appurl + this._name + "/getall"
-        //console.log(this._name)
         return this.httpClientBase.get<ListResponseModel<T>>(newPath);
     }
     get(id: number): Observable<SingleResponseModel<T>> {

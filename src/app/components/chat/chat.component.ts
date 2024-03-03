@@ -48,8 +48,6 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['messages']) {
-      // console.log("message change ");
-
       const prevValue = changes['messages'].previousValue;
       const currentValue = changes['messages'].currentValue;
 
@@ -59,7 +57,6 @@ export class ChatComponent implements OnInit, OnChanges, AfterViewInit {
           this.changeMessages = false;
         }, 100);
       }
-      // console.log(`Previous Value: ${prevValue}, Current Value: ${currentValue}`);
     }
   }
 

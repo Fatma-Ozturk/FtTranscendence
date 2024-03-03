@@ -19,22 +19,17 @@ export class MyHttpLoadInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     this.loadProgressService.visible();
     this.spinner.show();
-    //console.log("show");
     this.count++;
     return next.handle(request)
       .pipe(tap(
-        //event => //console.log(event),
-        //error => //console.log(error)
       ), finalize(() => {
         this.loadProgressService.hidden();
         this.loadProgressService.visible();
         this.count--;
         if (this.count == 0){
           setTimeout(() => {
-            /** spinner ends after 5 seconds */
             this.spinner.hide();
           }, 100);
-          //console.log("hide");
         }
       })
       );

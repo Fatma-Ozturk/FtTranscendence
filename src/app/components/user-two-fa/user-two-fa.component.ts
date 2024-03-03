@@ -58,25 +58,20 @@ export class UserTwoFAComponent implements OnInit {
 	verifyTwoFAOtp(settings: any, token: string) {
 		this.twoFAService.verify(settings, token).pipe(
 		  switchMap((value: any) => {
-			// Doğrulama başarılıysa, buradan sonraki işlemi belirleyin
 			if (value && value.success && value.data) {
-			  // Örneğin, kullanıcının TwoFA ayarlarını güncellemek için updateUserTwoFA çağırabilirsiniz
-			  // Bu kısım, iş akışınıza bağlı olarak değişiklik gösterebilir
 			  this.userTwoFA.isVerify = true;
 			  return this.updateUserTwoFA(this.userTwoFA);
 			} else {
-			  // Başarılı bir doğrulama olmaması durumunda, işlemi burada sonlandırın
 			  return of(null);
 			}
 		  }),
 		  tap((response) => {
-			// switchMap'ten başarılı bir sonuç alındığında çalışacak kısım
 			if (response && response.success){
 				this.router.navigate(['/view']);
-				this.toastrService.success(Messages.success);
+				this.toastrService.success(Messages.success, Messages.twoFASuccess);
 			}else{
 				this.tryOutCounter++;
-				this.toastrService.error(Messages.error);
+				this.toastrService.error(Messages.error, Messages.twoFAPassError);
 			}
 			if (this.tryOutCounter > 3){
 				this.localStorageService.clearItem("token");
@@ -85,11 +80,10 @@ export class UserTwoFAComponent implements OnInit {
 			}
 		  }),
 		  catchError((err) => {
-			// Hata yönetimi
 			this.localStorageService.clearItem("token");
 			this.toastrService.info(Messages.info, Messages.twoFAError);
 			this.router.navigate(['/']);
-			return of(null); // catchError içinde bir Observable döndürmek gerekiyor
+			return of(null);
 		  })
 		).subscribe();
 	  }

@@ -18,7 +18,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     let res = next.handle(request);
     res.pipe(
       catchError((error: HttpErrorResponse) => {
-        console.log(error);
         if (error.status == 404) {
           this.router.navigate(['404'])
         }

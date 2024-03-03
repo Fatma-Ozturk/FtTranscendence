@@ -87,6 +87,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 					return this.getGameTotalScories(this.nickName);
 				}),
 				switchMap((params: any) => {
+					this.gameTotalScoriesSubject.next(params.data);
 					return this.userInfoService.getByNickName(this.nickName);
 				}),
 				switchMap((params: any) => {
@@ -106,7 +107,6 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 					}
 				},
 				error: (error) => {
-					console.log("error ", error);
 					this.toastrService.error(Messages.error);
 				}
 			});
@@ -114,16 +114,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		this.user$.subscribe(response => {
-			console.log("res ", response);
 		});
-		// this.getGameTotalScories();
 		this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
-		// this.getUserBlock();
-
 		this.userBlock$.subscribe(response => {
-			// if (response) {
 			this.userBlock = response;
-			// }
 		});
 	}
 

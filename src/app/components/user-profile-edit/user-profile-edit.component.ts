@@ -339,8 +339,6 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		let twoFAType: number = 1;
 
 		if (!userTwoFA || userTwoFA.isTwoFA == false) {
-			console.log("ok");
-
 			this.twoFAService.generate({ "email": user.email }).pipe(
 				switchMap((response) => {
 					if (response.success) {
@@ -372,7 +370,6 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 				}
 			});
 		} else {
-			console.log("ok1");
 			let newUserTwoFA = {
 				...userTwoFA,
 				isTwoFA: false,

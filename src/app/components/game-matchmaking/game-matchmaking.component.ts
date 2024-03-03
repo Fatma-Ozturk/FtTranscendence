@@ -70,33 +70,33 @@ export class GameMatchmakingComponent implements OnInit {
 		};
 		this.gameService.sendMatchmaking(gameRoomStartOptionSocket);
 		this.gameService.getNewMatchmakingResponse().pipe(switchMap((response: any) => {
-			// if (response) {
-				if (response.message === "Matchmaking Search") {
-					this.progressBarDivVisible = true;
-					this.gameText = "Oyuncu Aranıyor..."
-				}
-				else if (response.message === "Matchmaking Join") {
-					this.progressBarDivVisible = false;
-					this.gameText = "Oyuncu Bulundu..."
-				}
-				else if (response.message === "Matchmaking Finish") {
-					this.progressBarDivVisible = false;
-					this.gameText = "Yönlendiriliyor..."
-					return this.gameService.getGameRoomId();
-				}
-				return of(null);
-			// }
-			// return of(null);
+			if (response.message === "Matchmaking Search") {
+				this.progressBarDivVisible = true;
+				this.gameText = "Oyuncu Aranıyor..."
+			}
+			else if (response.message === "Matchmaking Join") {
+				this.progressBarDivVisible = false;
+				this.gameText = "Oyuncu Bulundu..."
+			}
+			else if (response.message === "Matchmaking Finish") {
+				this.progressBarDivVisible = false;
+				this.gameText = "Yönlendiriliyor..."
+				return this.gameService.getGameRoomId();
+			}
+			return of(null);
 		})).subscribe({
 			next: (response: any) => {
 				if (response && response != null && response !== undefined) {
-					console.log("response.message ", response.message);
 					const queryParams = { 'room-id': response.message };
 					this.gameService.removeGameRoomId();
 					this.gameService.removeNewMatchmaking();
 					this.gameService.removeMatchmakingResponse();
 					this.router.navigate(['/game'], { queryParams });
 				}
+			},
+			error: (errorResponse) => {
+				this.toastrService.error(Messages.error);
+				this.router.navigate(['/view']);
 			}
 		});
 	}
@@ -124,8 +124,6 @@ export class GameMatchmakingComponent implements OnInit {
 						return this.gameService.getGameRoomId();
 					}
 				}
-				console.log("enes");
-
 				return of(null);
 			})
 		).subscribe({
@@ -135,7 +133,7 @@ export class GameMatchmakingComponent implements OnInit {
 					this.gameService.removeGameRoomId();
 					this.gameService.removeNewMatchmakingTwoUser();
 					this.gameService.removeMatchmakingTwoResponse();
-					// this.router.navigate(['/game'], { queryParams });
+					this.router.navigate(['/game'], { queryParams });
 				}
 			},
 			error: (errorResponse) => {

@@ -32,4 +32,7 @@ export class Messages {
     public static readonly updloadFileSuccess: string = "Dosya yüklendi";
     public static readonly updloadFileError: string = "Dosya yüklenemedi";
 	public static readonly twoFAError: string = "İki faktörlü kimlik doğrulama hatası";
+	public static readonly twoFAPassError: string= "Doğrulama kodu hatalı";
+	public static readonly twoFASuccess: string= "Doğrulama başarılı";
+	public static readonly  newAchievement: string= "Yeni başarı kazandın";
 }

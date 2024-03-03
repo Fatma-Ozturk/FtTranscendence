@@ -31,7 +31,6 @@ export class SidebarComponent implements OnInit {
     private localStorageService: LocalStorageService) {
     this.authService.roleName.subscribe(response => {
       this.role = response;
-      //console.log(response);
     })
     this.getMenu();
   }
@@ -43,10 +42,7 @@ export class SidebarComponent implements OnInit {
     this.role = this.authService.getCurrentRole();
     this.authService.roleName.subscribe(response => {
       this.role = response;
-      //console.log(response);
     })
-    //console.log(this.role);
-
     if (this.role != null && this.role.indexOf("developer") > -1) {
       this.roleCheckClass = "";
       ROUTES.forEach(element => {
@@ -58,16 +54,13 @@ export class SidebarComponent implements OnInit {
       ROUTES.forEach(element => {
         if (element.chilName === "claim") {
           element.class = "d-none"
-          //console.log("yok")
         }
-
       });
     }
 
     this.authService.isAuth.subscribe(response => {
       if (response) {
         this.localAuth = response
-        //console.log(response)
       }
     })
     this.menuItems = ROUTES.filter(menuItem => menuItem);
@@ -75,8 +68,6 @@ export class SidebarComponent implements OnInit {
   }
   getChildItems(name: string) {
     this.menuChildedItems = this.menuChildItems.filter(p => p.name == name)
-    //console.log(this.menuChildedItems)
-    //...
   }
   isNameIsChildName(name: string, nameChild: string) {
     if (name === nameChild) {
@@ -112,9 +103,6 @@ export class SidebarComponent implements OnInit {
           element.class = ""
           object.chilIcon = "pi-chevron-down"
         }
-        //console.log(element.class)
-      } else if (element.name != object.chilName) {
-        //element.class = ""
       }
     });
   }

@@ -55,15 +55,15 @@
                 </div>
                 <div class="info">
                     <div class="title">Başarı Yüzdesi:</div>
-                    <div class="description">{{gameTotalScore.totalWin}}/{{(+gameTotalScore.totalWin | number) + (+gameTotalScore.totalLose | number)}}</div>
+                    <div class="description">{{(gameTotalScories$ | async).totalWin}}/{{(+(gameTotalScories$ | async).totalWin | number) + (+(gameTotalScories$ | async).totalLose | number)}}</div>
                 </div>
                 <div class="info">
                     <div class="title">Losses:</div>
-                    <div class="description">{{gameTotalScore.totalLose}}</div>
+                    <div class="description">{{(gameTotalScories$ | async).totalLose}}</div>
                 </div>
                 <div class="info">
                     <div class="title">Wins:</div>
-                    <div class="description">{{gameTotalScore.totalWin}}</div>
+                    <div class="description">{{(gameTotalScories$ | async).totalWin}}</div>
                 </div>
             </div>
             <ng-template #noGameTotalScore>
