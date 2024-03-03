@@ -8,4 +8,6 @@ export class GameModel {
 	whoIs?: number;
 	remainingTime: Date;
 	roomId: number;
+	startTime: Date;
+	timer: number;
 }

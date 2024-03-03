@@ -13,10 +13,13 @@ import { GamePlayerEnum } from './../../models/enums/gamePlayer';
 import { GameService } from './../../services/game.service';
 import { PaddleGameModel } from './../../models/model/paddleGameModel';
 import {
+	AfterViewInit,
 	ChangeDetectorRef,
 	Component,
 	ElementRef,
 	HostListener,
+	OnDestroy,
+	OnInit,
 	ViewChild,
 } from '@angular/core';
 import { BallGameModel } from 'src/app/models/model/ballGameModel';
@@ -29,7 +32,7 @@ import { BehaviorSubject, timeInterval } from 'rxjs';
 	templateUrl: './game.component.html',
 	styleUrls: ['./game.component.css'],
 })
-export class GameComponent {
+export class GameComponent implements OnInit , OnDestroy, AfterViewInit {
 	screenHeight: number;
 	screenWidth: number;
 
@@ -92,6 +95,7 @@ export class GameComponent {
 		this.paddleHost = new PaddleGameModel();
 		this.ball = new BallGameModel();
 		this.bendCall = 0;
+		this.ball.speed = 0;
 		this.gameService.getGameRoomSocketResponse().subscribe({
 			next: (response: any) => {
 				if (response && response.message === 'GameRoomSocketResponse Info') {
@@ -121,21 +125,6 @@ export class GameComponent {
 			}
 		});
 	}
-
-	ngAfterViewInit(): void {
-		if (this.whoIs != -1 && this.whoIs != 3) {
-			this.gameLoop();
-		}
-		if (this.whoIs == 3){
-			this.gameViewLoop();
-		}
-		this.gameTotalScore$.subscribe(response => {
-			this.gameTotalScore = response;
-			if (response?.totalWin > 1) {
-				this.checkAchievement("firstPongWin");
-			}
-		})
-	}
 	ngOnInit(): void {
 		this.currentUserId = this.authService.getCurrentUserId();
 		this.route.queryParams.subscribe((data: any) => {
@@ -151,22 +140,23 @@ export class GameComponent {
 			this.setCanvasSize();
 			this.initGameModels();
 		} else {
-			this.whoIs = 3;
-			this.getTimeNow();
-			this.getScreenSize();
-			this.setCanvasSize();
-			this.gameService.connectSocket();
-			this.paddleHost.roomId = this.gameRoomId;
-			this.paddleGuest.roomId = this.gameRoomId;
-			this.leftPaddle = this.paddleHost;
-			this.rightPaddle = this.paddleGuest;
-			this.ball.roomId = this.gameRoomId;
-			this.initGameModels();
-			this.gameService.sendViewer({ roomId: this.gameRoomId });
-			this.gameViewLoop();
+			this.setupViewer();
 		}
 	}
-	ngDoCheck() { }
+	ngAfterViewInit(): void {
+		if (this.whoIs != -1 && this.whoIs != 3) {
+			this.gameLoop();
+		}
+		if (this.whoIs == 3){
+			this.gameViewLoop();
+		}
+		this.gameTotalScore$.subscribe(response => {
+			this.gameTotalScore = response;
+			if (response?.totalWin > 1) {
+				this.checkAchievement("firstPongWin");
+			}
+		})
+	}
 	ngOnDestroy() {
 		this.gameService.removeGameRoomSocketResponse();
 		this.gameService.removeScoreRespnse();
@@ -183,6 +173,22 @@ export class GameComponent {
 		}
 		if (this.gameRemainingTime > 0)
 			this.gameFinish();
+	}
+
+	setupViewer(){
+		this.ball.speed = 0;
+		this.whoIs = 3;
+		this.getTimeNow();
+		this.getScreenSize();
+		this.setCanvasSize();
+		this.gameService.connectSocket();
+		this.paddleHost.roomId = this.gameRoomId;
+		this.paddleGuest.roomId = this.gameRoomId;
+		this.leftPaddle = this.paddleHost;
+		this.rightPaddle = this.paddleGuest;
+		this.ball.roomId = this.gameRoomId;
+		this.initGameModels();
+		this.gameService.sendViewer({ roomId: this.gameRoomId });
 	}
 
 	//* ^^ eventloophooks and constructor^^
@@ -236,6 +242,9 @@ export class GameComponent {
 						this.ball.xVel = response.data.xVel;
 						this.ball.yVel = response.data.yVel;
 					}
+					this.ball.speed = response.data.speed;
+					this.ball.timer = response.data.timer;
+					this.ball.startTime = response.data.startTime;
 				}
 			});
 	}
@@ -245,13 +254,16 @@ export class GameComponent {
 		window.requestAnimationFrame(this.gameViewLoop);
 		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
 		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
-
+		this.ball.roomId = this.gameRoomId;
+		this.gameService.sendBallLocation(this.ball);
+		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
+		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
 		this.gameRemainingTime =
-			new Date(this.gameRoomSocket.startTime).getTime() +
-			this.gameRoomSocket.timer * 1000 -
+			new Date(this.ball.startTime).getTime() +
+			this.ball.timer * 1000 -
 			this.gameNowDate.getTime();
-		if (this.gameRemainingTime <= 0)
-			this.navigeMainPage();
+		if (this.gameRemainingTime <= 0 || isNaN(this.gameRemainingTime))
+			this.gameFinish();
 	};
 	gameLoop = (): void => {
 		if (!this.gameRunning) return;
@@ -260,13 +272,16 @@ export class GameComponent {
 		window.requestAnimationFrame(this.gameLoop);
 		this.ball.fixedX = this.ball.x / this.fixedScreenRatio;
 		this.ball.fixedY = this.ball.y / this.fixedScreenRatio;
+		this.ball.speed = this.gameRoomSocket.speed;
+		this.ball.roomId = this.gameRoomId;
+		this.ball.startTime = this.gameRoomSocket.startTime;
+		this.ball.timer = this.gameRoomSocket.timer;
 		this.gameService.sendBallLocation(this.ball);
-
 		this.gameRemainingTime =
 			new Date(this.gameRoomSocket.startTime).getTime() +
 			this.gameRoomSocket.timer * 1000 -
 			this.gameNowDate.getTime();
-		if (this.gameRemainingTime <= 0)
+		if (this.gameRemainingTime <= 0 || isNaN(this.gameRemainingTime))
 			this.gameFinish();
 	};
 	initGameModels(): void {
@@ -323,6 +338,7 @@ export class GameComponent {
 				this.paddleHost.x / this.fixedScreenRatio;
 			this.paddleHost.topFixed =
 				this.paddleHost.y / this.fixedScreenRatio;
+			this.paddleHost.roomId = this.gameRoomId;
 			this.gameService.sendKeydown(this.paddleHost);
 		}
 		if (this.whoIs == 1) {
@@ -345,6 +361,7 @@ export class GameComponent {
 				this.paddleGuest.x / this.fixedScreenRatio;
 			this.paddleGuest.topFixed =
 				this.paddleGuest.y / this.fixedScreenRatio;
+			this.paddleGuest.roomId = this.gameRoomId;
 			this.gameService.sendKeydown(this.paddleGuest);
 		}
 		if (this.whoIs == 3) {
