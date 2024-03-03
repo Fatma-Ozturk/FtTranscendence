@@ -42,15 +42,6 @@ export class RedirectionAuthGoogleComponent {
 		this.token = this.route.snapshot.paramMap.get('token');
 		this.success = this.route.snapshot.paramMap.get('success');
 		this.message = this.route.snapshot.paramMap.get('message');
-		if (this.success === 'false') {
-			if (this.message === 'User Already Exists') {
-				this.toastrService.error(Messages.userAlreadyExists);
-			}
-			if (this.message === 'User Not Found') {
-				this.toastrService.error(Messages.userNotFound);
-			}
-			this.router.navigate(['/main']);
-		}
 		if (this.success === 'true') {
 			if (this.jwtControllerService.isActive(this.token)) {
 				this.localStorageService.saveItem("token", this.token);
@@ -63,7 +54,6 @@ export class RedirectionAuthGoogleComponent {
 				}
 			}
 		} else if (this.success === 'false') {
-			// Hata mesajları ve yönlendirme
 			this.handleError(this.message);
 		}
 	}
@@ -79,27 +69,6 @@ export class RedirectionAuthGoogleComponent {
 		this.router.navigate(['/main']);
 	}
 
-	// updateUserInfo() {
-	// 	let currentUserId = this.authService.getCurrentUserId();
-	// 	let userInfo: UserInfo = {
-	// 		id: 0,
-	// 		userId: currentUserId,
-	// 		loginDate: new Date(),
-	// 		profileCheck: true,
-	// 		profileImagePath: "",
-	// 		profileText: "",
-	// 		gender: false,
-	// 		birthdayDate: new Date()
-	// 	};
-	// 	this.userInfoService.add(userInfo).subscribe(response => {
-	// 		if (response.success) {
-	// 		}
-	// 	}, responseError => {
-	// 		if (responseError.error) {
-	// 			this.toastrService.error(Messages.error);
-	// 		}
-	// 	})
-	// }
 	getUserTwoFA() {
 		this.userTwoFAService.getByUserId(this.authService.getCurrentUserId()).pipe(
 			tap((value: any) => {
@@ -107,7 +76,6 @@ export class RedirectionAuthGoogleComponent {
 					this.userTwoFA = value.data;
 					this.userTwoFA.isVerify = false;
 					this.updateUserTwoFA(this.userTwoFA);
-					// isTwoFA durumuna göre yönlendirme
 					if (this.userTwoFA.isTwoFA) {
 						this.router.navigate(['/user-two-fa']);
 					} else {
@@ -120,7 +88,6 @@ export class RedirectionAuthGoogleComponent {
 			}),
 			catchError((error) => {
 				this.toastrService.error(Messages.error);
-				// Hata durumunda uygun bir Observable döndür
 				return of(null);
 			})
 		).subscribe();

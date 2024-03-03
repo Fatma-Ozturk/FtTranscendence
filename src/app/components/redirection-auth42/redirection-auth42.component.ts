@@ -42,22 +42,9 @@ export class RedirectionAuth42Component {
 		this.token = this.route.snapshot.paramMap.get('token');
 		this.success = this.route.snapshot.paramMap.get('success');
 		this.message = this.route.snapshot.paramMap.get('message');
-		if (this.success === 'false') {
-			if (this.message === 'User Already Exists') {
-				this.toastrService.error(Messages.userAlreadyExists);
-			}
-			if (this.message === 'User Not Found') {
-				this.toastrService.error(Messages.userNotFound);
-			}
-			if (this.message === 'Password Error') {
-				this.toastrService.error(Messages.passwordError);
-			}
-			this.router.navigate(['/main']);
-		}
 		if (this.success === 'true') {
 			if (this.jwtControllerService.isActive(this.token)) {
 				this.localStorageService.saveItem("token", this.token);
-				// this.updateUserInfo();
 				this.checkAchievement('sign');
 				this.getUserTwoFA();
 			}
@@ -66,28 +53,6 @@ export class RedirectionAuth42Component {
 			this.handleError(this.message);
 		}
 	}
-
-	// updateUserInfo() {
-	// 	let currentUserId = this.authService.getCurrentUserId();
-	// 	let userInfo: UserInfo = {
-	// 		id: 0,
-	// 		userId: currentUserId,
-	// 		loginDate: new Date(),
-	// 		profileCheck: true,
-	// 		profileImagePath: "",
-	// 		profileText: "",
-	// 		gender: false,
-	// 		birthdayDate: new Date()
-	// 	};
-	// 	this.userInfoService.add(userInfo).subscribe(response => {
-	// 		if (response.success) {
-	// 		}
-	// 	}, responseError => {
-	// 		if (responseError.error) {
-	// 			this.toastrService.error(Messages.error);
-	// 		}
-	// 	})
-	// }
 
 	handleError(message: string) {
 		if (message === 'User Already Exists') {

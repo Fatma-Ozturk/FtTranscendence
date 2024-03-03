@@ -36,8 +36,8 @@ export class AppComponent implements OnInit {
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private userTwoFAService: UserTwoFAService) {
-		this.getActivePageName();
 		this.isAuther();
+		this.getActivePageName();
 		this.monitorRouterEvents();
 	}
 	ngOnInit(): void {
@@ -45,29 +45,33 @@ export class AppComponent implements OnInit {
 		this.isAuther();
 		this.getActivePageName();
 	}
-	ngAfterViewInit(): void {
-		this.isAuther();
-	}
 	isAuther() {
 		this.authService.getIsAuth().pipe(
-			distinctUntilChanged(),
-			shareReplay(1),
-			tap(response => {
-				this.isAuthBoolSubject.next(response);
+			distinctUntilChanged(), // Yalnızca önceki değerden farklı olduğunda çalışır.
+			tap(isAuthenticated => {
+				this.isAuthBoolSubject.next(isAuthenticated);
+				if (!isAuthenticated) {
+					// Kullanıcı kimlik doğrulaması başarısız olursa, 2FA konteynerini gizle.
+					this.isVerifContainerVisibleSubject.next(false);
+				}
 			}),
-			switchMap(response => {
-				if (response) {
+			switchMap(isAuthenticated => {
+				if (isAuthenticated) {
 					this.currentNickName = this.authService.getCurrentNickName();
 					this.currentUserId = this.authService.getCurrentUserId();
 					return this.userTwoFAService.getByUserId(this.currentUserId);
 				} else {
-					return of(null);
+					return of(null); // Kullanıcı kimlik doğrulaması başarısız olduğunda bir sonraki adıma geçme.
 				}
 			}),
 		).subscribe({
-			next: (response: any) => {
-				if (response) {
-					this.isVerifContainerVisibleSubject.next(response?.data ? response?.data?.isVerify : true);
+			next: response => {
+				if (!response || response == null) {
+					this.isVerifContainerVisibleSubject.next(true);
+				} else if (response && response.data && !response.data.isTwoFA) {
+					this.isVerifContainerVisibleSubject.next(true);
+				} else if (response && response.data && response.data.isTwoFA) {
+					this.isVerifContainerVisibleSubject.next(response.data.isVerify);
 				}
 			},
 			error: err => {

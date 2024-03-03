@@ -339,6 +339,8 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		let twoFAType: number = 1;
 
 		if (!userTwoFA || userTwoFA.isTwoFA == false) {
+			console.log("ok");
+
 			this.twoFAService.generate({ "email": user.email }).pipe(
 				switchMap((response) => {
 					if (response.success) {
@@ -353,7 +355,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 								settings = this.googleTwoFASettings(response.data.secretBase32, response.data.qrCode);
 							}
 							userTwoFA.settings = settings;
-							userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
+							userTwoFA.isTwoFA = true;
 							userTwoFA.updateTime = new Date();
 							return from(this.updateUserTwoFA(userTwoFA));
 						}
@@ -370,9 +372,20 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 				}
 			});
 		} else {
-			userTwoFA.isTwoFA = !userTwoFA.isTwoFA;
-			userTwoFA.updateTime = new Date();
-			this.updateUserTwoFA(userTwoFA);
+			console.log("ok1");
+			let newUserTwoFA = {
+				...userTwoFA,
+				isTwoFA: false,
+				updateTime: new Date(),
+			}
+			this.updateUserTwoFA(newUserTwoFA).subscribe({
+				next: (response)=>{
+					this.toastrService.success(Messages.success);
+				},
+				error: (err)=> {
+					this.toastrService.error(Messages.error);
+				},
+			})
 		}
 	}
 
@@ -413,14 +426,6 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 		this.userInfoFormVisible = false;
 		this.userFormVisible = false;
 		this.userVerifVisible = false;
-
-		// let userTwoFA: UserTwoFA = this.userTwoFASubject.getValue();
-		// let user: User = this.userSubject.getValue();
-		// if (this.twoFAVisible) {
-		// 	if (userTwoFA.isTwoFA) {
-		// 		this.twoFAGenerate({ "email": user.email });
-		// 	}
-		// }
 	}
 
 	visibleUserVerif() {
@@ -446,16 +451,6 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 
 	getByIdUserTwoFA(userId: number) {
 		return this.userTwoFAService.getByUserId(userId);
-		// .subscribe({
-		// 	next: (response) => {
-		// 		if (response && response.success) {
-		// 			if (response.data && response.data.twoFAType == 1){
-		// 				this.googleTwoFASetting =  this.parseGoogleTwoFASettings(response.data.settings);
-		// 			}
-		// 			this.userTwoFASubject.next(response.data);
-		// 		}
-		// 	}
-		// });
 	}
 
 	updateUserTwoFA(userTwoFA: UserTwoFA) {
@@ -483,6 +478,7 @@ export class UserProfileEditComponent implements OnInit, AfterViewInit {
 			this.userInfoService.uploadProfileImage(this.nickName, this.selectedFile).subscribe({
 				next: (response) => {
 					if (response && response.success) {
+						this.getUserInfoByNickName(this.nickName);
 						this.toastrService.success(Messages.updloadFileSuccess, Messages.success);
 					}
 				},

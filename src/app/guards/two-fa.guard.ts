@@ -26,6 +26,9 @@ export const twoFAGuard: CanActivateFn = (route, state) => {
 				// router.navigate(['/user-two-fa']);
 				return true;
 			}
+			if (response && response.data.isTwoFA == false){
+				return true;
+			}
 			if(response.data.isVerify && response.data.isTwoFA){
 				return true;
 			}
