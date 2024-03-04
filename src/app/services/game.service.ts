@@ -21,6 +21,8 @@ export class GameService {
 	public gameRoomId$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomSocket$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameRoomSocketResponse$: BehaviorSubject<string> = new BehaviorSubject('');
+	public isUserInRoom$: BehaviorSubject<string> = new BehaviorSubject('');
+	public isUserInRoomResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public paddleResponse$: BehaviorSubject<string> = new BehaviorSubject('');
 	public gameDisconnected$: BehaviorSubject<string> = new BehaviorSubject('');
 	private token: string;
@@ -73,6 +75,12 @@ export class GameService {
 		this.socket.on('gameRoomSocketResponse', (message: any): any => { //+
 			this.gameRoomSocketResponse$.next(message);
 		});
+		this.socket.on('isUserInRoom', (message: any): any => {
+			this.isUserInRoom$.next(message);
+		});
+		this.socket.on('isUserInRoomResponse', (message: any): any => { //+
+			this.isUserInRoomResponse$.next(message);
+		});
 		this.socket.on('ballLocationResponse', (message: any): any => {//+
 			this.ballLocationResponse$.next(message);
 		});
@@ -116,6 +124,11 @@ export class GameService {
 
 	public sendGameRoomSocket(gameRoomSocket: any) {
 		this.socket.emit('gameRoomSocket', gameRoomSocket);
+	}
+
+
+	public sendIsUserInRoom(data: any) {
+		this.socket.emit('isUserInRoom', data);
 	}
 
 	public sendMatchmaking(matchmaking: any) {
@@ -170,6 +183,14 @@ export class GameService {
 
 	public getGameRoomSocketResponse = () => {
 		return this.gameRoomSocketResponse$.asObservable();
+	};
+
+	public getIsUserInRoomSocket = () => {
+		return this.isUserInRoom$.asObservable();
+	};
+
+	public getIsUserInRoomResponse = () => {
+		return this.isUserInRoomResponse$.asObservable();
 	};
 
 	public getBallLocationResponse = () => {
@@ -238,6 +259,14 @@ export class GameService {
 
 	public removeGameRoomSocketResponse(): void{
 		this.socket.off('gameRoomSocketResponse');
+	}
+
+	public removeIsUserInRoom():void{
+		this.socket.off('isUserInRoom');
+	}
+
+	public removeIsUserInRoomResponse(): void{
+		this.socket.off('isUserInRoomResponse');
 	}
 
 	public removeBallLocationResponse(): void{

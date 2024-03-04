@@ -5,122 +5,131 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-    <main class="profile">
-        <div class="user">
-            <div class="image-container">
-                <img class="avatar" alt=""
-                    [src]="profileUrl">
-            </div>
-            <div class="user-info" *ngIf="(userSubject | async) as User">
-                <p class="user-name" *ngIf="userSubject.getValue().firstName && userSubject.getValue().lastName">
-                    {{userSubject.getValue().firstName}} {{userSubject.getValue().lastName}}</p>
-                <p class="user-name" *ngIf="userSubject.getValue().nickName">{{userSubject.getValue().nickName}}</p>
-                <div class="user-subinfo">
-                    <p class="user-class">Master</p>
-                    <div class="separator vertical"></div>
-                    <p class="user-level">22lvl</p>
-                </div>
-            </div>
-        </div>
+	<main class="profile">
+		<div class="user">
+			<div class="image-container">
+				<i pBadge value="" [severity]="userStatus">
+					<img class="avatar" alt="" [src]="profileUrl">
+				</i>
+			</div>
+			<div class="user-info" *ngIf="(user$ | async)">
+				<p class="user-name" *ngIf="(user$ | async).firstName && (user$ | async).lastName">
+					{{(user$ | async).firstName}} {{(user$ | async).lastName}}</p>
+				<p class="user-name" *ngIf="(user$ | async).nickName">{{(user$ | async).nickName}}</p>
+				<div class="user-subinfo">
+					<p class="user-class">Master</p>
+					<div class="separator vertical"></div>
+					<p class="user-level">22lvl</p>
+				</div>
+				<h4>{{userStatusMessage}}</h4>
+			</div>
+		</div>
 		<div class="block-user-container" *ngIf="!editProfileVisible">
-			<p-button
-				[label]="(!isUserBlock) ? 'Kullanıcıyı Engelle' : 'Engeli Kaldır'"
-				(click)="userBlockDelete();"
-				icon="pi"
-				[icon]="(!isUserBlock) ? 'pi-user' : 'pi-user'"
-				class="btn block-user-btn"
+			<p-button [label]="(!isUserBlock) ? 'Kullanıcıyı Engelle' : 'Engeli Kaldır'" (click)="userBlockDelete();"
+				icon="pi" [icon]="(!isUserBlock) ? 'pi pi-user' : 'pi pi-user'" class="btn block-user-btn"
 				[styleClass]="(!isUserBlock) ? 'p-button-outlined p-button-danger w-100' : 'p-button-outlined p-button-success w-100'">
 			</p-button>
 		</div>
-        <div class="edit-profile-container" *ngIf="editProfileVisible">
-            <p-button label="Profili Düzenle" (click)="showProfileSettingDialog()" icon="pi pi-external-link"
-                class="btn profile-edit-btn" styleClass="p-button-outlined p-button-secondary w-100">
-            </p-button>
-        </div>
-        <div class="view-history-container">
-            <p-button label="Game History" class="btn profile-edit-btn"
-                styleClass="p-button-outlined p-button-secondary w-100" (click)="showGameHistoryDialog()"
-                icon="pi pi-external-link"></p-button>
-        </div>
-        <div>
-            <div class="info-container" *ngIf="gameTotalScories$ | async as gameTotalScore;else noGameTotalScore">
-                <div class="info">
-                    <div class="title">Current place:</div>
-                    <div class="description">1st</div>
-                </div>
-                <div class="info">
-                    <div class="title">Başarı Yüzdesi:</div>
-                    <div class="description">{{(gameTotalScories$ | async).totalWin}}/{{(+(gameTotalScories$ | async).totalWin | number) + (+(gameTotalScories$ | async).totalLose | number)}}</div>
-                </div>
-                <div class="info">
-                    <div class="title">Losses:</div>
-                    <div class="description">{{(gameTotalScories$ | async).totalLose}}</div>
-                </div>
-                <div class="info">
-                    <div class="title">Wins:</div>
-                    <div class="description">{{(gameTotalScories$ | async).totalWin}}</div>
-                </div>
-            </div>
-            <ng-template #noGameTotalScore>
-                Oyun Skor Yok
-            </ng-template>
-        </div>
+		<div class="add-friend-container" *ngIf="!editProfileVisible">
+			<p-button label="Arkadaş Ekle" (click)="addFriend()" icon="pi pi-lock" class="btn profile-edit-btn"
+				styleClass="p-button-outlined p-button-success w-100"
+				*ngIf="(userFriend$ | async) == null || (userFriend$ | async) === undefined">
+			</p-button>
+			<p-button label="Arkadaş Çıkar" (click)="deleteFriend(userFriend.id)" icon="pi pi-unlock"
+				class="btn profile-edit-btn" styleClass="p-button-outlined p-button-danger w-100"
+				*ngIf="(userFriend$ | async) != null && (userFriend$ | async) !== undefined">
+			</p-button>
+		</div>
+		<div class="edit-profile-container" *ngIf="editProfileVisible">
+			<p-button label="Profili Düzenle" (click)="showProfileSettingDialog()" icon="pi pi-external-link"
+				class="btn profile-edit-btn" styleClass="p-button-outlined p-button-secondary w-100">
+			</p-button>
+		</div>
+		<div class="view-history-container">
+			<p-button label="Game History" class="btn profile-edit-btn"
+				styleClass="p-button-outlined p-button-secondary w-100" (click)="showGameHistoryDialog()"
+				icon="pi pi-external-link"></p-button>
+		</div>
+		<div>
+			<div class="info-container" *ngIf="gameTotalScories$ | async as gameTotalScore;else noGameTotalScore">
+				<div class="info">
+					<div class="title">Current place:</div>
+					<div class="description">1st</div>
+				</div>
+				<div class="info">
+					<div class="title">Başarı Yüzdesi:</div>
+					<div class="description">{{(gameTotalScories$ | async).totalWin}}/{{(+(gameTotalScories$ |
+						async).totalWin | number) + (+(gameTotalScories$ | async).totalLose | number)}}</div>
+				</div>
+				<div class="info">
+					<div class="title">Losses:</div>
+					<div class="description">{{(gameTotalScories$ | async).totalLose}}</div>
+				</div>
+				<div class="info">
+					<div class="title">Wins:</div>
+					<div class="description">{{(gameTotalScories$ | async).totalWin}}</div>
+				</div>
+			</div>
+			<ng-template #noGameTotalScore>
+				Oyun Skor Yok
+			</ng-template>
+		</div>
 
-        <div class="info-container">
-            <div class="achievements">
-                <ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement ">
-                    <div *ngIf="editProfileVisible && userAchievementByAchievement?.length > 0; else noAchievements">
-                        <div *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
-                            <div style="text-align: center;">
-                                <div>
-                                    <img [src]="achievement.imagePath" style="height: 30px;" alt="_1">
-                                </div>
-                                <div class="mt-2">
-                                    Ad : <label>{{achievement.name}}</label>
-                                </div>
-                                <div>
-                                    <label>{{achievement.reward}}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ng-container>
+		<div class="info-container">
+			<div class="achievements">
+				<ng-container *ngIf="userAchievementByAchievementDtos$ | async as userAchievementByAchievement ">
+					<div *ngIf="editProfileVisible && userAchievementByAchievement?.length > 0; else noAchievements">
+						<div *ngFor="let achievement of userAchievementByAchievementDtos$ | async">
+							<div style="text-align: center;">
+								<div>
+									<img [src]="achievement.imagePath" style="height: 30px;" alt="_1">
+								</div>
+								<div class="mt-2">
+									Ad : <label>{{achievement.name}}</label>
+								</div>
+								<div>
+									<label>{{achievement.reward}}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ng-container>
 
-                <ng-template #noAchievements>
-                    Achievement not found
-                </ng-template>
-            </div>
-        </div>
-        <div>
-            <p-dialog header="Oyun Geçmişi" [(visible)]="gameHistoryDialogVisible" [style]="{width: '90vw'}">
-                <p-table *ngIf="userGameHistoryDtosSubject | async" [value]="userGameHistoryDtosSubject | async"
-                    [itemSize]="50" scrollHeight="200px" styleClass="border-1 surface-border"
-                    [style]="{'min-width': '50rem', 'height': '200px'}">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th>Ev Sahibi</th>
-                            <th>Konuk</th>
-                            <th>Bitiş Tarihi</th>
-                            <th>Başlangıç Zamanı</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-history>
-                        <tr>
-                            <td>{{history.userHostNickName}}</td>
-                            <td>{{history.userGuestNickName}}</td>
-                            <td>{{history.finishDate}}</td>
-                            <td>{{history.updateTime}}</td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </p-dialog>
-        </div>
-    </main>
+				<ng-template #noAchievements>
+					Achievement not found
+				</ng-template>
+			</div>
+		</div>
+		<div>
+			<p-dialog header="Oyun Geçmişi" [(visible)]="gameHistoryDialogVisible" [style]="{width: '90vw'}">
+				<p-table *ngIf="userGameHistoryDtosSubject | async" [value]="userGameHistoryDtosSubject | async"
+					[itemSize]="50" scrollHeight="200px" styleClass="border-1 surface-border"
+					[style]="{'min-width': '50rem', 'height': '200px'}">
+					<ng-template pTemplate="header">
+						<tr>
+							<th>Ev Sahibi</th>
+							<th>Konuk</th>
+							<th>Bitiş Tarihi</th>
+							<th>Başlangıç Zamanı</th>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="body" let-history>
+						<tr>
+							<td>{{history.userHostNickName}}</td>
+							<td>{{history.userGuestNickName}}</td>
+							<td>{{history.finishDate}}</td>
+							<td>{{history.updateTime}}</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</p-dialog>
+		</div>
+	</main>
 </body>
 
 </html>

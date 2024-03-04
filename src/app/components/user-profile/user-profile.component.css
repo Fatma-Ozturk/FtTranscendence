@@ -124,6 +124,13 @@ body {
     width: 100%;
 }
 
+.add-friend-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    margin: 8px 0;
+    width: 100%;
+}
 
 .history-container {
     display: flex;

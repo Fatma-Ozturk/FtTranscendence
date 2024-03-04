@@ -1,3 +1,4 @@
+import { GameService } from './../../services/game.service';
 import { UserInfoService } from 'src/app/services/user-info.service';
 import { UserAchievementService } from './../../services/user-achievement.service';
 import { UserAchievement } from './../../models/entities/userAchievement';
@@ -8,7 +9,7 @@ import { GameHistoryService } from './../../services/game-history.service';
 import { GameHistory } from './../../models/entities/gameHistory';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from 'src/app/services/user.service';
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { User } from 'src/app/models/entities/user';
 import { Messages } from 'src/app/constants/Messages';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,13 +23,15 @@ import { UserAchievementByAchievementDto } from 'src/app/models/dto/userAchievem
 import { UserBlockService } from 'src/app/services/user-block.service';
 import { UserBlock } from 'src/app/models/entities/userBlock';
 import { UserInfo } from 'src/app/models/entities/userInfo';
+import { UserFriendService } from 'src/app/services/user-friend.service';
+import { UserFriend } from 'src/app/models/entities/userFriend';
 
 @Component({
 	selector: 'app-user-profile',
 	templateUrl: './user-profile.component.html',
 	styleUrls: ['./user-profile.component.css']
 })
-export class UserProfileComponent implements OnInit, AfterViewInit {
+export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
 	userGameHistoryDtosSubject = new BehaviorSubject<GameHistoryDto[]>([]);
 	userGameHistoryDtos$ = this.userGameHistoryDtosSubject.asObservable();
 
@@ -57,6 +60,12 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 	userBlock: UserBlock;
 	isUserBlock: boolean = false;
 
+	userFriendSubject = new BehaviorSubject<UserFriend | null>(null);
+	userFriend$ = this.userFriendSubject.asObservable();
+	userFriend: UserFriend | null = null;
+
+	userStatus: 'success' | 'info' | 'warning' | 'danger' | null | undefined = 'success';
+	userStatusMessage: string = "Kullanıcı oyun oynamıyor";
 	constructor(
 		private userService: UserService,
 		private userInfoService: UserInfoService,
@@ -65,12 +74,19 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 		private achievementRuleService: AchievementRuleService,
 		private userAchievementService: UserAchievementService,
 		private userBlockService: UserBlockService,
+		private userFriendService: UserFriendService,
+		private gameService: GameService,
 		private toastrService: ToastrService,
 		private route: ActivatedRoute,
 		private router: Router,
 		private authService: AuthService,
 		private cdr: ChangeDetectorRef) {
 
+	}
+	ngOnDestroy(): void {
+		this.gameService.removeIsUserInRoom();
+		this.gameService.removeIsUserInRoomResponse();
+		this.gameService.disconnectSocket();
 	}
 
 	ngOnInit(): void {
@@ -93,7 +109,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 				switchMap((params: any) => {
 					this.profileUrl = this.userInfoService.getProfileImage(params.data.profileImagePath);
 					return this.userService.getByNickName(this.nickName);
-				})
+				}),
 			)
 			.subscribe({
 				next: (response: any) => {
@@ -101,6 +117,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 						this.profileUserId = Number(response.data.id);
 						this.editProfileVisible = (this.currentUserId == response.data.id);
 						this.userSubject.next(response.data);
+						this.getFriend(response.data.id);
 						this.getUserGameHistoryDtos(response.data.id);
 					} else {
 						throw new Error('User not found');
@@ -110,10 +127,14 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 					this.toastrService.error(Messages.error);
 				}
 			});
+			this.getGameUserInRoomResponse();
 	}
 
 	ngAfterViewInit(): void {
 		this.user$.subscribe(response => {
+			if (response){
+				this.getUserStatus(response.id);
+			}
 		});
 		this.getAllUserAchievementByAchievementDtoWithUserId(this.currentUserId);
 		this.userBlock$.subscribe(response => {
@@ -221,6 +242,59 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 		})
 	}
 
+	getFriend(targetUserId: number) {
+		let userFriend: UserFriend = {
+			id: 0,
+			fromUserId: Number(this.currentUserId),
+			targetUserId: targetUserId,
+			updateTime: new Date(),
+			status: true
+		};
+		return this.userFriendService.getByFromUserIdAndTargetUserId(userFriend).subscribe({
+			next: (response) => {
+				this.userFriendSubject.next(response.data);
+				this.userFriend = response.data;
+			},
+			error: () => {
+				this.userFriendSubject.next(null);
+			}
+		});
+	}
+
+	addFriend() {
+		let userFriend: UserFriend = {
+			id: 0,
+			fromUserId: this.currentUserId,
+			targetUserId: this.profileUserId,
+			updateTime: new Date(),
+			status: true
+		};
+		this.userFriendService.add(userFriend).subscribe({
+			next: (response) => {
+				if (response.success) {
+					Messages.userFriendAdded;
+					this.getFriend(this.profileUserId);
+				}
+			},
+			error: () => {
+			}
+		});
+	}
+
+	deleteFriend(id: number) {
+		if (this.userFriend == null || this.userFriend === undefined) return;
+		this.userFriendService.delete(id).subscribe({
+			next: (response) => {
+				if (response.success) {
+					Messages.userFriendDelete;
+					this.getFriend(this.profileUserId);
+				}
+			},
+			error: () => {
+			}
+		});
+	}
+
 	getUserInfoByNickName(nickName: string) {
 		this.userInfoService.getByNickName(nickName).subscribe({
 			next: (response) => {
@@ -230,6 +304,29 @@ export class UserProfileComponent implements OnInit, AfterViewInit {
 			},
 			error: () => {
 				// this.toastrService.error(Messages.error);
+			}
+		});
+	}
+
+	getUserStatus(profileUserId: number) {
+		console.log("profileUserId: ", profileUserId);
+
+		this.gameService.connectSocket();
+		this.gameService.sendIsUserInRoom({userId: profileUserId});
+	}
+
+	getGameUserInRoomResponse(){
+		this.gameService.getIsUserInRoomResponse().subscribe({
+			next: (response: any) => {
+				console.log("response: ", response);
+
+				if (response.message && response.message === "UserInRoom"){
+					this.userStatus = 'success';
+					this.userStatusMessage = "Kullanıcı oyun oynuyor";
+				}else if (response.message && response.message === "UserNotInRoom"){
+					this.userStatusMessage = "Kullanıcı oyun oynamıyor";
+					this.userStatus = 'warning';
+				}
 			}
 		});
 	}

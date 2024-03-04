@@ -34,5 +34,7 @@ export class Messages {
 	public static readonly twoFAError: string = "İki faktörlü kimlik doğrulama hatası";
 	public static readonly twoFAPassError: string= "Doğrulama kodu hatalı";
 	public static readonly twoFASuccess: string= "Doğrulama başarılı";
-	public static readonly  newAchievement: string= "Yeni başarı kazandın";
+	public static readonly newAchievement: string= "Yeni başarı kazandın";
+	public static readonly userFriendAdded: string= "Arkadaş eklendi";
+	public static readonly userFriendDelete: string= "Arkadaş silindi";
 }
